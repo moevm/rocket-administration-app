@@ -1,5 +1,5 @@
 [project]
-name = "backend"
+name = "rocketapp"
 version = "0.1.0"
 description = ""
 authors = [
@@ -18,7 +18,7 @@ dependencies = [
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
-build-backend = "poetry.core.masonry.api"
+build-rocketapp = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-start = "backend.main:start"
+start = "rocketapp.main:start"

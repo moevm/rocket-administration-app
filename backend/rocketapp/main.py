@@ -10,4 +10,4 @@ async def root():
 
 
 def start():
-    uvicorn.run("backend.main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("rocketapp.main:app", host="0.0.0.0", port=8000, reload=True)
