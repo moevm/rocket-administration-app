@@ -19,11 +19,9 @@ services:
       - "0.0.0.0:3000:3000"
 
   mongodb:
-    image: docker.io/bitnami/mongodb:6.0
+    image: mongo:6.0.5
     restart: always
     volumes:
-      - mongodb_data:/bitnami/mongodb
-    environment:
-      ALLOW_EMPTY_PASSWORD: yes
-    ports:
+      - mongodb_data:/data/db  # Change the volume path to the default MongoDB data directory
+    ports: 
       - "0.0.0.0:27017:27017"
