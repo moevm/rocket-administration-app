@@ -7,7 +7,6 @@ services:
     restart: always
     environment:
       MONGO_URL: "mongodb://mongodb:27017/rocketchat"
-      MONGO_OPLOG_URL: "mongodb://mongodb:27017/local"
       ROOT_URL: http://localhost:3000
       PORT: 3000
       DEPLOY_METHOD: docker
