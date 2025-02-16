@@ -1,7 +1,7 @@
 import uvicorn
 from fastapi import FastAPI
 
-from rocketapp.db import database_lifespan
+from app.db import database_lifespan
 
 app = FastAPI(lifespan=database_lifespan)
 counter = 0
@@ -19,4 +19,4 @@ async def root():
 
 
 def start():
-    uvicorn.run("rocketapp.main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)

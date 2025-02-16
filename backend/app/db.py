@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from pymongo import AsyncMongoClient
 from pymongo.errors import ConnectionFailure
 
-from rocketapp.config import settings
+from app.config import settings
 
 @asynccontextmanager
 async def database_lifespan(app: FastAPI):
