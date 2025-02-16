@@ -10,6 +10,9 @@ services:
       ROOT_URL: http://localhost:3000
       PORT: 3000
       DEPLOY_METHOD: docker
+      ADMIN_USERNAME: rocketadmin
+      ADMIN_PASS: admin
+      ADMIN_EMAIL: admin@example.com
     depends_on:
       - mongodb
     expose:
