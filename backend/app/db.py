@@ -1,18 +1,17 @@
 import sys
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
 from pymongo import AsyncMongoClient
 from pymongo.errors import ConnectionFailure
 
 from app.config import settings
 
+mongodb_client = AsyncMongoClient(settings.mongo.uri)
+
 @asynccontextmanager
-async def database_lifespan(app: FastAPI):
+async def database_lifespan(_):
     try:
-        mongodb_client = AsyncMongoClient(settings.mongo.uri)
         await mongodb_client.aconnect()
-        app.db = mongodb_client[settings.mongo.database]
     except ConnectionFailure as e:
         print("Could not connect to MongoDB:", e)
         sys.exit(1)
@@ -20,3 +19,6 @@ async def database_lifespan(app: FastAPI):
     yield
 
     await mongodb_client.aclose()
+
+async def get_db():
+    return mongodb_client[settings.mongo.database]
