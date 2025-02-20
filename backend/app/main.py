@@ -68,16 +68,17 @@ async def create_space(create_space_request: CreateSpaceRequest, db=Depends(get_
         )
 
         response = rocket.me()
-        if response.status_code == 200 and response.json()['success'] == False:
+        if not (response.status_code == 200 and response.json()['success'] == True):
             raise HTTPException(status_code=400, detail="Ошибка авторизации")
     except RocketAuthenticationException:
         raise HTTPException(status_code=400, detail="Неверные учетные данные")
     except RocketConnectionException:
         raise HTTPException(status_code=400, detail="Недействительный URL или проблема с подключением к серверу")
+    except HTTPException as e:
+        raise e
     except Exception as e:
         # TODO middleware
-        if e is not HTTPException:
-            raise HTTPException(status_code=500)
+        raise HTTPException(status_code=500)
 
     space = SpaceModel.model_validate(create_space_request.model_dump(mode='json'))
     insert_result = await db.spaces.insert_one(space.model_dump(mode='json'))
