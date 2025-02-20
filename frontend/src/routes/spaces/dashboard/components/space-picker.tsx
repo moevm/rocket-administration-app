@@ -5,9 +5,9 @@ import {
     DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator,
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu.tsx";
-import {$selectedSpaceId, $spaces} from "@/routes/global-store.ts";
+import {$spaces} from "@/routes/global-store.ts";
 import {$selectedSpace} from "@/routes/global-store.ts";
-import {useAtom, useAtomValue} from "jotai";
+import {useAtomValue} from "jotai";
 import {useNavigate} from "react-router";
 
 
@@ -56,7 +56,10 @@ function SpacePicker(){
                             </DropdownMenuItem>
                         ))}
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="gap-2 p-2 flex justify-between">
+                        <DropdownMenuItem
+                            onClick={() => navigate(`/register-space`)}
+                            className="gap-2 p-2 flex justify-between"
+                        >
                             <div className="bg-background flex size-6 items-center justify-center rounded-md border">
                                 <Plus className="size-4" />
                             </div>

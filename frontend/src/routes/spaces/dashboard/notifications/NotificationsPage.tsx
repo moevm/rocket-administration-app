@@ -1,6 +1,3 @@
-import {Outlet} from "react-router";
-
-
 function NotificationsPage() {
     return (
         <>

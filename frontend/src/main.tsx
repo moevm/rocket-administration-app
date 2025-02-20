@@ -1,26 +1,40 @@
 import {createRoot} from 'react-dom/client'
 import './index.css'
-import {BrowserRouter, Route, Routes} from "react-router";
-import MainPage from "@/routes/MainPage.tsx";
-import DashboardLayout from "@/routes/dashboard/DashboardLayout.tsx";
-import {useAtomValue} from "jotai";
-import {$selectedSpaceId} from "@/routes/global-store.ts";
+import {BrowserRouter, Navigate, Route, Routes} from "react-router";
+import DashboardLayout from "@/routes/spaces/dashboard/DashboardLayout.tsx";
 import SpaceLayout from "@/routes/spaces/SpaceLayout.tsx";
-import UsersPage from "@/routes/users/UsersPage.tsx";
-import RoomsPage from "@/routes/rooms/RoomsPage.tsx";
-import NotificationsPage from "@/routes/notifications/NotificationsPage.tsx";
+import UsersPage from "@/routes/spaces/dashboard/users/UsersPage.tsx";
+import RoomsPage from "@/routes/spaces/dashboard/rooms/RoomsPage.tsx";
+import NotificationsPage from "@/routes/spaces/dashboard/notifications/NotificationsPage.tsx";
+import NotFound from "@/routes/not-found/NotFound.tsx";
+import RegisterSpace from "@/routes/register-space/RegisterSpace.tsx";
+import i18next from "i18next";
+import {z} from "zod";
+import {zodI18nMap} from "zod-i18n-map";
+import translation from "zod-i18n-map/locales/ru/zod.json";
 
+i18next.init({
+    lng: "ru",
+    resources: {
+        ru: {zod: translation},
+    },
+});
+z.setErrorMap(zodI18nMap);
 
 createRoot(document.getElementById('root')!).render(
     <BrowserRouter>
         <Routes>
-            <Route path={`spaces/:spaceId`} element={<SpaceLayout/>}>
+            <Route path="spaces/:spaceId" element={<Navigate relative="path" to="dashboard" replace/>}/>
+            <Route path="spaces/:spaceId" element={<SpaceLayout/>}>
+                <Route path="dashboard" element={<Navigate relative="path" to="users" replace/>}/>
                 <Route path="dashboard" element={<DashboardLayout/>}>
                     <Route path="users" element={<UsersPage/>}/>
                     <Route path="rooms" element={<RoomsPage/>}/>
                     <Route path="notifications" element={<NotificationsPage/>}/>
                 </Route>
             </Route>
+            <Route path="register-space" element={<RegisterSpace/>}/>
+            <Route path="*" element={<NotFound/>}/>
         </Routes>
     </BrowserRouter>
 )
