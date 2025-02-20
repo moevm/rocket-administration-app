@@ -7,7 +7,7 @@ const MainPage = () => {
     const [count, setCount] = useAtom(countAtom)
     return (
         <>
-            <Button onClick={() => setCount(count + 1)}>Count: {count}</Button>
+            <Button className={"flex justify-center h-full "} onClick={() => setCount(count + 1)}>Count: {count}</Button>
         </>
     )
 }
