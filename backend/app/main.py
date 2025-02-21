@@ -1,6 +1,6 @@
-from typing import Annotated, Any, Union, Optional
+from asyncio import to_thread
+from typing import Annotated, Any, Union, Optional, TypeVar, Type
 
-import uvicorn
 from bson import ObjectId
 from fastapi import FastAPI, Depends, HTTPException
 from pydantic import BaseModel, HttpUrl, AfterValidator, PlainSerializer, WithJsonSchema, Field, ConfigDict
@@ -8,6 +8,8 @@ from rocketchat_API.APIExceptions.RocketExceptions import RocketConnectionExcept
 from rocketchat_API.rocketchat import RocketChat
 
 from app.db import database_lifespan, get_db
+from app.logging import setup_logging
+
 
 def validate_object_id(v: Any) -> ObjectId:
     if isinstance(v, ObjectId):
@@ -43,31 +45,30 @@ class SpaceModel(DbModel):
 class SpaceDto(SpaceModel):
     pass
 
-app = FastAPI(lifespan=database_lifespan)
-counter = 0
+T = TypeVar('T', bound=BaseModel)
+V = TypeVar('V', bound=BaseModel)
+def convert_model(target_model_class: Type[T], input_model: V) -> T:
+    return target_model_class.model_validate(input_model.model_dump(mode='json', by_alias=True))
 
-@app.get("/")
-async def root(db=Depends(get_db)):
-    global counter
-    await db.testcollection.insert_one({"id": counter, "biba": "boba"})
-    counter += 1
-    results = []
-    async for doc in db.testcollection.find():
-        doc.pop("_id")
-        results.append(doc)
-    return results
+setup_logging()
+app = FastAPI(lifespan=database_lifespan)
+
+@app.get("/_health")
+async def health():
+    return "ok"
 
 @app.post("/spaces")
 async def create_space(create_space_request: CreateSpaceRequest, db=Depends(get_db)) -> SpaceDto:
     try:
         # TODO async
-        rocket = RocketChat(
+        rocket = await to_thread(
+            RocketChat,
             user=create_space_request.login,
             password=create_space_request.password,
             server_url=str(create_space_request.url)
         )
 
-        response = rocket.me()
+        response = await to_thread(rocket.me)
         if not (response.status_code == 200 and response.json()['success'] == True):
             raise HTTPException(status_code=400, detail="Ошибка авторизации")
     except RocketAuthenticationException:
@@ -80,20 +81,15 @@ async def create_space(create_space_request: CreateSpaceRequest, db=Depends(get_
         # TODO middleware
         raise HTTPException(status_code=500)
 
-    space = SpaceModel.model_validate(create_space_request.model_dump(mode='json'))
+    space = convert_model(SpaceModel, create_space_request)
     insert_result = await db.spaces.insert_one(space.model_dump(mode='json'))
     space_model = SpaceModel.model_validate(await db.spaces.find_one({"_id": insert_result.inserted_id}))
-    return SpaceDto.model_validate(space_model.model_dump(mode='json', by_alias=True))
+    return convert_model(SpaceDto, space_model)
 
 
 @app.get("/spaces")
 async def get_spaces(db=Depends(get_db)):
     result = []
     async for doc in db.spaces.find():
-        space_model = SpaceModel.model_validate(doc)
-        result.append(SpaceDto.model_validate(space_model.model_dump(mode='json', by_alias=True)))
+        result.append(convert_model(SpaceDto, SpaceModel.model_validate(doc)))
     return result
-
-
-def start():
-    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
