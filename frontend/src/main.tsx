@@ -12,6 +12,7 @@ import i18next from "i18next";
 import {z} from "zod";
 import {zodI18nMap} from "zod-i18n-map";
 import translation from "zod-i18n-map/locales/ru/zod.json";
+import WelcomePage from "@/routes/welcome-page/WelcomePage.tsx";
 
 i18next.init({
     lng: "ru",
@@ -24,6 +25,7 @@ z.setErrorMap(zodI18nMap);
 createRoot(document.getElementById('root')!).render(
     <BrowserRouter>
         <Routes>
+            <Route path="welcome" element={<WelcomePage/>}/>
             <Route path="spaces/:spaceId" element={<Navigate relative="path" to="dashboard" replace/>}/>
             <Route path="spaces/:spaceId" element={<SpaceLayout/>}>
                 <Route path="dashboard" element={<Navigate relative="path" to="users" replace/>}/>
