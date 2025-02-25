@@ -1,6 +1,6 @@
 import logging
 from asyncio import to_thread
-from typing import Annotated, Any, Union, Optional, TypeVar, Type
+from typing import Annotated, Any, Union, Optional, TypeVar, Type, List
 
 from bson import ObjectId
 from fastapi import FastAPI, Depends, HTTPException
@@ -91,7 +91,7 @@ async def create_space(create_space_request: CreateSpaceRequest, db=Depends(get_
 
 
 @app.get("/spaces")
-async def get_spaces(db=Depends(get_db)):
+async def get_spaces(db=Depends(get_db)) -> List[SpaceDto]:
     result = []
     async for doc in db.spaces.find():
         result.append(convert_model(SpaceDto, SpaceModel.model_validate(doc)))
