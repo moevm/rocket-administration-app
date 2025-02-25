@@ -16,7 +16,7 @@
 - [Google диск](https://drive.google.com/drive/folders/17UqM0HQxNNSFASZToOG31zvY4lBywogW?usp=sharing)
 
 ## Созвоны
-- 19.02 "Установочный созвон с заказчиком" - [Видео созвона](https://drive.google.com/file/d/1fuV6T1Pz0x65xq_crpFkzh3fJxcRnu-M/view?usp=drive_link)
+- 19.02 "Установочный созвон с заказчиком" - [Видео созвона](https://drive.google.com/file/d/1fuV6T1Pz0x65xq_crpFkzh3fJxcRnu-M/view?usp=drive_link),[Протокол созвона](https://docs.google.com/document/d/13HYdbLqcll7nwrs00wcXWWKeJ4-dftQDDA2424svJtc/edit?usp=drive_link)
 
 ## Итерации
 - [Итерация 1](https://drive.google.com/drive/folders/1cgXuRVM2eAp7yFS5OYtudYH-PBtbQSNq?usp=sharing)
