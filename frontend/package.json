@@ -20,6 +20,7 @@
   },
   "private": true,
   "scripts": {
+    "openapi:generate": "bun run openapi-typescript openapi.json -o ./src/schema.d.ts",
     "dev": "vite --mode development",
     "build": "vite build",
     "lint": "eslint .",
@@ -38,6 +39,7 @@
     "clsx": "^2.1.1",
     "jotai": "^2.12.0",
     "lucide-react": "^0.475.0",
+    "openapi-typescript": "^7.6.1",
     "react": "18",
     "react-dom": "18",
     "react-hook-form": "^7.54.2",
