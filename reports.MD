@@ -20,9 +20,9 @@
 
 В результате проекта администраторы получат эффективное веб-приложение, которое позволит автоматизировать множество рутинных задач и упростит процессы работы с пользователями и пространствами.
 
-Собранные и проанализированные требования [Ссылка на файл](https://docs.google.com/spreadsheets/d/1kFtNcfJ5LSXiRemEKN3Jp4_cDXKjKZzD_wAxjGqOEXo/edit?usp=drive_link)
+### Собранные и проанализированные требования [Ссылка на файл](https://docs.google.com/spreadsheets/d/1kFtNcfJ5LSXiRemEKN3Jp4_cDXKjKZzD_wAxjGqOEXo/edit?usp=drive_link)
 
-**Все файлы, которые представлены внешними ссылками, продублированы тут: [Перейти в папку "files"](docs/files/)**
+### Все файлы, которые представлены внешними ссылками, продублированы тут: [Перейти в папку "files"](docs/files/)
 
 ## Важные ссылки по проекту:
 - [Google диск](https://drive.google.com/drive/folders/17UqM0HQxNNSFASZToOG31zvY4lBywogW?usp=sharing)
@@ -30,7 +30,7 @@
 ## Созвоны
 - 19.02 "Установочный созвон с заказчиком" - [Видео созвона](https://drive.google.com/file/d/1fuV6T1Pz0x65xq_crpFkzh3fJxcRnu-M/view?usp=drive_link),[Протокол созвона](https://docs.google.com/document/d/13HYdbLqcll7nwrs00wcXWWKeJ4-dftQDDA2424svJtc/edit?usp=drive_link)
 
-## Итерации
+## Презентационные материалы по итерациям
 - [Итерация 1](https://drive.google.com/drive/folders/1cgXuRVM2eAp7yFS5OYtudYH-PBtbQSNq?usp=sharing)
 
 ## Макет проекта в фигме
@@ -40,6 +40,12 @@
 ![maket_2](docs/images/maket_2.png)
 ![maket_3](docs/images/maket_3.png)
 ![maket_4](docs/images/maket_4.png)
+![maket_5](docs/images/maket_5.png)
+![maket_6](docs/images/maket_6.png)
+![maket_7](docs/images/maket_7.png)
+![maket_8](docs/images/maket_8.png)
+![maket_9](docs/images/maket_9.png)
+![maket_10](docs/images/maket_10.png)
 
 ## Сценарии использования
 
