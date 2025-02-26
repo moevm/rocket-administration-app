@@ -1,5 +1,6 @@
+import logging
 from asyncio import to_thread
-from typing import Annotated, Any, Union, Optional, TypeVar, Type
+from typing import Annotated, Any, Union, Optional, TypeVar, Type, List
 
 from bson import ObjectId
 from fastapi import FastAPI, Depends, HTTPException
@@ -8,8 +9,8 @@ from rocketchat_API.APIExceptions.RocketExceptions import RocketConnectionExcept
 from rocketchat_API.rocketchat import RocketChat
 
 from app.db import database_lifespan, get_db
-from app.logging import setup_logging
 
+logger = logging.getLogger(__name__)
 
 def validate_object_id(v: Any) -> ObjectId:
     if isinstance(v, ObjectId):
@@ -49,8 +50,6 @@ T = TypeVar('T', bound=BaseModel)
 V = TypeVar('V', bound=BaseModel)
 def convert_model(target_model_class: Type[T], input_model: V) -> T:
     return target_model_class.model_validate(input_model.model_dump(mode='json', by_alias=True))
-
-setup_logging()
 app = FastAPI(lifespan=database_lifespan)
 
 @app.get("/_health")
@@ -60,7 +59,6 @@ async def health():
 @app.post("/spaces")
 async def create_space(create_space_request: CreateSpaceRequest, db=Depends(get_db)) -> SpaceDto:
     try:
-        # TODO async
         rocket = await to_thread(
             RocketChat,
             user=create_space_request.login,
@@ -71,6 +69,10 @@ async def create_space(create_space_request: CreateSpaceRequest, db=Depends(get_
         response = await to_thread(rocket.me)
         if not (response.status_code == 200 and response.json()['success'] == True):
             raise HTTPException(status_code=400, detail="Ошибка авторизации")
+
+        if not 'admin' in response.json()['roles']:
+            raise HTTPException(status_code=400, detail="Пользователь должен быть админом")
+
     except RocketAuthenticationException:
         raise HTTPException(status_code=400, detail="Неверные учетные данные")
     except RocketConnectionException:
@@ -78,6 +80,7 @@ async def create_space(create_space_request: CreateSpaceRequest, db=Depends(get_
     except HTTPException as e:
         raise e
     except Exception as e:
+        print(e)
         # TODO middleware
         raise HTTPException(status_code=500)
 
@@ -88,7 +91,7 @@ async def create_space(create_space_request: CreateSpaceRequest, db=Depends(get_
 
 
 @app.get("/spaces")
-async def get_spaces(db=Depends(get_db)):
+async def get_spaces(db=Depends(get_db)) -> List[SpaceDto]:
     result = []
     async for doc in db.spaces.find():
         result.append(convert_model(SpaceDto, SpaceModel.model_validate(doc)))
