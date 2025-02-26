@@ -10,9 +10,11 @@
 
 В результате проекта администраторы получат эффективное веб-приложение, которое позволит автоматизировать множество рутинных задач и упростит процессы работы с пользователями и пространствами.
 
-Собранные и проанализированные требования [Файл](https://docs.google.com/spreadsheets/d/1kFtNcfJ5LSXiRemEKN3Jp4_cDXKjKZzD_wAxjGqOEXo/edit?usp=drive_link)
+Собранные и проанализированные требования [Ссылка на файл](https://docs.google.com/spreadsheets/d/1kFtNcfJ5LSXiRemEKN3Jp4_cDXKjKZzD_wAxjGqOEXo/edit?usp=drive_link)
 
-## Важные ссылки по проекту {#важные-ссылки}:
+**Все файлы, которые представлены внешними ссылками, продублированы тут: [Перейти в папку "files"](docs/files/)**
+
+## Важные ссылки по проекту:
 - [Google диск](https://drive.google.com/drive/folders/17UqM0HQxNNSFASZToOG31zvY4lBywogW?usp=sharing)
 
 ## Созвоны
@@ -24,10 +26,10 @@
 ## Макет проекта в фигме
 [Ссылка на макет](https://www.figma.com/design/1Fm0lzr0mrgXzQTRJC4MYu/RocketManager?node-id=0-1&t=BaHwGUoHsekZdO76-1)
 
-![maket_1](images/maket_1.png)
-![maket_2](images/maket_2.png)
-![maket_3](images/maket_3.png)
-![maket_4](images/maket_4.png)
+![maket_1](docs/images/maket_1.png)
+![maket_2](docs/images/maket_2.png)
+![maket_3](docs/images/maket_3.png)
+![maket_4](docs/images/maket_4.png)
 
 ## Сценарии использования
 
