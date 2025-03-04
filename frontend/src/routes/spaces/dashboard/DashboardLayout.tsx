@@ -1,5 +1,5 @@
 import { Outlet } from "react-router";
-import {SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar.tsx";
+import {SidebarProvider} from "@/components/ui/sidebar.tsx";
 import AppSidebar from "@/routes/spaces/dashboard/components/app-sidebar.tsx";
 import {useAtomValue} from "jotai";
 import {$selectedSpace} from "@/routes/global-store.ts";
