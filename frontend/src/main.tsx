@@ -15,6 +15,7 @@ import translation from "zod-i18n-map/locales/ru/zod.json";
 import {HydrateAtoms, queryClient} from "@/api";
 import {Provider} from 'jotai/react'
 import {QueryClientProvider} from '@tanstack/react-query'
+import WelcomePage from "@/routes/welcome-page/WelcomePage.tsx";
 
 i18next.init({
     lng: "ru",
@@ -30,6 +31,7 @@ createRoot(document.getElementById('root')!).render(
             <HydrateAtoms>
                 <BrowserRouter>
                     <Routes>
+                        <Route path="welcome" element={<WelcomePage/>}/>
                         <Route path="spaces/:spaceId" element={<Navigate relative="path" to="dashboard" replace/>}/>
                         <Route path="spaces/:spaceId" element={<SpaceLayout/>}>
                             <Route path="dashboard" element={<Navigate relative="path" to="users" replace/>}/>
