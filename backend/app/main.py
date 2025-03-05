@@ -2,6 +2,7 @@ import logging
 from asyncio import to_thread
 from typing import Annotated, Any, Union, Optional, TypeVar, Type, List
 
+import requests.exceptions
 from bson import ObjectId
 from fastapi import FastAPI, Depends, HTTPException
 from pydantic import BaseModel, HttpUrl, AfterValidator, PlainSerializer, WithJsonSchema, Field, ConfigDict
@@ -90,12 +91,12 @@ async def create_space(create_space_request: CreateSpaceRequest, db=Depends(get_
 
     except RocketAuthenticationException:
         raise HTTPException(status_code=400, detail="Неверные учетные данные")
-    except RocketConnectionException:
+    except (RocketConnectionException, requests.exceptions.ConnectionError):
         raise HTTPException(status_code=400, detail="Недействительный URL или проблема с подключением к серверу")
     except HTTPException as e:
         raise e
     except Exception as e:
-        print(e)
+        print(type(e), e)
         # TODO middleware
         raise HTTPException(status_code=500)
 
