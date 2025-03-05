@@ -12,7 +12,8 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {useForm} from "react-hook-form";
 import {Input} from "@/components/ui/input.tsx";
 import {Card, CardContent, CardHeader} from "@/components/ui/card.tsx";
-import {$api} from "@/api";
+import {$api, createMutationOptions} from "@/api";
+import * as url from "url";
 
 const formSchema = z.object({
     //TODO validation
@@ -23,6 +24,8 @@ const formSchema = z.object({
 })
 
 function RegisterSpace() {
+    const {mutate} = $api.useMutation('post', '/spaces', createMutationOptions())
+
     const form = useForm<z.infer<typeof formSchema>>({
         reValidateMode: "onChange",
         mode: "all",
@@ -32,8 +35,14 @@ function RegisterSpace() {
     function onSubmit(values: z.infer<typeof formSchema>) {
         // TODO registration new space
         console.log(values)
-
-        $api.queryOptions('post', '/spaces'))
+        mutate({
+            body: {
+                url: values.url,
+                login: values.login,
+                password: values.password,
+                name: values.name
+            },
+        });
     }
 
 
