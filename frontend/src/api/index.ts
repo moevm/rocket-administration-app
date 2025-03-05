@@ -35,3 +35,21 @@ export function loadableQuery<Value>(anAtom: Atom<AtomWithQueryResult<Awaited<Va
         return await get(anAtom).promise
     }))
 }
+
+// TODO show loader & toast
+export function createMutationOptions<D, E, I>(options?: Omit<UseMutationOptions<D, E, I>, "mutationKey" | "mutationFn">): Omit<UseMutationOptions<D, E, I>, "mutationKey" | "mutationFn"> {
+    return {
+        onMutate: (variables) => {
+            console.log('about to mutate', {variables})
+            if (options?.onMutate) options.onMutate(variables)
+        },
+        onError: (error, variables, context) => {
+            console.log(`mutation error`, {error, variables, context})
+            if (options?.onError) options.onError(error, variables, context)
+        },
+        onSuccess: (data, variables, context) => {
+            console.log('mutation success', {data, variables, context})
+            if (options?.onSuccess) options.onSuccess(data, variables, context)
+        },
+    }
+}

@@ -12,6 +12,7 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {useForm} from "react-hook-form";
 import {Input} from "@/components/ui/input.tsx";
 import {Card, CardContent, CardHeader} from "@/components/ui/card.tsx";
+import {$api} from "@/api";
 
 const formSchema = z.object({
     //TODO validation
@@ -31,6 +32,8 @@ function RegisterSpace() {
     function onSubmit(values: z.infer<typeof formSchema>) {
         // TODO registration new space
         console.log(values)
+
+        $api.queryOptions('post', '/spaces'))
     }
 
 
