@@ -3,10 +3,12 @@ from typing import Annotated, Any, Union, Optional, TypeVar, Type
 
 from bson import ObjectId
 from fastapi import FastAPI, Depends, HTTPException
-from pydantic import BaseModel, HttpUrl, AfterValidator, PlainSerializer, WithJsonSchema, Field, ConfigDict
+from pydantic import BaseModel, HttpUrl, AfterValidator, PlainSerializer, WithJsonSchema, Field, ConfigDict, EmailStr
 from rocketchat_API.APIExceptions.RocketExceptions import RocketConnectionException, RocketAuthenticationException
 from rocketchat_API.rocketchat import RocketChat
+from aiosmtplib import SMTP
 
+from app.config import settings
 from app.db import database_lifespan, get_db
 from app.logging import setup_logging
 
@@ -56,6 +58,27 @@ app = FastAPI(lifespan=database_lifespan)
 @app.get("/_health")
 async def health():
     return "ok"
+
+class EmailRequest(BaseModel):
+    subject: str
+    recipient: EmailStr
+    body: str
+
+@app.post("/send-email")
+async def send_email(email_request: EmailRequest):
+    try:
+        async with SMTP(hostname=settings.smtp.host, port=settings.smtp.port) as smtp:
+            print(settings.smtp.user, settings.smtp.password)
+            await smtp.login(settings.smtp.user, settings.smtp.password)
+
+            message = f"Subject: {email_request.subject}\n\n{email_request.body}"
+            await smtp.sendmail(settings.smtp.user, email_request.recipient, message)
+
+        return {"detail": "Email sent successfully"}
+    except Exception as e:
+        print(type(e), e)
+        raise HTTPException(status_code=500, detail=f"Error sending email: {str(e)}")
+
 
 @app.post("/spaces")
 async def create_space(create_space_request: CreateSpaceRequest, db=Depends(get_db)) -> SpaceDto:
