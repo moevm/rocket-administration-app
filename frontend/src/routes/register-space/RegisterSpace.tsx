@@ -13,9 +13,10 @@ import {useForm} from "react-hook-form";
 import {Input} from "@/components/ui/input.tsx";
 import {Card, CardContent, CardHeader} from "@/components/ui/card.tsx";
 import {$api, createMutationOptions} from "@/api";
-import * as url from "url";
-import {Toaster} from "sonner";
 import {Loader2} from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query"
+import {$spaces, $spacesQuery, $spacesQueryOptions} from "@/routes/global-store.ts";
+import {useNavigate} from "react-router";
 
 const formSchema = z.object({
     //TODO validation
@@ -26,7 +27,15 @@ const formSchema = z.object({
 })
 
 function RegisterSpace() {
-    const {mutate, isPending} = $api.useMutation('post', '/spaces', createMutationOptions())
+
+    const navigate = useNavigate()
+    const queryClient = useQueryClient()
+    const {mutate, isPending} = $api.useMutation('post', '/spaces', createMutationOptions({
+        onSuccess: async (data, variables, context) => {
+            await queryClient.invalidateQueries($spacesQueryOptions.queryKey)
+            navigate(`/spaces/${data._id}`)
+        }
+    }))
 
     const form = useForm<z.infer<typeof formSchema>>({
         reValidateMode: "onChange",

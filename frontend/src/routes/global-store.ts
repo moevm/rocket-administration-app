@@ -3,7 +3,8 @@ import {$api, loadableQuery} from "@/api";
 import {atomWithQuery} from 'jotai-tanstack-query'
 import {loadable} from "jotai/utils";
 
-export const $spacesQuery = atomWithQuery(() => $api.queryOptions('get', '/spaces'))
+export const $spacesQueryOptions = $api.queryOptions('get', '/spaces')
+export const $spacesQuery = atomWithQuery(() => $spacesQueryOptions)
 export const $spaces = loadableQuery($spacesQuery)
 
 export const $selectedSpaceId = atom<string | null>(null)
