@@ -18,7 +18,6 @@ function SpaceLayout() {
     return (
         // TODO custom component
         <>
-            <Toaster />
             {selectedSpace.state === 'hasError' && <div>Error: {String(selectedSpace.error)}</div>}
             {selectedSpace.state === 'loading' && <div>Loading...</div>}
             {selectedSpace.state === 'hasData' && <Outlet/>}
