@@ -1,7 +1,6 @@
 import createFetchClient from "openapi-fetch";
 import createClient from "openapi-react-query";
 import {paths} from "@/schema";
-import {QueryClient} from '@tanstack/react-query'
 import {useHydrateAtoms} from "jotai/react/utils";
 import {queryClientAtom} from 'jotai-tanstack-query'
 import {ReactNode} from "react";
@@ -10,6 +9,9 @@ import {loadable} from "jotai/utils";
 import {AtomWithQueryResult} from "jotai-tanstack-query"
 import {atom} from "jotai";
 import {Loadable} from "jotai/vanilla/utils/loadable";
+import {QueryClient, UseMutationOptions} from '@tanstack/react-query'
+import {toast} from "sonner";
+
 
 export const queryClient = new QueryClient({
     defaultOptions: {
@@ -45,10 +47,14 @@ export function createMutationOptions<D, E, I>(options?: Omit<UseMutationOptions
         },
         onError: (error, variables, context) => {
             console.log(`mutation error`, {error, variables, context})
+            toast.error("Error")
             if (options?.onError) options.onError(error, variables, context)
         },
         onSuccess: (data, variables, context) => {
             console.log('mutation success', {data, variables, context})
+            toast.success("Success", {
+                description:"gooool"
+            })
             if (options?.onSuccess) options.onSuccess(data, variables, context)
         },
     }
