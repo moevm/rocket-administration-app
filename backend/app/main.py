@@ -7,7 +7,7 @@ from fastapi import FastAPI, Depends, HTTPException
 from pydantic import BaseModel, HttpUrl, AfterValidator, PlainSerializer, WithJsonSchema, Field, ConfigDict
 from rocketchat_API.APIExceptions.RocketExceptions import RocketConnectionException, RocketAuthenticationException
 from rocketchat_API.rocketchat import RocketChat
-
+from fastapi.middleware.cors import CORSMiddleware
 from app.db import database_lifespan, get_db
 
 logger = logging.getLogger(__name__)
@@ -52,9 +52,24 @@ def convert_model(target_model_class: Type[T], input_model: V) -> T:
     return target_model_class.model_validate(input_model.model_dump(mode='json', by_alias=True))
 app = FastAPI(lifespan=database_lifespan)
 
+#TODO: add to config
+
+origins = [
+    "*",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 @app.get("/_health")
 async def health():
     return "ok"
+
 
 @app.post("/spaces")
 async def create_space(create_space_request: CreateSpaceRequest, db=Depends(get_db)) -> SpaceDto:
