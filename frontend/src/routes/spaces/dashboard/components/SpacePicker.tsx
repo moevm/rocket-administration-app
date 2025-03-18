@@ -5,17 +5,15 @@ import {
     DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator,
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu.tsx";
-import {$spaces} from "@/routes/global-store.ts";
-import {$selectedSpace} from "@/routes/global-store.ts";
-import {useAtomValue} from "jotai";
 import {useNavigate} from "react-router";
+import {ApiSpaceModel} from "@/store/spaces.ts";
+import {cn} from "@/lib/utils.ts";
 
-
-
-function SpacePicker(){
+function SpacePicker(props: {
+    selectedSpace: ApiSpaceModel,
+    spaces: ApiSpaceModel[]
+}) {
     const { isMobile } = useSidebar()
-    const spaces = useAtomValue($spaces)
-    const selectedSpace = useAtomValue($selectedSpace)
     const navigate = useNavigate()
 
     return (
@@ -29,7 +27,7 @@ function SpacePicker(){
                         >
                             <div className="grid flex-1 text-left text-sm leading-tight">
                                 <span className="truncate font-semibold">
-                                    {selectedSpace.name}
+                                    {props.selectedSpace.name}
                                 </span>
                             </div>
                             <ChevronsUpDown className="ml-auto" />
@@ -45,11 +43,11 @@ function SpacePicker(){
                             Пространства
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator/>
-                        {spaces.map((space, index) => (
+                        {props.spaces.map((space) => (
                             <DropdownMenuItem
-                                key={space.id}
-                                onClick={() => navigate(`/spaces/${space.id}/dashboard`)}
-                                className="gap-2 p-2"
+                                key={space._id}
+                                onClick={() => navigate(`/spaces/${space._id}/dashboard`)}
+                                className={cn("gap-2 p-2 cursor-pointer", {"menu-item--active": space._id === props.selectedSpace._id})}
                             >
                                 {space.name}
 
@@ -58,7 +56,7 @@ function SpacePicker(){
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
                             onClick={() => navigate(`/register-space`)}
-                            className="gap-2 p-2 flex justify-between"
+                            className="gap-2 p-2 flex justify-between cursor-pointer"
                         >
                             <div className="bg-background flex size-6 items-center justify-center rounded-md border">
                                 <Plus className="size-4" />
