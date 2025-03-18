@@ -15,6 +15,7 @@ import {Card, CardContent, CardHeader} from "@/components/ui/card.tsx";
 import {$api, createMutationOptions} from "@/api";
 import * as url from "url";
 import {Toaster} from "sonner";
+import {Loader2} from "lucide-react";
 
 const formSchema = z.object({
     //TODO validation
@@ -25,12 +26,13 @@ const formSchema = z.object({
 })
 
 function RegisterSpace() {
-    const {mutate} = $api.useMutation('post', '/spaces', createMutationOptions())
+    const {mutate, isPending} = $api.useMutation('post', '/spaces', createMutationOptions())
 
     const form = useForm<z.infer<typeof formSchema>>({
         reValidateMode: "onChange",
         mode: "all",
         resolver: zodResolver(formSchema),
+        disabled: isPending
     })
 
     function onSubmit(values: z.infer<typeof formSchema>) {
@@ -108,7 +110,16 @@ function RegisterSpace() {
                                     </FormItem>
                                 )}
                             />
-                            <Button type="submit" className="w-full">Сохранить</Button>
+                            <Button type="submit" className="w-full" disabled={isPending}>
+                                {isPending
+                                    ? <>
+                                        <Loader2 className="animate-spin"/>
+                                        Please wait</>
+                                    : <>
+                                        Сохранить
+                                    </>
+                                }
+                            </Button>
                         </form>
                     </Form>
                 </CardContent>
