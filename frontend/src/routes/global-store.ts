@@ -21,3 +21,7 @@ export const $selectedSpace = loadable(atom(async (get) => {
    return result
 }))
 
+export const $usersQueryOptions = $api.queryOptions('get', `/spaces/{space_id}/users/`)
+export const $usersQuery = atomWithQuery(() => $usersQueryOptions)
+export const users = loadableQuery($usersQuery)
+

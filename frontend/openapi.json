@@ -21,16 +21,22 @@
         }
       }
     },
-    "/spaces": {
+    "/spaces/": {
       "get": {
         "summary": "Get Spaces",
-        "operationId": "get_spaces_spaces_get",
+        "operationId": "get_spaces_spaces__get",
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SpaceDto"
+                  },
+                  "type": "array",
+                  "title": "Response Get Spaces Spaces  Get"
+                }
               }
             }
           }
@@ -38,7 +44,7 @@
       },
       "post": {
         "summary": "Create Space",
-        "operationId": "create_space_spaces_post",
+        "operationId": "create_space_spaces__post",
         "requestBody": {
           "content": {
             "application/json": {
@@ -57,6 +63,43 @@
                 "schema": {
                   "$ref": "#/components/schemas/SpaceDto"
                 }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spaces/{space_id}/users/": {
+      "get": {
+        "summary": "Get Users",
+        "operationId": "get_users_spaces__space_id__users__get",
+        "parameters": [
+          {
+            "name": "space_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Space Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
               }
             }
           },
