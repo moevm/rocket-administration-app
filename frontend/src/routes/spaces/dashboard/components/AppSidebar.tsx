@@ -1,15 +1,19 @@
 import {Sidebar, SidebarContent, SidebarGroup, SidebarHeader} from "@/components/ui/sidebar.tsx"
 import {Button} from "@/components/ui/button.tsx";
 import {Mail, User, Users} from "lucide-react";
-import SpacePicker from "@/routes/spaces/dashboard/components/space-picker.tsx";
+import SpacePicker from "@/routes/spaces/dashboard/components/SpacePicker.tsx";
 import {NavLink} from "react-router";
+import {ApiSpaceModel} from "@/store/spaces.ts";
 
 
-function AppSidebar() {
+function AppSidebar(props: {
+    selectedSpace: ApiSpaceModel,
+    spaces: ApiSpaceModel[]
+}) {
     return (
         <Sidebar>
             <SidebarHeader>
-                <SpacePicker/>
+                <SpacePicker spaces={props.spaces} selectedSpace={props.selectedSpace} />
             </SidebarHeader>
             <SidebarContent>
                 <SidebarGroup>
