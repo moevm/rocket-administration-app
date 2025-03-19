@@ -1,6 +1,7 @@
 import {User} from "/types/user.ts";
 import {ColumnDef} from "@tanstack/table-core";
 import DataTableColumnHeader from "@/components/reusableComponents/DataTableColumnHeader.tsx";
+import {Checkbox} from "@/components/ui/checkbox.tsx";
 
 const customSortingFn = (rowA, rowB, columnId) => {
     console.log("RowA:", rowA.original);
@@ -27,17 +28,39 @@ const customSortingFn = (rowA, rowB, columnId) => {
 
 export const columnsUser: ColumnDef<User>[] = [
     {
-        accessorKey: "id",
+        id: "select",
+        header: ({ table }) => (
+            <Checkbox
+                checked={
+                    table.getIsAllPageRowsSelected() ||
+                    (table.getIsSomePageRowsSelected() && "indeterminate")
+                }
+                onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+                aria-label="Выбрать всё"
+            />
+        ),
+        cell: ({ row }) => (
+            <Checkbox
+                checked={row.getIsSelected()}
+                onCheckedChange={(value) => row.toggleSelected(!!value)}
+                aria-label="Выбрать"
+            />
+        ),
+        enableSorting: false,
+        enableHiding: false,
+    },
+    {
+        accessorKey: "_id",
         header: ({ column }) => {
             return (
-                <DataTableColumnHeader column={column} title="Никнейм" />
+                <DataTableColumnHeader column={column} title="id" />
             )
         },
-        meta: { title: "Фамилия" },
+        meta: { title: "id" },
         sortingFn: customSortingFn,
     },
     {
-        accessorKey: "nickname",
+        accessorKey: "username",
         header: ({ column }) => {
             return (
                 <DataTableColumnHeader column={column} title="Никнейм" />
@@ -45,13 +68,20 @@ export const columnsUser: ColumnDef<User>[] = [
         },
         meta: { title: "Никнейм" },
         sortingFn: customSortingFn,
+        cell: ({row}) => row.original?.username || "-",
     },
     {
-        accessorKey: "email",
+        id: "emails",
+        accessorFn: (row) => {
+            if (Array.isArray(row.emails) && row.emails.length > 0) {
+                return row.emails[0].address; // Возвращаем адрес первого email
+            }
+            return "Нет email";
+        },
         header: ({ column }) => {
             return (
                 <DataTableColumnHeader column={column} title="Email" />
-        )
+            );
         },
         meta: { title: "Email" },
         sortingFn: customSortingFn,
@@ -65,6 +95,7 @@ export const columnsUser: ColumnDef<User>[] = [
         },
         meta: { title: "Статус" },
         sortingFn: customSortingFn,
+        cell: ({row}) => row.original?.status || "-",
     },
     {
         accessorKey: "roles",
@@ -75,5 +106,6 @@ export const columnsUser: ColumnDef<User>[] = [
         },
         meta: { title: "Роли" },
         sortingFn: customSortingFn,
+        cell: ({row}) => row.original?.roles || "-",
     },
 ]
