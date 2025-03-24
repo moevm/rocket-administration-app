@@ -1,9 +1,9 @@
 import {Outlet, useParams} from "react-router";
 import {useEffect} from "react";
 import {useSetAtom} from "jotai/react";
-import {$selectedSpace, $selectedSpaceId} from "@/store/spaces";
 import {useAtomValue} from "jotai";
-import {$spaces} from "@/store/spaces.ts";
+import {$selectedSpace, $selectedSpaceId, $spaces} from "@/store/global-store.ts";
+import DataLoader from "@/components/reusableComponents/DataLoader.tsx";
 
 function SpaceLayout() {
     const spaceId = useParams()['spaceId']
@@ -16,14 +16,17 @@ function SpaceLayout() {
     }, [setSelectedSpaceId, spaceId]);
 
     return (
-        // TODO custom component
         <>
-            {selectedSpace.state === 'hasError' && <div>{String(selectedSpace.error)}</div>}
-            {selectedSpace.state === 'loading' && <div>Loading...</div>}
-            {selectedSpace.state === 'hasData' && <Outlet context={{
-                selectedSpace: selectedSpace.data,
-                spaces: spaces.data
-            }} />}
+            <DataLoader
+                state={selectedSpace}
+                loadingMessage={"Загрузка пространства"}
+                display={(data) =>
+                    <Outlet context={{
+                        selectedSpace: data,
+                        spaces: spaces.data
+                    }}/>
+                }
+            />
         </>
     )
 }

@@ -15,7 +15,7 @@ import {Card, CardContent, CardHeader} from "@/components/ui/card.tsx";
 import {$api, createMutationOptions} from "@/api";
 import {Loader2} from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query"
-import {$spaces, $spacesQuery, $spacesQueryOptions,} from "@/routes/global-store.ts";
+import {$spaces, $spacesQuery, $spacesQueryOptions,} from "@/store/global-store.ts";
 import {useNavigate} from "react-router";
 
 const formSchema = z.object({
@@ -45,7 +45,6 @@ function RegisterSpace() {
     })
 
     function onSubmit(values: z.infer<typeof formSchema>) {
-        // TODO registration new space
         console.log(values)
         mutate({
             body: {
@@ -123,7 +122,7 @@ function RegisterSpace() {
                                 {isPending
                                     ? <>
                                         <Loader2 className="animate-spin"/>
-                                        Please wait</>
+                                        Загрузка</>
                                     : <>
                                         Сохранить
                                     </>

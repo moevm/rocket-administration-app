@@ -1,7 +1,7 @@
-import {User} from "/types/user.ts";
 import {ColumnDef} from "@tanstack/table-core";
 import DataTableColumnHeader from "@/components/reusableComponents/DataTableColumnHeader.tsx";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
+import {User} from "@/store/types/user.ts";
 
 const customSortingFn = (rowA, rowB, columnId) => {
     console.log("RowA:", rowA.original);

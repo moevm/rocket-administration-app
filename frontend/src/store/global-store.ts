@@ -2,14 +2,19 @@ import {atom} from "jotai";
 import {$api, loadableQuery} from "@/api";
 import {atomWithQuery} from 'jotai-tanstack-query'
 import {loadable} from "jotai/utils";
+import {components} from "@/schema";
+import {Atom} from "jotai/vanilla";
+import {Loadable} from "jotai/vanilla/utils/loadable";
+
+export type ApiSpaceModel = components['schemas']['SpaceDto']
 
 export const $spacesQueryOptions = () => $api.queryOptions('get', '/spaces/', {})
 export const $spacesQuery = atomWithQuery(() => $spacesQueryOptions())
-export const $spaces = loadableQuery($spacesQuery)
+export const $spaces: Atom<Loadable<Promise<ApiSpaceModel[]>>>  = loadableQuery($spacesQuery)
 
 export const $selectedSpaceId = atom<string | null>(null)
 
-export const $selectedSpace = loadable(atom(async (get) => {
+export const $selectedSpace: Atom<Loadable<Promise<ApiSpaceModel>>> = loadable(atom(async (get) => {
     const spaces = await get($spacesQuery).promise
     const selectedSpaceId = get($selectedSpaceId)
     const result = spaces.find(it => it._id === selectedSpaceId)
@@ -41,4 +46,4 @@ export const $usersQuery = atomWithQuery((get) => {
     const spaceId = enabled ? selectedSpace.data._id! : ''
     return $usersQueryOptions(spaceId, enabled)
 })
-export const $users = loadableQuery($usersQuery)
+export const $users: Atom<Loadable<unknown>> = loadableQuery($usersQuery)

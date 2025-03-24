@@ -14,7 +14,7 @@ import React from "react";
 import {DataTableViewOptions} from "@/components/reusableComponents/DataTableViewOptions.tsx";
 import {DataTablePagination} from "@/components/reusableComponents/DataTablePagination.tsx";
 import {Button} from "@/components/ui/button.tsx";
-import {CheckIcon, Filter, Import, Settings, SettingsIcon} from "lucide-react";
+import {CheckIcon, FileDown, FileUp, Filter, Import, Settings, SettingsIcon} from "lucide-react";
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
@@ -91,11 +91,11 @@ function TableData<TData, TValue>({
                         <div className={"flex gap-2"}>
                             <Button variant={"outline"} size="sm"
                                     className="ml-auto hidden h-8 lg:flex">
-                                <Import/> Импорт
+                                <FileUp/> Экспорт
                             </Button>
                             <Button variant={"outline"} size="sm"
                                     className="ml-auto hidden h-8 lg:flex">
-                                не нашел иконку ищите сами (Экспорт)
+                                <FileDown/> Импорт
                             </Button>
                             <Button variant={"outline"} size="sm"
                                     className="ml-auto hidden h-8 lg:flex">
