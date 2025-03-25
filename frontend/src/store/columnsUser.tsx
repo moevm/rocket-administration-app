@@ -2,34 +2,68 @@ import {ColumnDef} from "@tanstack/table-core";
 import DataTableColumnHeader from "@/components/reusableComponents/DataTableColumnHeader.tsx";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
 import {User} from "@/store/types/user.ts";
+import {RowData} from "@tanstack/table-core/src/types.ts";
+import {ColumnMeta} from "@tanstack/react-table";
+
+// TODO точно куда-то переместить (весь файл)
+
+// TODO а это куда-нибудь вынести
+export type ColumnType = 'string' | 'number' | 'list' | 'none'
+export type TypedColumnDef<T extends RowData> = ColumnDef<T> & { meta: ColumnMeta<T, unknown> & { type: ColumnType } }
+
+export const getColumnTypeRelations: (type: ColumnType) => string[] = type => {
+    switch (type) {
+        case 'string':
+            return ['includes', 'not-includes', 'equals', 'not-equals']
+        case 'number':
+            return ['eq', 'not-eq', 'gt', 'lt', 'ge', 'le']
+        case 'list':
+            return []
+        default:
+            return []
+    }
+}
+
+export const getRelationFullName = (relation: String) => {
+    switch (relation) {
+        case 'includes':
+    }
+}
+
+export const relationFullName = {
+    'includes': "включает",
+    'not-includes': "не включает",
+    'equals': "соответствует",
+    'not-equals': "не соответствует",
+    'eq': "равно",
+    'not-eq': "не равно",
+    'gt': "больше, чем",
+    'lt': "меньше, чем",
+    'ge': "больше или равно",
+    'le': "меньше или равно"
+}
 
 const customSortingFn = (rowA, rowB, columnId) => {
-    console.log("RowA:", rowA.original);
-    console.log("RowB:", rowB.original);
     const getValue = (row) => {
         const value = row.getValue(columnId);
-
         if (value === undefined || value === null) return "";
-        if (value === "+" || value === "-") return value;
-
         return String(value);
     };
 
     const a = getValue(rowA);
     const b = getValue(rowB);
 
-    if (a === "+" && b !== "+") return 1;
-    if (b === "+" && a !== "+") return -1;
-    if (a === "-" && b !== "-") return 1;
-    if (b === "-" && a !== "-") return -1;
+    if (a === b) return 0;
+    if (a === "+" || a === "-") return 1;
+    if (b === "+" || b === "-") return -1;
 
-    return a.localeCompare(b, "ru", { numeric: true });
+    return a.localeCompare(b, "ru", {numeric: true});
 };
 
-export const columnsUser: ColumnDef<User>[] = [
+export const columnsUser = [
     {
         id: "select",
-        header: ({ table }) => (
+        header: ({table}) => (
             <Checkbox
                 checked={
                     table.getIsAllPageRowsSelected() ||
@@ -39,7 +73,7 @@ export const columnsUser: ColumnDef<User>[] = [
                 aria-label="Выбрать всё"
             />
         ),
-        cell: ({ row }) => (
+        cell: ({row}) => (
             <Checkbox
                 checked={row.getIsSelected()}
                 onCheckedChange={(value) => row.toggleSelected(!!value)}
@@ -48,25 +82,34 @@ export const columnsUser: ColumnDef<User>[] = [
         ),
         enableSorting: false,
         enableHiding: false,
+        meta: {
+            type: 'none'
+        }
     },
     {
         accessorKey: "_id",
-        header: ({ column }) => {
+        header: ({column}) => {
             return (
-                <DataTableColumnHeader column={column} title="id" />
+                <DataTableColumnHeader column={column} title="id"/>
             )
         },
-        meta: { title: "id" },
+        meta: {
+            title: "id",
+            type: 'string'
+        },
         sortingFn: customSortingFn,
     },
     {
         accessorKey: "username",
-        header: ({ column }) => {
+        header: ({column}) => {
             return (
-                <DataTableColumnHeader column={column} title="Никнейм" />
-        )
+                <DataTableColumnHeader column={column} title="Никнейм"/>
+            )
         },
-        meta: { title: "Никнейм" },
+        meta: {
+            title: "Никнейм",
+            type: 'string'
+        },
         sortingFn: customSortingFn,
         cell: ({row}) => row.original?.username || "-",
     },
@@ -78,34 +121,67 @@ export const columnsUser: ColumnDef<User>[] = [
             }
             return "Нет email";
         },
-        header: ({ column }) => {
+        header: ({column}) => {
             return (
-                <DataTableColumnHeader column={column} title="Email" />
+                <DataTableColumnHeader column={column} title="Email"/>
             );
         },
-        meta: { title: "Email" },
+        meta: {
+            title: "Email",
+            type: 'list'
+        },
         sortingFn: customSortingFn,
     },
     {
         accessorKey: "status",
-        header: ({ column }) => {
+        header: ({column}) => {
             return (
-                <DataTableColumnHeader column={column} title="Статус" />
-        )
+                <DataTableColumnHeader column={column} title="Статус"/>
+            )
         },
-        meta: { title: "Статус" },
+        meta: {
+            title: "Статус",
+            type: 'list'
+        },
         sortingFn: customSortingFn,
         cell: ({row}) => row.original?.status || "-",
     },
     {
         accessorKey: "roles",
-        header: ({ column }) => {
+        header: ({column}) => {
             return (
-                <DataTableColumnHeader column={column} title="Роли" />
-        )
+                <DataTableColumnHeader column={column} title="Роли"/>
+            )
         },
-        meta: { title: "Роли" },
+        meta: {
+            title: "Роли",
+            type: 'list'
+        },
         sortingFn: customSortingFn,
         cell: ({row}) => row.original?.roles || "-",
     },
-]
+    {
+        accessorKey: "active",
+        header: ({column}) => {
+            return (
+                <DataTableColumnHeader column={column} title="Активен"/>
+            )
+        },
+        meta: {
+            title: "Активен",
+            type: 'boolean'
+        },
+    },
+    {
+        accessorKey: "type",
+        header: ({column}) => {
+            return (
+                <DataTableColumnHeader column={column} title="Тип"/>
+            )
+        },
+        meta: {
+            title: "Тип",
+            type: 'string'
+        },
+    },
+] as TypedColumnDef<User>[]
