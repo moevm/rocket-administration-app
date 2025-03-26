@@ -26,7 +26,7 @@
 
 ## Важные ссылки по проекту:
 - [Google диск](https://drive.google.com/drive/folders/17UqM0HQxNNSFASZToOG31zvY4lBywogW?usp=sharing)
-- [Гайд для установки и запуска релизной версии](docs/files/deployment_guide)
+- [Гайд для установки и запуска релизной версии](docs/files/deployment_guide.md)
 
 ## Созвоны
 - 19.02 "Установочный созвон с заказчиком" - [Видео созвона](https://drive.google.com/file/d/1fuV6T1Pz0x65xq_crpFkzh3fJxcRnu-M/view?usp=drive_link),[Протокол созвона](https://docs.google.com/document/d/13HYdbLqcll7nwrs00wcXWWKeJ4-dftQDDA2424svJtc/edit?usp=drive_link)
