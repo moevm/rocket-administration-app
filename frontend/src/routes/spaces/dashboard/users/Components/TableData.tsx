@@ -21,7 +21,7 @@ import {DataTableViewOptions} from "@/components/reusableComponents/DataTableVie
 import {DataTablePagination} from "@/components/reusableComponents/DataTablePagination.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {
-    CheckIcon,
+    CheckIcon, ChevronRight,
     FileDown,
     FileUp,
     Filter,
@@ -43,7 +43,7 @@ import {
     SelectTrigger,
     SelectValue
 } from "@/components/ui/select.tsx";
-import {getColumnTypeRelations, getRelationFullName, relationFullName} from "@/store/columnsUser.tsx";
+import {getColumnTypeRelations, relationFullName} from "@/store/columnsUser.tsx";
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]

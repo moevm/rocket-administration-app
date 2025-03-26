@@ -33,7 +33,7 @@ createRoot(document.getElementById('root')!).render(
                 <Toaster />
                 <BrowserRouter>
                     <Routes>
-                        <Route path="welcome" element={<WelcomePage/>}/>
+                        <Route path="" element={<WelcomePage/>}/>
                         <Route path="spaces/:spaceId" element={<Navigate relative="path" to="dashboard" replace/>}/>
                         <Route path="spaces/:spaceId" element={<SpaceLayout/>}>
                             <Route path="dashboard" element={<Navigate relative="path" to="users" replace/>}/>
