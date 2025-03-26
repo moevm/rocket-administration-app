@@ -12,6 +12,11 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {useForm} from "react-hook-form";
 import {Input} from "@/components/ui/input.tsx";
 import {Card, CardContent, CardHeader} from "@/components/ui/card.tsx";
+import {$api, createMutationOptions} from "@/api";
+import {Loader2} from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query"
+import {$spaces, $spacesQuery, $spacesQueryOptions,} from "@/store/global-store.ts";
+import {useNavigate} from "react-router";
 
 const formSchema = z.object({
     //TODO validation
@@ -22,15 +27,33 @@ const formSchema = z.object({
 })
 
 function RegisterSpace() {
+
+    const navigate = useNavigate()
+    const queryClient = useQueryClient()
+    const {mutate, isPending} = $api.useMutation('post', '/spaces', createMutationOptions({
+        onSuccess: async (data, variables, context) => {
+            await queryClient.invalidateQueries($spacesQueryOptions.queryKey)
+            navigate(`/spaces/${data._id}`)
+        }
+    }))
+
     const form = useForm<z.infer<typeof formSchema>>({
         reValidateMode: "onChange",
         mode: "all",
         resolver: zodResolver(formSchema),
+        disabled: isPending
     })
 
     function onSubmit(values: z.infer<typeof formSchema>) {
-        // TODO registration new space
         console.log(values)
+        mutate({
+            body: {
+                url: values.url,
+                login: values.login,
+                password: values.password,
+                name: values.name
+            },
+        });
     }
 
 
@@ -95,7 +118,16 @@ function RegisterSpace() {
                                     </FormItem>
                                 )}
                             />
-                            <Button type="submit" className="w-full">Сохранить</Button>
+                            <Button type="submit" className="w-full" disabled={isPending}>
+                                {isPending
+                                    ? <>
+                                        <Loader2 className="animate-spin"/>
+                                        Загрузка</>
+                                    : <>
+                                        Сохранить
+                                    </>
+                                }
+                            </Button>
                         </form>
                     </Form>
                 </CardContent>

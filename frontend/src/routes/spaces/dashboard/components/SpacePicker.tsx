@@ -5,17 +5,17 @@ import {
     DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator,
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu.tsx";
-import {$spaces} from "@/routes/global-store.ts";
-import {$selectedSpace} from "@/routes/global-store.ts";
+import {$spaces, ApiSpaceModel} from "@/store/global-store.ts";
+import {$selectedSpace} from "@/store/global-store.ts";
 import {useAtomValue} from "jotai";
 import {useNavigate} from "react-router";
 
 
-
-function SpacePicker(){
+function SpacePicker(props: {
+    selectedSpace: ApiSpaceModel,
+    spaces: ApiSpaceModel[]
+}){
     const { isMobile } = useSidebar()
-    const spaces = useAtomValue($spaces)
-    const selectedSpace = useAtomValue($selectedSpace)
     const navigate = useNavigate()
 
     return (
@@ -29,7 +29,7 @@ function SpacePicker(){
                         >
                             <div className="grid flex-1 text-left text-sm leading-tight">
                                 <span className="truncate font-semibold">
-                                    {selectedSpace.name}
+                                    {props.selectedSpace.name}
                                 </span>
                             </div>
                             <ChevronsUpDown className="ml-auto" />
@@ -45,16 +45,17 @@ function SpacePicker(){
                             Пространства
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator/>
-                        {spaces.map((space, index) => (
-                            <DropdownMenuItem
-                                key={space.id}
-                                onClick={() => navigate(`/spaces/${space.id}/dashboard`)}
-                                className="gap-2 p-2"
-                            >
-                                {space.name}
-
-                            </DropdownMenuItem>
-                        ))}
+                        {
+                            props.spaces.map((space) => (
+                                <DropdownMenuItem
+                                    key={space._id}
+                                    onClick={() => navigate(`/spaces/${space._id}/dashboard`)}
+                                    className="gap-2 p-2"
+                                >
+                                    {space.name}
+                                </DropdownMenuItem>
+                            ))
+                        }
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
                             onClick={() => navigate(`/register-space`)}

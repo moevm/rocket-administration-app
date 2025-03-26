@@ -1,0 +1,9 @@
+POST http://localhost:8000/spaces
+Content-Type: application/json
+
+{
+  "url": "http://localhost:3000",
+  "login": "rocketadmin",
+  "password": "admin",
+  "name": "space"
+}
