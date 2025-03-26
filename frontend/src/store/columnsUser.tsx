@@ -24,12 +24,6 @@ export const getColumnTypeRelations: (type: ColumnType) => string[] = type => {
     }
 }
 
-export const getRelationFullName = (relation: String) => {
-    switch (relation) {
-        case 'includes':
-    }
-}
-
 export const relationFullName = {
     'includes': "включает",
     'not-includes': "не включает",

@@ -13,7 +13,12 @@ function AppSidebar(props: {
     return (
         <Sidebar>
             <SidebarHeader>
-                <SpacePicker spaces={props.spaces} selectedSpace={props.selectedSpace} />
+                <Button variant="ghost" asChild className="justify-start text-xl font-bold px-2">
+                    <NavLink to="/">
+                        RocketManager
+                    </NavLink>
+                </Button>
+                <SpacePicker spaces={props.spaces} selectedSpace={props.selectedSpace}/>
             </SidebarHeader>
             <SidebarContent>
                 <SidebarGroup>
