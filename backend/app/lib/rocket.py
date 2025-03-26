@@ -1,3 +1,4 @@
+import urllib
 from asyncio import to_thread
 
 import requests
@@ -41,7 +42,7 @@ async def create_rocket_instance(key: RocketInstanceKey) -> RocketChat:
 
     me = await rocket_request(rocket.me)
     if not 'admin' in me['roles']:
-        raise HTTPException(status_code=400, detail="Ошибка досупа к RocketChat: Пользователь должен быть админом")
+        raise HTTPException(status_code=400, detail="Ошибка доступа к RocketChat: Пользователь должен быть админом")
 
     return rocket
 
@@ -50,7 +51,7 @@ async def rocket_request(func, /, *args, **kwargs):
     response = await rocket_interaction(func, *args, **kwargs)
 
     if not (response.status_code == 200 and response.json()['success'] == True):
-        raise HTTPException(status_code=400, detail="Ошибка досупа к RocketChat")
+        raise HTTPException(status_code=400, detail="Ошибка запроса к RocketChat")
 
     json = response.json()
     del json['success']
@@ -60,7 +61,20 @@ async def rocket_interaction(func, /, *args, **kwargs):
     try:
         return await to_thread(func, *args, **kwargs)
     except RocketAuthenticationException:
-        raise HTTPException(status_code=400, detail="Ошибка досупа к RocketChat: Неверные учетные данные")
+        raise HTTPException(status_code=400, detail="Ошибка доступа к RocketChat: Неверные учетные данные")
     except (RocketConnectionException, requests.exceptions.ConnectionError):
         raise HTTPException(status_code=400,
-                            detail="Ошибка досупа к RocketChat: Недействительный URL или проблема с подключением к серверу")
+                            detail="Ошибка доступа к RocketChat: Недействительный URL или проблема с подключением к серверу")
+
+def rocket_query_args(**kwargs):
+    def include_arg(key, value):
+        return value is not None
+
+    def map_value(value):
+        if value is list:
+            return [map_value(x) for x in value]
+        if value is str:
+            return urllib.parse.quote(value)
+        return value
+
+    return { key: map_value(value) for key, value in kwargs.items() if include_arg(key, value) }
