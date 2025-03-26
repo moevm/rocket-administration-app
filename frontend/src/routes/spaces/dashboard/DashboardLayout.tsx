@@ -1,18 +1,19 @@
-import { Outlet } from "react-router";
-import {SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar.tsx";
-import AppSidebar from "@/routes/spaces/dashboard/components/app-sidebar.tsx";
-import {useAtomValue} from "jotai";
-import {$selectedSpace} from "@/routes/global-store.ts";
+import {Outlet, useOutletContext} from "react-router";
+import {SidebarProvider} from "@/components/ui/sidebar.tsx";
+import AppSidebar from "@/routes/spaces/dashboard/components/AppSidebar";
+import {ApiSpaceModel} from "@/store/spaces.ts";
 
 function DashboardLayout() {
-    const selectedSpace = useAtomValue($selectedSpace)
+    const context = useOutletContext<{
+        spaces: ApiSpaceModel[],
+        selectedSpace: ApiSpaceModel
+    }>()
     return (
         <div>
             <SidebarProvider>
-                <AppSidebar />
+                <AppSidebar spaces={context.spaces} selectedSpace={context.selectedSpace} />
                 <main>
-                    {JSON.stringify(selectedSpace)}
-                    <Outlet />
+                    <Outlet context={context} />
                 </main>
             </SidebarProvider>
         </div>

@@ -1,28 +1,23 @@
 import {atom} from "jotai";
+import {$api, loadableQuery} from "@/api";
+import {atomWithQuery} from 'jotai-tanstack-query'
+import {loadable} from "jotai/utils";
 
-export interface ApiShortSpace {
-    id: number
-    name: string
-}
+export const $spacesQueryOptions = $api.queryOptions('get', '/spaces')
+export const $spacesQuery = atomWithQuery(() => $spacesQueryOptions)
+export const $spaces = loadableQuery($spacesQuery)
 
-export const $spaces = atom<ApiShortSpace[]>([
-    {
-        id: 0,
-        name: 'Test space 1'
-    },
-    {
-        id: 1,
-        name: 'Test space 2'
-    },
-    {
-        id: 2,
-        name: 'Test space 3'
-    }
-])
+export const $selectedSpaceId = atom<string | null>(null)
 
-export const $selectedSpaceId = atom<number>(0)
+export const $selectedSpace = loadable(atom(async (get) => {
+   const spaces = await get($spacesQuery).promise
+   const selectedSpaceId = get($selectedSpaceId)
+   const result = spaces.find(it => it._id === selectedSpaceId)
 
-export const $selectedSpace = atom<ApiShortSpace>((get) => {
-    return get($spaces)[get($selectedSpaceId)]
-})
+   if (!result) {
+      throw Error('Space not found: ' + selectedSpaceId)
+   }
+
+   return result
+}))
 
