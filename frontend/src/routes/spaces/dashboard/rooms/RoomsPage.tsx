@@ -1,7 +1,14 @@
+import {useOutletContext} from "react-router";
+import {ApiSpaceModel} from "@/store/spaces.ts";
+
 function RoomsPage() {
+    const context = useOutletContext<{
+        spaces: ApiSpaceModel[],
+        selectedSpace: ApiSpaceModel
+    }>()
     return (
         <>
-            Im Rooms Page
+            {JSON.stringify(context)} rooms
         </>
     )
 }

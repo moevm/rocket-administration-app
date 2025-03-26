@@ -1,7 +1,14 @@
+import {useOutletContext} from "react-router";
+import {ApiSpaceModel} from "@/store/spaces.ts";
+
 function NotificationsPage() {
+    const context = useOutletContext<{
+        spaces: ApiSpaceModel[],
+        selectedSpace: ApiSpaceModel
+    }>()
     return (
         <>
-            Im Notification Page
+            {JSON.stringify(context)} notifications
         </>
     )
 }
