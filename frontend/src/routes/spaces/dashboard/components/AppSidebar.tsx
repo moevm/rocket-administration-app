@@ -3,7 +3,7 @@ import {Button} from "@/components/ui/button.tsx";
 import {Mail, User, Users} from "lucide-react";
 import SpacePicker from "@/routes/spaces/dashboard/components/SpacePicker.tsx";
 import {NavLink} from "react-router";
-import {ApiSpaceModel} from "@/store/spaces.ts";
+import {ApiSpaceModel} from "@/store/global-store.ts";
 
 
 function AppSidebar(props: {

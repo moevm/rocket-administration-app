@@ -1,8 +1,7 @@
 import {Outlet, useOutletContext} from "react-router";
 import {SidebarProvider} from "@/components/ui/sidebar.tsx";
 import AppSidebar from "@/routes/spaces/dashboard/components/AppSidebar";
-import {ApiSpaceModel} from "@/store/spaces.ts";
-
+import {ApiSpaceModel} from "@/store/global-store.ts";
 function DashboardLayout() {
     const context = useOutletContext<{
         spaces: ApiSpaceModel[],

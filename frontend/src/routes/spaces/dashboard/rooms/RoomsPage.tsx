@@ -1,5 +1,5 @@
 import {useOutletContext} from "react-router";
-import {ApiSpaceModel} from "@/store/spaces.ts";
+import {ApiSpaceModel} from "@/store/global-store.ts";
 
 function RoomsPage() {
     const context = useOutletContext<{
