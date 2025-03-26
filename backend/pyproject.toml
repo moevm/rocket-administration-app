@@ -8,7 +8,7 @@ dependencies = [
     "aiosmtplib>=4.0.0",
     "dynaconf>=3.2.7",
     "fastapi[standard]>=0.115.8",
-    "pymongo>=4.11.1",
+    "pymongo>=4.11.3",
     "rocketchat-api>=1.35.0",
     "uvicorn>=0.34.0",
 ]
