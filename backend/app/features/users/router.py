@@ -17,7 +17,6 @@ async def get_users(
 ) -> UsersResponseDto:
 
     rocket = await obtain_rocket_instance(key_for_space(space))
-
     users = UsersResponseDto.model_validate(await rocket_request(
         rocket.users_list,
         **rocket_query_args(
@@ -27,5 +26,4 @@ async def get_users(
             count=count,
         )
     ))
-
     return users
