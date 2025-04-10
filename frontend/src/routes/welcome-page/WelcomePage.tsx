@@ -10,6 +10,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu.tsx";
+import {LucideRocket} from "lucide-react";
 
 
 function WelcomePage() {

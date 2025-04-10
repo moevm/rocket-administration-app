@@ -222,8 +222,7 @@ function RichTableView<TData, TValue>({
                             <Button variant="outline" size="sm">
                                 <FileDown/> Импорт
                             </Button>
-                            <Button variant="outline" size="sm"
-                                    className="ml-auto hidden h-8 lg:flex">
+                            <Button variant="outline" size="sm">
                                 <CheckIcon/> Выделить из файла
                             </Button>
                         </div>

@@ -5,8 +5,6 @@ import {Card, CardContent, CardHeader} from "@/components/ui/card.tsx";
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form.tsx";
 import {Input} from "@/components/ui/input.tsx";
 import {Button} from "@/components/ui/button.tsx";
-import {$api, createMutationOptions, queryClient} from "@/api";
-import {$spacesQueryOptions} from "@/store/global-store.ts";
 
 
 const formSchema = z.object({
@@ -35,8 +33,8 @@ function NotificationsPage() {
 
                 <div className="mt-6">
 
-                    <Card className="max-w-[100vw] w-[450px] border-2 border-gray-300">
-                        <CardHeader className="font-bold">
+                    <Card className="max-w-[100vw] w-[450px] ">
+                        <CardHeader>
                             SMTP
                         </CardHeader>
                         <CardContent>

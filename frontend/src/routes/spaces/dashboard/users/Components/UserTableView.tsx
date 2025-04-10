@@ -1,6 +1,6 @@
 import RichTableView from "@/components/reusableComponents/RichTableView.tsx";
 import {columnsUser} from "@/store/columnsUser.tsx";
-import {ContextMenuItem} from "@/components/custom-radix/context-menu.tsx";
+import {ContextMenuItem} from "@/components/ui/context-menu.tsx";
 
 function UserTableView (data: any) {
     console.info(data)
