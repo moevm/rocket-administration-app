@@ -30,6 +30,7 @@ function UserTableView (data: any) {
                     enableSearch: true,
                     enableExport: true,
                     enableColumnVisibilityToggle: true
+
                     //rowClickHandler: (user) => openModal(user)
                 }}
             />

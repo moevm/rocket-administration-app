@@ -13,12 +13,16 @@ import {ContextMenuLabel} from "@/components/ui/context-menu.tsx";
 import {Input} from "@/components/ui/input.tsx";
 import {MultiSelect} from "@/components/ui/multi-select.tsx";
 import {Button} from "@/components/ui/button.tsx";
-import {FileDown, FileUp} from "lucide-react";
+import {CheckIcon, FileDown, FileUp, Filter} from "lucide-react";
 import {DataTableViewOptions} from "@/components/reusableComponents/DataTableViewOptions.tsx";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {DataTablePagination} from "@/components/reusableComponents/DataTablePagination.tsx";
 import {ColumnDef} from "@tanstack/table-core";
 import ExternallyTriggeredContextMenu from "@/components/reusableComponents/ExternallyTriggeredContextMenu.tsx";
+import {Label} from "@/components/ui/label.tsx";
+import {getColumnTypeRelations, relationFullName} from "@/store/columnsUser.tsx";
+import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
+import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover.tsx";
 
 
 
@@ -122,15 +126,92 @@ function RichTableView<TData, TValue>({
                         />
                         <MultiSelect
                             options={table.getAllColumns()
-                                .filter(it => typeof it.accessorFn !== "undefined")
+                                .filter(
+                                    (column) =>
+                                        typeof column.accessorFn !== "undefined" &&
+                                        column.getCanHide() &&
+                                        column.columnDef.meta.type === 'string'
+                                )
                                 .map(it => ({
                                     label: it.columnDef.meta?.title || it.id,
                                     value: it.id
                                 }))}
                             onValueChange={setSearchPosition}
                         />
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button variant="outline">
+                                    <Filter/>
+                                </Button>
+                            </PopoverTrigger>
+
+                            <PopoverContent className="w-80">
+                                <div className="mb-4">
+                                    <h4 className="font-medium leading-none">Фильтры</h4>
+                                </div>
+
+                                <div className="flex flex-col gap-2 justify-items-stretch">
+                                    <Label htmlFor="width">Атрибут</Label>
+                                    <Select>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Выберите атрибут"/>
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectGroup>
+                                                {table
+                                                    .getAllColumns()
+                                                    .filter(
+                                                        (column) =>
+                                                            typeof column.accessorFn !== "undefined" && column.getCanHide()
+                                                    )
+                                                    .map((column) => {
+                                                        return (
+                                                            <SelectItem
+                                                                value={column.id}>{column.columnDef.meta?.title ? column.columnDef.meta.title : column.id}</SelectItem>
+                                                        )
+                                                    })}
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
+
+                                    <Label htmlFor="width">Отношение</Label>
+                                    <Select>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Выберите отношение"/>
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectGroup>
+                                                {getColumnTypeRelations('number')
+                                                    .map((relation) => {
+                                                        return (
+                                                            <SelectItem
+                                                                value={relation}>{relationFullName[relation]}</SelectItem>
+                                                        )
+                                                    })
+                                                }
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
+
+                                    <Label htmlFor="width">Значение</Label>
+                                    <Input
+                                        //TODO закончить форму
+                                        placeholder="gmail.com"
+                                        onChange={
+                                            (event) => {
+                                            }
+                                        }
+                                        className="max-w-sm"
+                                    />
+                                    <Button variant="outline">Добавить фильтр</Button>
+                                    <Button variant="outline">Очистить фильтры</Button>
+                                    <Button variant="outline">Применить</Button>
+                                </div>
+                            </PopoverContent>
+                        </Popover>
                     </div>
                 )}
+
 
                 <div className="flex justify-between">
                     {!(settings) || settings.enableExport && (
@@ -140,6 +221,10 @@ function RichTableView<TData, TValue>({
                             </Button>
                             <Button variant="outline" size="sm">
                                 <FileDown/> Импорт
+                            </Button>
+                            <Button variant="outline" size="sm"
+                                    className="ml-auto hidden h-8 lg:flex">
+                                <CheckIcon/> Выделить из файла
                             </Button>
                         </div>
                     )}
