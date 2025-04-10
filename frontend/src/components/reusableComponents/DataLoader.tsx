@@ -1,10 +1,10 @@
 import {Loadable} from "jotai/vanilla/utils/loadable";
 import * as React from "react";
 
-const DataLoader =  <T,>({state, loadingMessage, display}: {
+export const DataLoader = <T, >({state, loadingMessage, display}: {
     state: Loadable<T>,
-    loadingMessage: String,
-    display: (data: T) => React.ReactNode
+    loadingMessage: string,
+    display: (data: Awaited<T>) => React.ReactNode
 }) => {
     if (state.state === 'hasError') {
         return (<div>{"Ошибка: " + String(state.error)}</div>)
@@ -12,9 +12,21 @@ const DataLoader =  <T,>({state, loadingMessage, display}: {
     if (state.state === 'loading') {
         return <div>{loadingMessage}</div>
     }
-    if (state.state === 'hasData') {
-        return <>{display(state.data)}</>
-    }
+    return <>{display(state.data)}</>
 };
 
-export default DataLoader;
+export const BulkLoader = ({states, loadingMessage, display}: {
+    states: Loadable<unknown>[],
+    loadingMessage: string,
+    display: () => React.ReactNode
+}) => {
+    const errorState = states.find(it => it.state === 'hasError')
+    if (errorState) {
+        return (<div>{"Ошибка: " + String(errorState.error)}</div>)
+    }
+    const someLoading = states.some(it => it.state === 'loading')
+    if (someLoading) {
+        return <div>{loadingMessage}</div>
+    }
+    return  <>{display()}</>
+}

@@ -1,26 +1,15 @@
 import {Label} from "@/components/ui/label.tsx";
 import {Button} from "@/components/ui/button.tsx";
-import {NavLink, Outlet, useNavigate} from "react-router";
-import DataLoader from "@/components/reusableComponents/DataLoader.tsx";
+import {NavLink, useNavigate} from "react-router";
+import {DataLoader} from "@/components/reusableComponents/DataLoader.tsx";
 import {useAtomValue} from "jotai/index";
 import {$spaces} from "@/store/global-store.ts";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuLabel, DropdownMenuSeparator,
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu.tsx";
-import {SidebarMenuButton} from "@/components/ui/sidebar.tsx";
-import {ChevronsUpDown, Plus} from "lucide-react";
-import {
-    NavigationMenu,
-    NavigationMenuContent,
-    NavigationMenuItem, NavigationMenuLink,
-    NavigationMenuList
-} from "@/components/ui/navigation-menu.tsx";
-import {cn} from "@/lib/utils.ts";
-import * as React from "react";
 
 
 function WelcomePage() {

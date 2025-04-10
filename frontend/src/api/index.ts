@@ -38,23 +38,41 @@ export function loadableQuery<Value>(anAtom: Atom<AtomWithQueryResult<Awaited<Va
     }))
 }
 
+export function loaded<T> (loadable: Loadable<T>) {
+    return loadable as {
+        state: 'hasData';
+        data: Awaited<T>;
+    }
+}
+
+const errorMessage: (error: unknown) => string = error => {
+    if (typeof error === "string") {
+        return error
+    }
+    if (error && typeof error === 'object') {
+        if ('message' in error) {
+            return String((error as { 'message': unknown })['message'])
+        }
+        if ('detail' in error) {
+            return String((error as { 'detail': unknown })['detail'])
+        }
+    }
+    return 'Неизвестная ошибка'
+}
+
 // TODO show loader & toast
 export function createMutationOptions<D, E, I>(options?: Omit<UseMutationOptions<D, E, I>, "mutationKey" | "mutationFn">): Omit<UseMutationOptions<D, E, I>, "mutationKey" | "mutationFn"> {
     return {
         onMutate: (variables) => {
-            console.log('about to mutate', {variables})
             if (options?.onMutate) options.onMutate(variables)
         },
         onError: (error, variables, context) => {
             console.log(`mutation error`, {error, variables, context})
-            toast.error("Error")
+            toast.error("Ошибка ", { description: errorMessage(error) })
             if (options?.onError) options.onError(error, variables, context)
         },
         onSuccess: (data, variables, context) => {
-            console.log('mutation success', {data, variables, context})
-            toast.success("Success", {
-                description:"gooool"
-            })
+            toast.success("Успех")
             if (options?.onSuccess) options.onSuccess(data, variables, context)
         },
     }

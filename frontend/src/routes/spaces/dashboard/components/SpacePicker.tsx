@@ -50,7 +50,7 @@ function SpacePicker(props: {
                                 <DropdownMenuItem
                                     key={space._id}
                                     onClick={() => navigate(`/spaces/${space._id}/dashboard`)}
-                                    className="gap-2 p-2"
+                                    className="gap-2 p-2 cursor-pointer"
                                 >
                                     {space.name}
                                 </DropdownMenuItem>
@@ -59,7 +59,7 @@ function SpacePicker(props: {
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
                             onClick={() => navigate(`/register-space`)}
-                            className="gap-2 p-2 flex justify-between"
+                            className="gap-2 p-2 flex justify-between cursor-pointer"
                         >
                             <div className="bg-background flex size-6 items-center justify-center rounded-md border">
                                 <Plus className="size-4" />

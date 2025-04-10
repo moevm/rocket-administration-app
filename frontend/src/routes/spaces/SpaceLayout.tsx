@@ -3,7 +3,8 @@ import {useEffect} from "react";
 import {useSetAtom} from "jotai/react";
 import {useAtomValue} from "jotai";
 import {$selectedSpace, $selectedSpaceId, $spaces} from "@/store/global-store.ts";
-import DataLoader from "@/components/reusableComponents/DataLoader.tsx";
+import {BulkLoader} from "@/components/reusableComponents/DataLoader.tsx";
+import {loaded} from "@/api";
 
 function SpaceLayout() {
     const spaceId = useParams()['spaceId']
@@ -17,13 +18,13 @@ function SpaceLayout() {
 
     return (
         <>
-            <DataLoader
-                state={selectedSpace}
+            <BulkLoader
+                states={[spaces, selectedSpace]}
                 loadingMessage={"Загрузка пространства"}
-                display={(data) =>
+                display={() =>
                     <Outlet context={{
-                        selectedSpace: data,
-                        spaces: spaces.data
+                        selectedSpace: loaded(selectedSpace).data,
+                        spaces: loaded(spaces).data
                     }}/>
                 }
             />

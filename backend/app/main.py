@@ -6,7 +6,7 @@ from pydantic import BaseModel, EmailStr
 from aiosmtplib import SMTP
 
 from app.services.db import database_lifespan
-from app.features import spaces, users
+from app.features import spaces, users, roles
 from app.config import settings
 
 logger = logging.getLogger(__name__)
@@ -29,6 +29,7 @@ async def health():
 
 app.include_router(spaces.router, prefix="/spaces")
 app.include_router(users.router, prefix="/spaces/{space_id}/users")
+app.include_router(roles.router, prefix="/spaces/{space_id}/roles")
 
 class EmailRequest(BaseModel):
     subject: str
