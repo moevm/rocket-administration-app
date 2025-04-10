@@ -11,6 +11,8 @@ import {useEffect} from "react";
 import * as MenuPrimitive from "@radix-ui/react-menu";
 import {ContextMenuContent} from "@/components/ui/context-menu.tsx";
 
+
+// TODO: накинуть стиля сюда
 const ExternallyTriggeredContextMenu = (props: ScopedProps<ContextMenuProps & {open: boolean, point: Point}>) => {
     const { __scopeContextMenu, children, onOpenChange, dir, modal = true, open } = props;
     const menuScope = useMenuScope(__scopeContextMenu);
