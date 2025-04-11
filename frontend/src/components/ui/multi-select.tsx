@@ -73,6 +73,9 @@ interface MultiSelectProps
      */
     onValueChange: (value: string[]) => void;
 
+    /** Custom trigger button (optional) */
+    trigger?: React.ReactNode;
+
     /** The default selected values when the component mounts. */
     defaultValue?: string[];
 
@@ -126,6 +129,7 @@ export const MultiSelect = React.forwardRef<
             animation = 0,
             modalPopover = false,
             className,
+            trigger,
             ...props
         },
         ref
@@ -156,10 +160,20 @@ export const MultiSelect = React.forwardRef<
             onValueChange(newSelectedValues);
         };
 
-        const handleTogglePopover = () => {
+        const handleTogglePopover = (e?: React.MouseEvent) => {
+            e?.stopPropagation();
             setIsPopoverOpen((prev) => !prev);
         };
 
+
+        React.useEffect(() => {
+            if (isPopoverOpen) {
+                const input = document.querySelector('.multi-select-search-input');
+                if (input) {
+                    (input as HTMLInputElement).focus();
+                }
+            }
+        }, [isPopoverOpen]);
 
         return (
             <Popover
@@ -168,27 +182,47 @@ export const MultiSelect = React.forwardRef<
                 modal={modalPopover}
             >
                 <PopoverTrigger asChild>
-                    <Button
-                        variant={"outline"}
-                        ref={ref}
-                        {...props}
-                        onClick={handleTogglePopover}
-                        className={cn(
-                            className
-                        )}
-                    >
-                        <SettingsIcon />
-                    </Button>
+                    {trigger ? (
+                        React.cloneElement(trigger as React.ReactElement, {
+                            onClick: (e: React.MouseEvent) => {
+                                trigger.props?.onClick?.(e);
+                                handleTogglePopover();
+                            },
+                        })
+                    ) : (
+                        <Button
+                            variant="outline"
+                            ref={ref}
+                            {...props}
+                            onClick={handleTogglePopover}
+                            className={cn(className)}
+                        >
+                            Кнопище
+                        </Button>
+                    )}
                 </PopoverTrigger>
                 <PopoverContent
                     className="w-auto p-0"
                     align="start"
-                    onEscapeKeyDown={() => setIsPopoverOpen(false)}
+                    onEscapeKeyDown={(e) => {
+                        setIsPopoverOpen(false);
+                        e.preventDefault();
+                    }}
+                    onPointerDownOutside={(e) => {
+                        const target = e.target as HTMLElement;
+                        // Разрешаем закрытие только кликами вне триггера
+                        if (!target.closest('.multi-select-trigger')) {
+                            setIsPopoverOpen(false);
+                        }
+                        e.preventDefault();
+                    }}
                 >
                     <Command>
                         <CommandInput
                             placeholder="Поиск..."
                             onKeyDown={handleInputKeyDown}
+                            autoFocus
+                            className="multi-select-search-input"
                         />
                         <CommandList>
                             <CommandEmpty>Нет результатов.</CommandEmpty>

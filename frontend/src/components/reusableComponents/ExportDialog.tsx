@@ -1,0 +1,94 @@
+import { MultiSelect } from "@/components/ui/multi-select";
+import { Table } from "@tanstack/react-table";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import {useState} from "react";
+import {DialogBase} from "@/components/ui/DialogBase.tsx";
+import {Button} from "@/components/ui/button.tsx";
+
+interface ExportDialogProps {
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+    table: Table<any>;
+    selectedCount: number;
+    onExport: (format: string, selectedFields: string[]) => void;
+}
+
+export const ExportDialog = ({
+                                 open,
+                                 onOpenChange,
+                                 table,
+                                 selectedCount,
+                                 onExport,
+                             }: ExportDialogProps) => {
+    const [format, setFormat] = useState("CSV");
+    const [selectedFields, setSelectedFields] = useState<string[]>([]);
+
+    const handleExport = () => {
+        onExport(format, selectedFields);
+        onOpenChange(false);
+    };
+
+    return (
+        <DialogBase
+            open={open}
+            onOpenChange={onOpenChange}
+            title="Экспорт"
+            description={`Выбрано ${selectedCount} пользователей`}
+            footerContent={
+                <Button
+                    type="submit"
+                    className="w-full"
+                    onClick={handleExport}
+                >
+                    Экспорт
+                </Button>
+            }
+        >
+            <div className="flex flex-col w-full gap-5">
+                <div className="flex flex-col items-start gap-2 w-full">
+                    <Label>Формат</Label>
+                    <RadioGroup
+                        value={format}
+                        onValueChange={setFormat}
+                        className="grid grid-cols-3 gap-2"
+                    >
+                        {["CSV", "JSON", "XLS"].map((value) => (
+                            <div key={value} className="flex items-center space-x-2">
+                                <RadioGroupItem value={value} id={value} />
+                                <Label htmlFor={value}>{value}</Label>
+                            </div>
+                        ))}
+                    </RadioGroup>
+                </div>
+
+                <Separator />
+
+                <div className="flex flex-col items-start gap-2 w-full">
+                    <Label>Поля</Label>
+                    <MultiSelect
+                        options={table.getAllColumns()
+                            .filter(
+                                column =>
+                                    typeof column.accessorFn !== "undefined" &&
+                                    column.getCanHide() &&
+                                    column.columnDef.meta?.type === 'string'
+                            )
+                            .map(it => ({
+                                label: it.columnDef.meta?.title || it.id,
+                                value: it.id
+                            }))}
+                        trigger={
+                            <Button variant="outline" className="w-full">
+                                Выберите поля
+                            </Button>
+                        }
+                        onValueChange={setSelectedFields}
+                        modalPopover={true}
+                    />
+                </div>
+            </div>
+        </DialogBase>
+    );
+};

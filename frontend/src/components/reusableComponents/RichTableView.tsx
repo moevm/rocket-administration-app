@@ -13,7 +13,7 @@ import {ContextMenuLabel} from "@/components/ui/context-menu.tsx";
 import {Input} from "@/components/ui/input.tsx";
 import {MultiSelect} from "@/components/ui/multi-select.tsx";
 import {Button} from "@/components/ui/button.tsx";
-import {CheckIcon, FileDown, FileUp, Filter} from "lucide-react";
+import {CheckIcon, FileDown, FileUp, Filter, SettingsIcon} from "lucide-react";
 import {DataTableViewOptions} from "@/components/reusableComponents/DataTableViewOptions.tsx";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {DataTablePagination} from "@/components/reusableComponents/DataTablePagination.tsx";
@@ -23,6 +23,18 @@ import {Label} from "@/components/ui/label.tsx";
 import {getColumnTypeRelations, relationFullName} from "@/store/columnsUser.tsx";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover.tsx";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle
+} from "@/components/ui/dialog.tsx";
+import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group.tsx";
+import {Separator} from "@/components/ui/separator.tsx";
+import {FileDialog} from "@/components/reusableComponents/FileDialog.tsx";
+import {ExportDialog} from "@/components/reusableComponents/ExportDialog.tsx";
 
 
 
@@ -65,6 +77,10 @@ function RichTableView<TData, TValue>({
     const contextMenuPosition = React.useRef<Point>({ x: 0, y: 0 });
     const [contextMenuOpen, setContextMenuOpen] = React.useState(false);
     const contextMenuRows = React.useRef<Row<TData>[]>([]);
+
+    const [showDialogImport, setShowDialogImport] = React.useState<boolean>(false);
+    const [showDialogExport, setShowDialogExport] = React.useState<boolean>(false);
+    const [showDialogSelectFromFile, setShowDialogSelectFromFile] = React.useState<boolean>(false);
 
     const defaultGlobalFilter = (row, columnId, filterValue) => {
         return row.getValue(columnId)?.toString().toLowerCase().includes(filterValue.toLowerCase());
@@ -137,6 +153,12 @@ function RichTableView<TData, TValue>({
                                     value: it.id
                                 }))}
                             onValueChange={setSearchPosition}
+                            trigger={
+                                <Button
+                                    variant="outline">
+                                    <SettingsIcon />
+                                </Button>
+                            }
                         />
                         <Popover>
                             <PopoverTrigger asChild>
@@ -216,18 +238,18 @@ function RichTableView<TData, TValue>({
                 <div className="flex justify-between">
                     {!(settings) || settings.enableExport && (
                         <div className="flex gap-2">
-                            <Button variant="outline" size="sm">
+                            <Button variant="outline" size="sm" onClick={() => setShowDialogExport(true)}>
                                 <FileUp/> Экспорт
                             </Button>
-                            <Button variant="outline" size="sm">
+                            <Button variant="outline" size="sm" onClick={() => setShowDialogImport(true)}>
                                 <FileDown/> Импорт
                             </Button>
-                            <Button variant="outline" size="sm">
+                            <Button variant="outline" size="sm" onClick={() => setShowDialogSelectFromFile(true)}>
                                 <CheckIcon/> Выделить из файла
                             </Button>
                         </div>
                     )}
-                    {settings?.enableColumnVisibilityToggle && <DataTableViewOptions table={table} />}
+                    {settings?.enableColumnVisibilityToggle && <DataTableViewOptions table={table}/>}
                 </div>
             </div>
 
@@ -257,7 +279,7 @@ function RichTableView<TData, TValue>({
                                     //onClick={() => settings.rowClickHandler?.(row.original)}
                                     onContextMenu={(e) => {
                                         e.preventDefault();
-                                        contextMenuPosition.current = { x: e.clientX, y: e.clientY };
+                                        contextMenuPosition.current = {x: e.clientX, y: e.clientY};
                                         const selectedRows = table.getSelectedRowModel().rows as Row<TData>[];
                                         contextMenuRows.current = row.getIsSelected() ? selectedRows : [row as Row<TData>];
 
@@ -280,8 +302,32 @@ function RichTableView<TData, TValue>({
                         )}
                     </TableBody>
                 </Table>
-                <DataTablePagination table={table} />
+                <DataTablePagination table={table}/>
             </div>
+
+            <FileDialog
+                open={showDialogImport}
+                onOpenChange={setShowDialogImport}
+                title="Импорт"
+                buttonText="Импорт"
+                onSubmit={()=>{}}
+            />
+
+            <FileDialog
+                open={showDialogSelectFromFile}
+                onOpenChange={setShowDialogSelectFromFile}
+                title="Выделить из файла"
+                buttonText="Выделить"
+                onSubmit={()=>{}}
+            />
+
+            <ExportDialog
+                open={showDialogExport}
+                onOpenChange={setShowDialogExport}
+                table={table}
+                selectedCount={Object.keys(rowSelection).length}
+                onExport={()=>{}}
+            />
         </div>
     );
 }
