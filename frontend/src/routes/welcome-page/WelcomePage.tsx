@@ -57,7 +57,7 @@ function WelcomePage() {
                             </DropdownMenu>
                         </div>
                 }/>
-            <Button>
+            <Button asChild>
                 <NavLink to="/register-space">
                     Регистрация пространства
                 </NavLink>
