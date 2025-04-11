@@ -46,7 +46,7 @@ export const ExportDialog = ({
                 </Button>
             }
         >
-            <div className="flex flex-col w-full gap-5">
+            <div className="flex flex-col w-full gap-4">
                 <div className="flex flex-col items-start gap-2 w-full">
                     <Label>Формат</Label>
                     <RadioGroup
@@ -63,8 +63,6 @@ export const ExportDialog = ({
                     </RadioGroup>
                 </div>
 
-                <Separator />
-
                 <div className="flex flex-col items-start gap-2 w-full">
                     <Label>Поля</Label>
                     <MultiSelect
@@ -79,13 +77,9 @@ export const ExportDialog = ({
                                 label: it.columnDef.meta?.title || it.id,
                                 value: it.id
                             }))}
-                        trigger={
-                            <Button variant="outline" className="w-full">
-                                Выберите поля
-                            </Button>
-                        }
                         onValueChange={setSelectedFields}
-                        modalPopover={true}
+                        modalPopover
+                        placeholder={'Выберите поля'}
                     />
                 </div>
             </div>

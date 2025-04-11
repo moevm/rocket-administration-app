@@ -23,16 +23,6 @@ import {Label} from "@/components/ui/label.tsx";
 import {getColumnTypeRelations, relationFullName} from "@/store/columnsUser.tsx";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover.tsx";
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle
-} from "@/components/ui/dialog.tsx";
-import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group.tsx";
-import {Separator} from "@/components/ui/separator.tsx";
 import {FileDialog} from "@/components/reusableComponents/FileDialog.tsx";
 import {ExportDialog} from "@/components/reusableComponents/ExportDialog.tsx";
 
@@ -153,13 +143,13 @@ function RichTableView<TData, TValue>({
                                     value: it.id
                                 }))}
                             onValueChange={setSearchPosition}
-                            trigger={
-                                <Button
-                                    variant="outline">
-                                    <SettingsIcon />
-                                </Button>
-                            }
-                        />
+                            asChild
+                        >
+                            <Button
+                                variant="outline">
+                                <SettingsIcon />
+                            </Button>
+                        </MultiSelect>
                         <Popover>
                             <PopoverTrigger asChild>
                                 <Button variant="outline">

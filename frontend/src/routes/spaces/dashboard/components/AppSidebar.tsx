@@ -15,7 +15,7 @@ function AppSidebar(props: {
             <SidebarHeader>
                 <Button variant="ghost" asChild className="justify-start text-xl font-bold px-2">
                     <NavLink to="/">
-                        <LucideRocket className={"text-primary !size-6 animate-pulse"}/>RocketManager
+                        <LucideRocket className={"text-primary !size-6"}/>RocketManager
                     </NavLink>
                 </Button>
                 <SpacePicker spaces={props.spaces} selectedSpace={props.selectedSpace}/>
