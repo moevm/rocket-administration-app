@@ -2,8 +2,7 @@ import { MultiSelect } from "@/components/ui/multi-select";
 import { Table } from "@tanstack/react-table";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {DialogBase} from "@/components/ui/DialogBase.tsx";
 import {Button} from "@/components/ui/button.tsx";
 
@@ -27,8 +26,15 @@ export const ExportDialog = ({
 
     const handleExport = () => {
         onExport(format, selectedFields);
+        setSelectedFields([]);
         onOpenChange(false);
     };
+
+    useEffect(() => {
+        if (open) {
+            setSelectedFields(null);
+        }
+    }, [open]);
 
     return (
         <DialogBase
@@ -41,6 +47,7 @@ export const ExportDialog = ({
                     type="submit"
                     className="w-full"
                     onClick={handleExport}
+                    disabled={(!(selectedFields?.length > 0) || !(selectedCount > 0))}
                 >
                     Экспорт
                 </Button>
@@ -70,8 +77,8 @@ export const ExportDialog = ({
                             .filter(
                                 column =>
                                     typeof column.accessorFn !== "undefined" &&
-                                    column.getCanHide() &&
-                                    column.columnDef.meta?.type === 'string'
+                                    column.getCanHide()
+                                    //column.columnDef.meta?.type === 'string'
                             )
                             .map(it => ({
                                 label: it.columnDef.meta?.title || it.id,
