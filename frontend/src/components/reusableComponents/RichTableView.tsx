@@ -167,6 +167,7 @@ function RichTableView<TData, TValue>({
                                                     .map((column) => {
                                                         return (
                                                             <SelectItem
+                                                                key={column.id}
                                                                 value={column.id}>{column.columnDef.meta?.title ? column.columnDef.meta.title : column.id}</SelectItem>
                                                         )
                                                     })}
@@ -185,6 +186,7 @@ function RichTableView<TData, TValue>({
                                                     .map((relation) => {
                                                         return (
                                                             <SelectItem
+                                                                key={relation}
                                                                 value={relation}>{relationFullName[relation]}</SelectItem>
                                                         )
                                                     })
