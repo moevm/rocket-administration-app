@@ -1,7 +1,7 @@
 import {Label} from "@/components/ui/label.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {NavLink, useNavigate} from "react-router";
-import {DataLoader} from "@/components/reusableComponents/DataLoader.tsx";
+import {BatchLoader} from "@/components/reusableComponents/DataLoader.tsx";
 import {useAtomValue} from "jotai/index";
 import {$spaces} from "@/store/global-store.ts";
 import {
@@ -10,7 +10,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu.tsx";
-import {LucideRocket} from "lucide-react";
+import {loaded} from "@/api";
 
 
 function WelcomePage() {
@@ -22,11 +22,11 @@ function WelcomePage() {
             <Label className={"text-2xl"}>
                 Добро пожаловать в <span className={"text-primary"}>RocketManager</span>
             </Label>
-            <DataLoader
-                state={spaces}
+            <BatchLoader
+                states={[spaces]}
                 loadingMessage={"Загрузка..."}
-                display={(data) =>
-                    data.length === 0
+                display={() =>
+                    spaces.state.length === 0
                         ?
                         <Label className={"text-foreground/60"}>
                             Приступим к настройке вашего первого пространства
@@ -44,7 +44,7 @@ function WelcomePage() {
                                     align="start"
                                 >
                                     {
-                                        data.map((space) => (
+                                        loaded(spaces).data.map((space) => (
                                             <DropdownMenuItem
                                                 key={space._id}
                                                 onClick={() => navigate(`/spaces/${space._id}/dashboard`)}

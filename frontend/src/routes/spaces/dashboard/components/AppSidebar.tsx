@@ -33,6 +33,11 @@ function AppSidebar(props: {
                         </NavLink>
                     </Button>
                     <Button asChild variant="ghost" className="justify-start px-3">
+                        <NavLink to="teams">
+                            <Users/> Команды
+                        </NavLink>
+                    </Button>
+                    <Button asChild variant="ghost" className="justify-start px-3">
                         <NavLink to="notifications">
                             <Mail/> Уведомления
                         </NavLink>

@@ -3,19 +3,19 @@ import {$api, loadableQuery} from "@/api";
 import {atomWithQuery} from 'jotai-tanstack-query'
 import {loadable} from "jotai/utils";
 import {components} from "@/schema";
-import {Atom} from "jotai/vanilla";
-import {Loadable} from "jotai/vanilla/utils/loadable";
 
-export type ApiSpaceModel = components['schemas']['SpaceDto']
 export type ApiUserModel = components['schemas']['UserDto']
+export type ApiRoomModel = components['schemas']['RoomDto']
+export type ApiTeamModel = components['schemas']['TeamDto']
+export type ApiSpaceModel = components['schemas']['SpaceDto']
 
 export const $spacesQueryOptions = () => $api.queryOptions('get', '/spaces/', {})
 export const $spacesQuery = atomWithQuery(() => $spacesQueryOptions())
-export const $spaces: Atom<Loadable<Promise<ApiSpaceModel[]>>>  = loadableQuery($spacesQuery)
+export const $spaces = loadableQuery($spacesQuery)
 
 export const $selectedSpaceId = atom<string | null>(null)
 
-export const $selectedSpace: Atom<Loadable<Promise<ApiSpaceModel>>> = loadable(atom(async (get) => {
+export const $selectedSpace = loadable(atom(async (get) => {
     const spaces = await get($spacesQuery).promise
     const selectedSpaceId = get($selectedSpaceId)
     const result = spaces.find(it => it._id === selectedSpaceId)
@@ -70,3 +70,71 @@ export const $rolesQuery = atomWithQuery((get) => {
     return $rolesQueryOptions(spaceId, enabled)
 })
 export const $roles = loadableQuery($rolesQuery)
+
+export const $notificationsQueryOptions = (spaceId: string, enabled: boolean) => $api.queryOptions(
+    'get',
+    `/spaces/{space_id}/notifications/settings`,
+    {
+        params: {
+            path: {
+                space_id: spaceId
+            }
+        },
+    },
+    {
+        enabled
+    }
+);
+
+export const $notificationsQuery = atomWithQuery((get) => {
+    const selectedSpace = get($selectedSpace)
+    const enabled = selectedSpace.state === 'hasData'
+    const spaceId = enabled ? selectedSpace.data._id! : ''
+    return $notificationsQueryOptions(spaceId, enabled)
+})
+
+export const $notifications = loadableQuery($notificationsQuery)
+
+export const $roomsQueryOptions = (spaceId: string, enabled: boolean) => $api.queryOptions(
+    'get',
+    `/spaces/{space_id}/rooms/`,
+    {
+        params: {
+            path: {
+                space_id: spaceId
+            },
+        },
+    },
+    {
+        enabled
+    }
+);
+export const $roomsQuery = atomWithQuery((get) => {
+    const selectedSpace = get($selectedSpace)
+    const enabled = selectedSpace.state === 'hasData'
+    const spaceId = enabled ? selectedSpace.data._id! : ''
+    return $roomsQueryOptions(spaceId, enabled)
+})
+export const $rooms = loadableQuery($roomsQuery)
+
+export const $teamsQueryOptions = (spaceId: string, enabled: boolean) => $api.queryOptions(
+    'get',
+    `/spaces/{space_id}/teams/`,
+    {
+        params: {
+            path: {
+                space_id: spaceId
+            }
+        },
+    },
+    {
+        enabled
+    }
+);
+export const $teamsQuery = atomWithQuery((get) => {
+    const selectedSpace = get($selectedSpace)
+    const enabled = selectedSpace.state === 'hasData'
+    const spaceId = enabled ? selectedSpace.data._id! : ''
+    return $teamsQueryOptions(spaceId, enabled)
+})
+export const $teams = loadableQuery($teamsQuery)

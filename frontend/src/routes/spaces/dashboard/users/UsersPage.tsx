@@ -1,7 +1,6 @@
-import {columnsUser} from "@/store/columnsUser.tsx";
 import {$roles, $users} from "@/store/global-store.ts";
 import {useAtomValue} from "jotai/index";
-import {BulkLoader} from "@/components/reusableComponents/DataLoader.tsx";
+import {BatchLoader} from "@/components/reusableComponents/DataLoader.tsx";
 import UserTableView from "@/routes/spaces/dashboard/users/Components/UserTableView.tsx";
 import {loaded} from "@/api";
 
@@ -12,7 +11,7 @@ function UsersPage() {
     console.log(users)
     return (
         <>
-            <BulkLoader
+            <BatchLoader
                 states={[users, roles]}
                 loadingMessage={"Загрузка пользователей"}
                 display={() =>
