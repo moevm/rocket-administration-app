@@ -1,5 +1,6 @@
 import urllib
 from asyncio import to_thread
+from pprint import pprint
 
 import requests
 from fastapi import HTTPException
@@ -7,7 +8,7 @@ from rocketchat_API.APIExceptions.RocketExceptions import RocketAuthenticationEx
 from rocketchat_API.rocketchat import RocketChat
 from dataclasses import dataclass
 
-from app.features.spaces.models import SpaceModel
+from app.models import SpaceModel
 
 cache = {}
 
@@ -51,10 +52,13 @@ async def rocket_request(func, /, *args, **kwargs):
     response = await rocket_interaction(func, *args, **kwargs)
 
     if not (response.status_code == 200 and response.json()['success'] == True):
+        pprint(response.status_code)
+        pprint(response.json())
         raise HTTPException(status_code=400, detail="Ошибка запроса к RocketChat")
 
     json = response.json()
     del json['success']
+    pprint(json)
     return json
 
 async def rocket_interaction(func, /, *args, **kwargs):
