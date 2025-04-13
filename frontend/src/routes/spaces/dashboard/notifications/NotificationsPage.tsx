@@ -9,7 +9,7 @@ import {$api, createMutationOptions, loaded} from "@/api";
 import {$notifications, $selectedSpaceId} from "@/store/global-store.ts";
 import {useAtomValue} from "jotai/index";
 import UserTableView from "@/routes/spaces/dashboard/users/Components/UserTableView.tsx";
-import {BatchLoader} from "@/components/reusableComponents/DataLoader.tsx";
+import {BatchLoader} from "@/components/app/DataLoader.tsx";
 import {useState} from "react";
 
 

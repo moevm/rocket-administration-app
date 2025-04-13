@@ -1,7 +1,7 @@
 import {Label} from "@/components/ui/label.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {NavLink, useNavigate} from "react-router";
-import {BatchLoader} from "@/components/reusableComponents/DataLoader.tsx";
+import {BatchLoader} from "@/components/app/DataLoader.tsx";
 import {useAtomValue} from "jotai/index";
 import {$spaces} from "@/store/global-store.ts";
 import {

@@ -3,7 +3,7 @@ import {useEffect} from "react";
 import {useSetAtom} from "jotai/react";
 import {useAtomValue} from "jotai";
 import {$selectedSpace, $selectedSpaceId, $spaces} from "@/store/global-store.ts";
-import {BatchLoader} from "@/components/reusableComponents/DataLoader.tsx";
+import {BatchLoader} from "@/components/app/DataLoader.tsx";
 import {loaded} from "@/api";
 
 function SpaceLayout() {
