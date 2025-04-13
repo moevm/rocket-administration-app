@@ -1,13 +1,15 @@
 import RichTableView from "@/components/app/table/RichTableView.tsx";
 import {ContextMenuItem} from "@/components/ui/context-menu.tsx";
 import {columnsTeam} from "@/store/columnsTeam.tsx";
+import {ApiTeamModel} from "@/store/global-store.ts";
 
-function TeamsTableView (data: any) {
-    console.info(data)
+function TeamsTableView (props: {
+    data: ApiTeamModel[]
+}) {
     return (
         <>
             <RichTableView
-                dataAtom={data}
+                entries={props.data}
                 tableConfig={{
                     columns: columnsTeam
                 }}

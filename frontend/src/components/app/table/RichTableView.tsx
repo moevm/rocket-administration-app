@@ -27,7 +27,7 @@ import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover.t
 
 
 interface RichTableViewProps<TData, TValue> {
-    dataAtom: TData[]; // состояние с данными
+    entries: TData[]; // состояние с данными
     tableConfig: {
         columns: ColumnDef<TData, TValue>[];
         globalFilterFn?: any; // кастомный фильтр
@@ -45,15 +45,15 @@ interface RichTableViewProps<TData, TValue> {
 }
 
 function RichTableView<TData, TValue>({
-                                          dataAtom,
+                                          entries,
                                           tableConfig,
                                           contextMenuConfig,
                                           settings = {}
                                       }: RichTableViewProps<TData, TValue>) {
     console.info({
-        dataAtom
+        entries: entries
     })
-    const data = dataAtom.users;
+    const data = entries;
 
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [rowSelection, setRowSelection] = React.useState({});
@@ -256,7 +256,7 @@ function RichTableView<TData, TValue>({
                                     key={row.id}
                                     data-state={row.getIsSelected() && "selected"}
                                     // TODO: проваливание здесь
-                                    //onClick={() => settings.rowClickHandler?.(row.original)}
+                                    onClick={() => settings.rowClickHandler?.(row.original)}
                                     onContextMenu={(e) => {
                                         e.preventDefault();
                                         contextMenuPosition.current = { x: e.clientX, y: e.clientY };

@@ -8,6 +8,7 @@ export type ApiUserModel = components['schemas']['UserDto']
 export type ApiRoomModel = components['schemas']['RoomDto']
 export type ApiTeamModel = components['schemas']['TeamDto']
 export type ApiSpaceModel = components['schemas']['SpaceDto']
+export type ApiUserInfoRoomModel = components['schemas']['UserInfoRoomDto']
 
 export const $spacesQueryOptions = () => $api.queryOptions('get', '/spaces/', {})
 export const $spacesQuery = atomWithQuery(() => $spacesQueryOptions())
@@ -138,3 +139,46 @@ export const $teamsQuery = atomWithQuery((get) => {
     return $teamsQueryOptions(spaceId, enabled)
 })
 export const $teams = loadableQuery($teamsQuery)
+
+
+export const $selectedUserId = atom<string | null>(null)
+
+export const $selectedUser = loadable(atom(async (get) => {
+    const users = await get($usersQuery).promise
+    const selectedUserId = get($selectedUserId)
+    const result = users.find(it => it._id === selectedUserId)
+
+    if (!result) {
+        throw Error('User not found: ' + selectedUserId)
+    }
+
+    return result
+}))
+
+export const $userInfoQueryOptions = (spaceId: string, userId: string, enabled: boolean) => $api.queryOptions(
+    'get',
+    `/spaces/{space_id}/users/{user_id}`,
+    {
+        params: {
+            path: {
+                space_id: spaceId,
+                user_id: userId
+            }
+        },
+    },
+    {
+        enabled
+    }
+);
+export const $userInfoQuery = atomWithQuery((get) => {
+    const selectedSpace = get($selectedSpace);
+    const selectedUser = get($selectedUser);
+    const enabled = selectedSpace.state === 'hasData' && selectedUser.state === "hasData";
+    const spaceId = enabled ? selectedSpace.data._id! : ''
+    const userId = enabled ? selectedUser.data._id! : ''
+    return $userInfoQueryOptions(spaceId, userId, enabled)
+})
+export const $userInfo = loadableQuery($userInfoQuery)
+
+
+
