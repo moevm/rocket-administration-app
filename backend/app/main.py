@@ -6,7 +6,7 @@ from pydantic import BaseModel, EmailStr
 from aiosmtplib import SMTP
 
 from app.services.db import database_lifespan
-from app.features import spaces, users, roles
+from app.features import spaces, users, roles, rooms, teams
 from app.config import settings
 
 logger = logging.getLogger(__name__)
@@ -27,6 +27,8 @@ app.add_middleware(
 async def health():
     return "ok"
 
+app.include_router(teams.router, prefix="/spaces/{space_id}/teams")
+app.include_router(rooms.router, prefix="/spaces/{space_id}/rooms")
 app.include_router(spaces.router, prefix="/spaces")
 app.include_router(users.router, prefix="/spaces/{space_id}/users")
 app.include_router(roles.router, prefix="/spaces/{space_id}/roles")
