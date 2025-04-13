@@ -1,7 +1,8 @@
-import DataTableColumnHeader from "@/components/reusableComponents/DataTableColumnHeader.tsx";
+import DataTableColumnHeader from "@/components/app/table/DataTableColumnHeader.tsx";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
 import {ApiRoomModel} from "@/store/global-store.ts";
 import {TypedColumnDef} from "@/store/columnsUser.tsx";
+import {CheckboxRenderer, MonoRenderer, OptRenderer} from "@/components/app/table/cell/CellRenderers.tsx";
 
 
 //TODO: вынести в отдельный компонент
@@ -67,8 +68,8 @@ export const columnsRoom = [
             title: "id",
             type: 'string'
         },
-        cell: ({row}) => (<span className="font-mono"> {row.original._id} </span>),
-            sortingFn: customSortingFn,
+        cell: MonoRenderer(),
+        sortingFn: customSortingFn,
     },
     {
         accessorKey: "description",
@@ -82,7 +83,7 @@ export const columnsRoom = [
             type: 'string'
         },
         sortingFn: customSortingFn,
-        cell: ({row}) => row.original?.description || "–",
+        cell: OptRenderer(),
     },
     {
         accessorKey: "broadcast",
@@ -95,7 +96,7 @@ export const columnsRoom = [
             title: "Бродкаст",
             type: 'boolean'
         },
-        cell: ({row}) => row.original?.broadcast || "–",
+        cell: CheckboxRenderer(),
     },
     {
         accessorKey: "name",
@@ -109,7 +110,7 @@ export const columnsRoom = [
             type: 'string'
         },
         sortingFn: customSortingFn,
-        cell: ({row}) => row.original?.name || "–",
+        cell: OptRenderer(),
     },
     {
         id: "t",
@@ -143,11 +144,11 @@ export const columnsRoom = [
         accessorKey: "usersCount",
         header: ({column}) => {
             return (
-                <DataTableColumnHeader column={column} title="Количество пользователей"/>
+                <DataTableColumnHeader column={column} title="Пользователи"/>
             )
         },
         meta: {
-            title: "Количество пользователей",
+            title: "Пользователи",
             type: 'number'
         },
     },
@@ -163,7 +164,7 @@ export const columnsRoom = [
             type: 'string'
         },
         sortingFn: customSortingFn,
-        cell: ({row}) => row.original?.u?._id || "–",
+        cell: MonoRenderer(),
     },
     {
         accessorKey: "ro",
@@ -176,6 +177,7 @@ export const columnsRoom = [
             title: "Read only",
             type: 'boolean'
         },
+        cell: CheckboxRenderer()
     },
     {
         accessorKey: "default",
@@ -188,6 +190,7 @@ export const columnsRoom = [
             title: "Default",
             type: 'boolean'
         },
+        cell: CheckboxRenderer()
     },
     {
         accessorKey: "topic",
@@ -201,7 +204,7 @@ export const columnsRoom = [
             type: 'string'
         },
         sortingFn: customSortingFn,
-        cell: ({row}) => row.original?.topic || "–",
+        cell: OptRenderer(),
     },
     {
         accessorKey: "announcement",
@@ -215,6 +218,6 @@ export const columnsRoom = [
             type: 'string'
         },
         sortingFn: customSortingFn,
-        cell: ({row}) => row.original?.announcement || "–",
+        cell: OptRenderer(),
     },
 ] as TypedColumnDef<ApiRoomModel>[]

@@ -6,58 +6,50 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/
 import {Input} from "@/components/ui/input.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {$api, createMutationOptions, loaded} from "@/api";
-import {$notifications, $selectedSpaceId} from "@/store/global-store.ts";
+import {$smtpSettings, $selectedSpaceId} from "@/store/global-store.ts";
 import {useAtomValue} from "jotai/index";
 import UserTableView from "@/routes/spaces/dashboard/users/Components/UserTableView.tsx";
-import {BatchLoader} from "@/components/reusableComponents/DataLoader.tsx";
+import {BatchLoader} from "@/components/app/DataLoader.tsx";
 import {useState} from "react";
+import {Loader2} from "lucide-react";
 
 
 const formSchema = z.object({
     host: z.string().url(),
-    port: z.coerce.number({message: "Неверное число"}),
     sender: z.string().email()
 })
 
 function NotificationForm() {
-    const notifications = loaded(useAtomValue($notifications)).data
-    const selectedSpaceId = useAtomValue($selectedSpaceId)
+    const notifications = loaded(useAtomValue($smtpSettings)).data
+    const selectedSpaceId = useAtomValue($selectedSpaceId)!
+
+    const {
+        mutate,
+        isPending
+    } = $api.useMutation('post', '/spaces/{space_id}/settings/smtp', createMutationOptions({
+    }))
 
     const form = useForm<z.infer<typeof formSchema>>({
         reValidateMode: "onChange",
         mode: "all",
         resolver: zodResolver(formSchema),
         defaultValues: {
-            host: notifications?.settings?.host,
-            port: notifications?.settings?.port,
-            sender: notifications?.settings?.sender
-        }
-    })
-
-    const {
-        mutate,
-        isPending
-    } = $api.useMutation('post', '/spaces/{space_id}/notifications/settings', createMutationOptions({
-        onSuccess()  {
-            console.log("success")
+            host: notifications?.value?.host,
+            sender: notifications?.value?.sender
         },
-        onError() {
-            console.log('error')
-        }
-    }))
-
+        disabled: isPending
+    })
 
     function onSubmit(values: z.infer<typeof formSchema>) {
         console.log(values)
         mutate({
             body: {
                 host: values.host,
-                port: values.port,
                 sender: values.sender
             },
             params: {
                 path: {
-                    space_id: selectedSpaceId
+                    space_id: selectedSpaceId!
                 },
             }
         })
@@ -66,7 +58,7 @@ function NotificationForm() {
 
     return (
         <div className="flex flex-col m-6 h-screen max-w-screen-lg w-screen py-4 ml-6">
-            <span className="text-4xl">Уведомления</span>
+            <span className="text-4xl">Настройки</span>
 
             <div className="mt-6">
 
@@ -92,19 +84,6 @@ function NotificationForm() {
                                 />
                                 <FormField
                                     control={form.control}
-                                    name="port"
-                                    render={({field}) => (
-                                        <FormItem>
-                                            <FormLabel>Порт</FormLabel>
-                                            <FormControl>
-                                                <Input {...field} />
-                                            </FormControl>
-                                            <FormMessage/>
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
                                     name="sender"
                                     render={({field}) => (
                                         <FormItem>
@@ -116,8 +95,15 @@ function NotificationForm() {
                                         </FormItem>
                                     )}
                                 />
-                                <Button type="submit" className="w-full">
-                                    Сохранить
+                                <Button type="submit" className="w-full" disabled={isPending}>
+                                    {isPending
+                                        ? <>
+                                            <Loader2 className="animate-spin"/>
+                                            Загрузка</>
+                                        : <>
+                                            Сохранить
+                                        </>
+                                    }
                                 </Button>
                             </form>
                         </Form>
@@ -128,8 +114,8 @@ function NotificationForm() {
     )
 }
 
-function NotificationsPage() {
-    const notifications = useAtomValue($notifications)
+function SettingsPage() {
+    const notifications = useAtomValue($smtpSettings)
     return (
         <>
             <BatchLoader
@@ -143,4 +129,4 @@ function NotificationsPage() {
     )
 }
 
-export default NotificationsPage
+export default SettingsPage

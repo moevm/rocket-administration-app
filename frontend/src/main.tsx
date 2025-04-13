@@ -5,7 +5,7 @@ import DashboardLayout from "@/routes/spaces/dashboard/DashboardLayout.tsx";
 import SpaceLayout from "@/routes/spaces/SpaceLayout.tsx";
 import UsersPage from "@/routes/spaces/dashboard/users/UsersPage.tsx";
 import RoomsPage from "@/routes/spaces/dashboard/rooms/RoomsPage.tsx";
-import NotificationsPage from "@/routes/spaces/dashboard/notifications/NotificationsPage.tsx";
+import SettingsPage from "@/routes/spaces/dashboard/settings/SettingsPage.tsx";
 import NotFound from "@/routes/not-found/NotFound.tsx";
 import RegisterSpace from "@/routes/register-space/RegisterSpace.tsx";
 import i18next from "i18next";
@@ -42,7 +42,7 @@ createRoot(document.getElementById('root')!).render(
                                 <Route path="users" element={<UsersPage/>}/>
                                 <Route path="rooms" element={<RoomsPage/>}/>
                                 <Route path="teams" element={<TeamsPage/>}/>
-                                <Route path="notifications" element={<NotificationsPage/>}/>
+                                <Route path="notifications" element={<SettingsPage/>}/>
                             </Route>
                         </Route>
                         <Route path="register-space" element={<RegisterSpace/>}/>

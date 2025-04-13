@@ -1,4 +1,4 @@
-import RichTableView from "@/components/reusableComponents/RichTableView.tsx";
+import RichTableView from "@/components/app/table/RichTableView.tsx";
 import {columnsRoom} from "@/store/columnsRoom.tsx";
 import {ContextMenuItem} from "@/components/ui/context-menu.tsx";
 

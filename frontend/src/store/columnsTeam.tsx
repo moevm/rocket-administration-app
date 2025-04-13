@@ -1,8 +1,9 @@
-import DataTableColumnHeader from "@/components/reusableComponents/DataTableColumnHeader.tsx";
+import DataTableColumnHeader from "@/components/app/table/DataTableColumnHeader.tsx";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
 import {ApiTeamModel} from "@/store/global-store.ts";
 import {TypedColumnDef} from "@/store/columnsUser.tsx";
 import dayjs from 'dayjs';
+import {MonoRenderer} from "@/components/app/table/cell/CellRenderers.tsx";
 
 
 //TODO: вынести в отдельный компонент
@@ -66,7 +67,7 @@ export const columnsTeam = [
             type: 'string'
         },
         sortingFn: customSortingFn,
-        cell: ({row}) => (<span className="font-mono"> {row.original._id} </span>)
+        cell: MonoRenderer()
     },
     {
         accessorKey: "name",
@@ -116,14 +117,15 @@ export const columnsTeam = [
         accessorKey: "createdBy._id",
         header: ({column}) => {
             return (
-                <DataTableColumnHeader column={column} title="Создано"/>
+                <DataTableColumnHeader column={column} title="Создатель"/>
             )
         },
         meta: {
             title: "Создатель",
             type: 'string'
         },
-        sortingFn: customSortingFn
+        sortingFn: customSortingFn,
+        cell: MonoRenderer()
     },
     {
         accessorKey: "updatedAt",
@@ -149,7 +151,8 @@ export const columnsTeam = [
             title: "Id комнаты",
             type: 'string'
         },
-        sortingFn: customSortingFn
+        sortingFn: customSortingFn,
+        cell: MonoRenderer()
     },
     {
         accessorKey: "rooms",

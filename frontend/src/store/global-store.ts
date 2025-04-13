@@ -71,9 +71,9 @@ export const $rolesQuery = atomWithQuery((get) => {
 })
 export const $roles = loadableQuery($rolesQuery)
 
-export const $notificationsQueryOptions = (spaceId: string, enabled: boolean) => $api.queryOptions(
+export const $smtpSettingsQueryOptions = (spaceId: string, enabled: boolean) => $api.queryOptions(
     'get',
-    `/spaces/{space_id}/notifications/settings`,
+    `/spaces/{space_id}/settings/smtp`,
     {
         params: {
             path: {
@@ -86,14 +86,14 @@ export const $notificationsQueryOptions = (spaceId: string, enabled: boolean) =>
     }
 );
 
-export const $notificationsQuery = atomWithQuery((get) => {
+export const $smtpSettingsQuery = atomWithQuery((get) => {
     const selectedSpace = get($selectedSpace)
     const enabled = selectedSpace.state === 'hasData'
     const spaceId = enabled ? selectedSpace.data._id! : ''
-    return $notificationsQueryOptions(spaceId, enabled)
+    return $smtpSettingsQueryOptions(spaceId, enabled)
 })
 
-export const $notifications = loadableQuery($notificationsQuery)
+export const $smtpSettings = loadableQuery($smtpSettingsQuery)
 
 export const $roomsQueryOptions = (spaceId: string, enabled: boolean) => $api.queryOptions(
     'get',
