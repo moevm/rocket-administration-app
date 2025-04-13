@@ -2,7 +2,7 @@ from typing import List
 
 from fastapi import APIRouter, Depends
 
-from app.features.spaces.models import CreateSpaceRequest, SpaceDto, SpaceModel
+from app.models import CreateSpaceRequest, SpaceDto, SpaceModel
 from app.lib.rocket import obtain_rocket_instance, RocketInstanceKey, key_for_space
 from app.services.db import get_db, convert_to
 
