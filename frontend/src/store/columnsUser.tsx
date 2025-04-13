@@ -3,11 +3,7 @@ import DataTableColumnHeader from "@/components/app/table/DataTableColumnHeader.
 import {Checkbox} from "@/components/ui/checkbox.tsx";
 import {ColumnMeta} from "@tanstack/react-table";
 import {ApiUserModel} from "@/store/global-store.ts";
-import CellRenderers, {
-    CheckboxRenderer, ListRenderer,
-    MonoRenderer,
-    OptRenderer
-} from "@/components/app/table/cell/CellRenderers.tsx";
+import {CheckboxRenderer, ListRenderer, MonoRenderer, OptRenderer} from "@/components/app/ValueRenderers.tsx";
 
 // TODO точно куда-то переместить (весь файл)
 
@@ -101,7 +97,7 @@ export const columnsUser = [
             type: 'string'
         },
         sortingFn: customSortingFn,
-        cell: MonoRenderer()
+        cell: ({cell}) => <MonoRenderer value={cell.getValue()} />
     },
     {
         accessorKey: "username",
@@ -115,7 +111,7 @@ export const columnsUser = [
             type: 'string'
         },
         sortingFn: customSortingFn,
-        cell: OptRenderer()
+        cell: ({cell}) => <OptRenderer value={cell.getValue()} />
     },
     {
         id: "emails",
@@ -148,7 +144,7 @@ export const columnsUser = [
             type: 'list'
         },
         sortingFn: customSortingFn,
-        cell: ({row}) => row.original?.status || "–",
+        cell: ({cell}) => <OptRenderer value={cell.getValue()} />
     },
     {
         accessorKey: "roles",
@@ -162,7 +158,7 @@ export const columnsUser = [
             type: 'list'
         },
         sortingFn: customSortingFn,
-        cell: ListRenderer(),
+        cell: ({cell}) => <ListRenderer value={cell.getValue()} />
     },
     {
         accessorKey: "active",
@@ -175,7 +171,7 @@ export const columnsUser = [
             title: "Активен",
             type: 'boolean'
         },
-        cell: CheckboxRenderer()
+        cell: ({cell}) => <CheckboxRenderer value={cell.getValue()} />
     },
     {
         id: "type",

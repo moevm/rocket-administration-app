@@ -11,7 +11,7 @@ import {
     $selectedUserId,
     $userInfo
 } from "@/store/global-store.ts";
-import {Link, useParams} from "react-router";
+import {Link, NavLink, useParams} from "react-router";
 import {Label} from "@/components/ui/label.tsx";
 import {loaded} from "@/api";
 import {Card, CardContent} from "@/components/ui/card.tsx";
@@ -21,6 +21,8 @@ import {useEffect} from "react";
 import {BatchLoader} from "@/components/app/DataLoader.tsx";
 import UserInfoRoomTableView from "@/routes/spaces/dashboard/users/user/Components/UserInfoRoomsTableView.tsx";
 import ShortTeamTableView from "@/routes/spaces/dashboard/users/user/Components/ShortTeamTableView.tsx";
+import EntityCard from "@/components/app/EntityCard.tsx";
+import {ListRenderer, MonoRenderer, OptRenderer} from "@/components/app/ValueRenderers.tsx";
 
 function UserPageContent() {
     const user = loaded(useAtomValue($selectedUser)).data
@@ -34,9 +36,9 @@ function UserPageContent() {
                 <BreadcrumbList>
                     <BreadcrumbItem>
                         <BreadcrumbLink asChild>
-                            <Link to={`/spaces/${selectedSpaceId}/dashboard/users`}>
+                            <NavLink to={`/spaces/${selectedSpaceId}/dashboard/users`}>
                                 Пользователи &gt;
-                            </Link>
+                            </NavLink>
                         </BreadcrumbLink>
                     </BreadcrumbItem>
                 </BreadcrumbList>
@@ -44,37 +46,17 @@ function UserPageContent() {
 
             <div className="flex flex-col gap-2">
                 <Label className={"text-3xl"}>{user.username}</Label>
-                <Card>
-                    <CardContent>
-                        <div className="grid grid-cols-3 gap-3 py-4">
-                            <div className="flex justify-between">
-                                <Label>id</Label>
-                                <Label>{user._id}</Label>
-                            </div>
-                            <div className="flex justify-between">
-                                <Label>Ник</Label>
-                                <Label>{user.username}</Label>
-                            </div>
-                            <div className="flex justify-between">
-                                <Label>Email</Label>
-                                <Label>{user.emails?.join(', ') ?? '-'}</Label>
-                            </div>
-                            <div className="flex justify-between">
-                                <Label>Статус</Label>
-                                <Label>{user.status}</Label>
-                            </div>
-                            <div className="flex justify-between">
-                                <Label>Активен</Label>
-                                <Label>{user.active}</Label>
-                            </div>
-                            <div className="flex justify-between">
-                                <Label>Роли</Label>
-                                <Label>{user.roles?.join(', ') ?? '-'}</Label>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
 
+                <EntityCard
+                    items={[
+                        ['id', <MonoRenderer value={user._id} />],
+                        ['Ник', user.username],
+                        ['Email', <ListRenderer value={user.emails?.map(it => it.address)} />],
+                        ['Статус', user.status],
+                        ['Активен', <OptRenderer value={user.active} />],
+                        ['Роли', <ListRenderer value={user.roles} />],
+                    ]}
+                />
                 <div className={"flex justify-between gap-6"}>
                     <div className="flex justify-between gap-2">
                         <Button variant="outline">
@@ -102,8 +84,15 @@ function UserPageContent() {
             </div>
 
             {/*{JSON.stringify({teams, rooms})}*/}
-            <UserInfoRoomTableView data={rooms}/>
-            <ShortTeamTableView data={teams}/>
+            <div className={"pt-8"}>
+                <Label className={"text-3xl"}>Комнаты</Label>
+                <UserInfoRoomTableView data={rooms}/>
+            </div>
+
+            <div className={"pt-8"}>
+                <Label className={"text-3xl"}>Команды</Label>
+                <ShortTeamTableView data={teams}/>
+            </div>
             {/*<ShortTeamTableView data={teams} />*/}
 
         </div>

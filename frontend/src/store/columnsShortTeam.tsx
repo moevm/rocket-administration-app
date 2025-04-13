@@ -4,6 +4,7 @@ import {ApiTeamModel} from "@/store/global-store.ts";
 import {TypedColumnDef} from "@/store/columnsUser.tsx";
 import dayjs from 'dayjs';
 import {MonoRenderer} from "@/components/app/table/cell/CellRenderers.tsx";
+import {CheckboxRenderer} from "@/components/app/ValueRenderers.tsx";
 
 
 //TODO: вынести в отдельный компонент
@@ -67,7 +68,7 @@ export const columnsShortTeam = [
             type: 'string'
         },
         sortingFn: customSortingFn,
-        cell: MonoRenderer()
+        cell: ({cell}) => <MonoRenderer value={cell.getValue()} />
     },
     {
         accessorKey: "name",
@@ -109,6 +110,6 @@ export const columnsShortTeam = [
             type: 'string'
         },
         sortingFn: customSortingFn,
-        cell: MonoRenderer()
+        cell: ({cell}) => <MonoRenderer value={cell.getValue()} />
     },
 ] as TypedColumnDef<ApiTeamModel>[]

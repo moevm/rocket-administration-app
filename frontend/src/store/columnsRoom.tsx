@@ -2,7 +2,7 @@ import DataTableColumnHeader from "@/components/app/table/DataTableColumnHeader.
 import {Checkbox} from "@/components/ui/checkbox.tsx";
 import {ApiRoomModel} from "@/store/global-store.ts";
 import {TypedColumnDef} from "@/store/columnsUser.tsx";
-import {CheckboxRenderer, MonoRenderer, OptRenderer} from "@/components/app/table/cell/CellRenderers.tsx";
+import {CheckboxRenderer, MonoRenderer, OptRenderer} from "@/components/app/ValueRenderers.tsx";
 
 
 //TODO: вынести в отдельный компонент
@@ -68,7 +68,7 @@ export const columnsRoom = [
             title: "id",
             type: 'string'
         },
-        cell: MonoRenderer(),
+        cell: ({cell}) => <MonoRenderer value={cell.getValue()} />,
         sortingFn: customSortingFn,
     },
     {
@@ -83,7 +83,7 @@ export const columnsRoom = [
             type: 'string'
         },
         sortingFn: customSortingFn,
-        cell: OptRenderer(),
+        cell: ({cell}) => <OptRenderer value={cell.getValue()} />
     },
     {
         accessorKey: "broadcast",
@@ -96,7 +96,7 @@ export const columnsRoom = [
             title: "Бродкаст",
             type: 'boolean'
         },
-        cell: CheckboxRenderer(),
+        cell: ({cell}) => <CheckboxRenderer value={cell.getValue()} />
     },
     {
         accessorKey: "name",
@@ -110,7 +110,7 @@ export const columnsRoom = [
             type: 'string'
         },
         sortingFn: customSortingFn,
-        cell: OptRenderer(),
+        cell: ({cell}) => <OptRenderer value={cell.getValue()} />
     },
     {
         id: "t",
@@ -164,7 +164,7 @@ export const columnsRoom = [
             type: 'string'
         },
         sortingFn: customSortingFn,
-        cell: MonoRenderer(),
+        cell: ({cell}) => <MonoRenderer value={cell.getValue()} />
     },
     {
         accessorKey: "ro",
@@ -177,7 +177,7 @@ export const columnsRoom = [
             title: "Read only",
             type: 'boolean'
         },
-        cell: CheckboxRenderer()
+        cell: ({cell}) => <CheckboxRenderer value={cell.getValue()} />
     },
     {
         accessorKey: "default",
@@ -190,7 +190,7 @@ export const columnsRoom = [
             title: "Default",
             type: 'boolean'
         },
-        cell: CheckboxRenderer()
+        cell: ({cell}) => <CheckboxRenderer value={cell.getValue()} />
     },
     {
         accessorKey: "topic",
@@ -204,7 +204,7 @@ export const columnsRoom = [
             type: 'string'
         },
         sortingFn: customSortingFn,
-        cell: OptRenderer(),
+        cell: ({cell}) => <OptRenderer value={cell.getValue()} />
     },
     {
         accessorKey: "announcement",
@@ -218,6 +218,6 @@ export const columnsRoom = [
             type: 'string'
         },
         sortingFn: customSortingFn,
-        cell: OptRenderer(),
+        cell: ({cell}) => <OptRenderer value={cell.getValue()} />
     },
 ] as TypedColumnDef<ApiRoomModel>[]

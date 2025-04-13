@@ -25,7 +25,6 @@ import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVal
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover.tsx";
 
 
-
 interface RichTableViewProps<TData, TValue> {
     entries: TData[]; // состояние с данными
     tableConfig: {
@@ -39,6 +38,8 @@ interface RichTableViewProps<TData, TValue> {
     settings?: {
         enableSearch?: boolean;
         enableExport?: boolean;
+        enableImport?: boolean;
+        enableSelectFromFile?: boolean;
         enableColumnVisibilityToggle?: boolean;
         rowClickHandler?: (data: TData) => void;
     };
@@ -62,7 +63,7 @@ function RichTableView<TData, TValue>({
     const [filterString, setFilterString] = React.useState<string>();
     const [searchPosition, setSearchPosition] = React.useState<string[]>([]);
 
-    const contextMenuPosition = React.useRef<Point>({ x: 0, y: 0 });
+    const contextMenuPosition = React.useRef<Point>({x: 0, y: 0});
     const [contextMenuOpen, setContextMenuOpen] = React.useState(false);
     const contextMenuRows = React.useRef<Row<TData>[]>([]);
 
@@ -216,20 +217,18 @@ function RichTableView<TData, TValue>({
 
 
                 <div className="flex justify-between">
-                    {!(settings) || settings.enableExport && (
-                        <div className="flex gap-2">
-                            <Button variant="outline" size="sm">
-                                <FileUp/> Экспорт
-                            </Button>
-                            <Button variant="outline" size="sm">
-                                <FileDown/> Импорт
-                            </Button>
-                            <Button variant="outline" size="sm">
-                                <CheckIcon/> Выделить из файла
-                            </Button>
-                        </div>
-                    )}
-                    {settings?.enableColumnVisibilityToggle && <DataTableViewOptions table={table} />}
+                    <div className="flex gap-2">
+                        {settings?.enableExport && <Button variant="outline" size="sm">
+                            <FileUp/> Экспорт
+                        </Button>}
+                        {settings?.enableImport && <Button variant="outline" size="sm">
+                            <FileDown/> Импорт
+                        </Button>}
+                        {settings?.enableSelectFromFile && <Button variant="outline" size="sm">
+                            <CheckIcon/> Выделить из файла
+                        </Button>}
+                    </div>
+                    {settings?.enableColumnVisibilityToggle && <DataTableViewOptions table={table}/>}
                 </div>
             </div>
 
@@ -253,13 +252,14 @@ function RichTableView<TData, TValue>({
                         {table.getRowModel().rows.length ? (
                             table.getRowModel().rows.map((row) => (
                                 <TableRow
+                                    className={"cursor-pointer"}
                                     key={row.id}
                                     data-state={row.getIsSelected() && "selected"}
                                     // TODO: проваливание здесь
                                     onClick={() => settings.rowClickHandler?.(row.original)}
                                     onContextMenu={(e) => {
                                         e.preventDefault();
-                                        contextMenuPosition.current = { x: e.clientX, y: e.clientY };
+                                        contextMenuPosition.current = {x: e.clientX, y: e.clientY};
                                         const selectedRows = table.getSelectedRowModel().rows as Row<TData>[];
                                         contextMenuRows.current = row.getIsSelected() ? selectedRows : [row as Row<TData>];
 
@@ -282,7 +282,7 @@ function RichTableView<TData, TValue>({
                         )}
                     </TableBody>
                 </Table>
-                <DataTablePagination table={table} />
+                <DataTablePagination table={table}/>
             </div>
         </div>
     );

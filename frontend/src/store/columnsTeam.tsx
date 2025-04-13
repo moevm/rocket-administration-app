@@ -3,7 +3,7 @@ import {Checkbox} from "@/components/ui/checkbox.tsx";
 import {ApiTeamModel} from "@/store/global-store.ts";
 import {TypedColumnDef} from "@/store/columnsUser.tsx";
 import dayjs from 'dayjs';
-import {MonoRenderer} from "@/components/app/table/cell/CellRenderers.tsx";
+import {CheckboxRenderer, MonoRenderer, OptRenderer} from "@/components/app/ValueRenderers.tsx";
 
 
 //TODO: вынести в отдельный компонент
@@ -67,7 +67,7 @@ export const columnsTeam = [
             type: 'string'
         },
         sortingFn: customSortingFn,
-        cell: MonoRenderer()
+        cell: ({cell}) => <MonoRenderer value={cell.getValue()} />
     },
     {
         accessorKey: "name",
@@ -125,7 +125,7 @@ export const columnsTeam = [
             type: 'string'
         },
         sortingFn: customSortingFn,
-        cell: MonoRenderer()
+        cell: ({cell}) => <MonoRenderer value={cell.getValue()} />
     },
     {
         accessorKey: "updatedAt",
@@ -138,7 +138,7 @@ export const columnsTeam = [
             title: "Обновлено в",
             type: 'boolean'
         },
-        cell: ({row}) => row.original?.updatedAt || "–",
+        cell: ({cell}) => <OptRenderer value={cell.getValue()} />
     },
     {
         accessorKey: "roomId",
@@ -152,7 +152,7 @@ export const columnsTeam = [
             type: 'string'
         },
         sortingFn: customSortingFn,
-        cell: MonoRenderer()
+        cell: ({cell}) => <MonoRenderer value={cell.getValue()} />
     },
     {
         accessorKey: "rooms",
