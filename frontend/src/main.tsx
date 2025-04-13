@@ -17,6 +17,7 @@ import {Provider} from 'jotai/react'
 import {QueryClientProvider} from '@tanstack/react-query'
 import WelcomePage from "@/routes/welcome-page/WelcomePage.tsx";
 import {Toaster} from "sonner";
+import TeamsPage from "@/routes/spaces/dashboard/teams/TeamsPage.tsx";
 
 i18next.init({
     lng: "ru",
@@ -40,6 +41,7 @@ createRoot(document.getElementById('root')!).render(
                             <Route path="dashboard" element={<DashboardLayout/>}>
                                 <Route path="users" element={<UsersPage/>}/>
                                 <Route path="rooms" element={<RoomsPage/>}/>
+                                <Route path="teams" element={<TeamsPage/>}/>
                                 <Route path="notifications" element={<NotificationsPage/>}/>
                             </Route>
                         </Route>
