@@ -395,19 +395,67 @@
         }
       }
     },
-    "/send-email": {
-      "post": {
-        "summary": "Send Email",
-        "operationId": "send_email_send_email_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/EmailRequest"
+    "/spaces/{space_id}/settings/smtp": {
+      "get": {
+        "summary": "Get Smtp Settings",
+        "operationId": "get_smtp_settings_spaces__space_id__settings_smtp_get",
+        "parameters": [
+          {
+            "name": "space_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Space Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SmtpSettingsResponseDto"
+                }
               }
             }
           },
-          "required": true
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Set Smtp Settings",
+        "operationId": "set_smtp_settings_spaces__space_id__settings_smtp_post",
+        "parameters": [
+          {
+            "name": "space_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Space Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SmtpSettingsDto"
+              }
+            }
+          }
         },
         "responses": {
           "200": {
@@ -464,30 +512,6 @@
           "name"
         ],
         "title": "CreateSpaceRequest"
-      },
-      "EmailRequest": {
-        "properties": {
-          "subject": {
-            "type": "string",
-            "title": "Subject"
-          },
-          "recipient": {
-            "type": "string",
-            "format": "email",
-            "title": "Recipient"
-          },
-          "body": {
-            "type": "string",
-            "title": "Body"
-          }
-        },
-        "type": "object",
-        "required": [
-          "subject",
-          "recipient",
-          "body"
-        ],
-        "title": "EmailRequest"
       },
       "HTTPValidationError": {
         "properties": {
@@ -762,6 +786,47 @@
           "username"
         ],
         "title": "ShortUserDto"
+      },
+      "SmtpSettingsDto": {
+        "properties": {
+          "host": {
+            "type": "string",
+            "maxLength": 2083,
+            "minLength": 1,
+            "format": "uri",
+            "title": "Host"
+          },
+          "sender": {
+            "type": "string",
+            "format": "email",
+            "title": "Sender"
+          }
+        },
+        "type": "object",
+        "required": [
+          "host",
+          "sender"
+        ],
+        "title": "SmtpSettingsDto"
+      },
+      "SmtpSettingsResponseDto": {
+        "properties": {
+          "value": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SmtpSettingsDto"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "title": "SmtpSettingsResponseDto"
       },
       "SpaceDto": {
         "properties": {

@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, HttpUrl
+from pydantic import BaseModel, Field, HttpUrl, EmailStr, AnyUrl
 from typing import Optional, List
 from app.services.db import DbModel
 from datetime import datetime
@@ -111,3 +111,14 @@ class TeamInfoDto(BaseModel):
 class UserInfoDto(BaseModel):
     teams: List[ShortTeamDto]
     rooms: List[UserInfoRoomDto]
+
+class SmtpSettingsDto(BaseModel):
+    host: AnyUrl
+    sender: EmailStr
+
+class SmtpSettingsModel(DbModel):
+    host: AnyUrl
+    sender: EmailStr
+
+class SmtpSettingsResponseDto(BaseModel):
+    value: Optional[SmtpSettingsDto]

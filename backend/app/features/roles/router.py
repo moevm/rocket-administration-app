@@ -3,7 +3,8 @@ from typing import List
 from fastapi import APIRouter, Depends
 
 from app.features.spaces.utils import get_space
-from app.lib.rocket import obtain_rocket_instance, key_for_space, rocket_request, rocket_query_args
+from app.lib.cache import key_for_space
+from app.lib.rocket import obtain_rocket_instance, rocket_request, rocket_query_args
 
 from app.models import RoleDto
 

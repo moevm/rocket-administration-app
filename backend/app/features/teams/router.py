@@ -3,11 +3,12 @@ import asyncio
 from fastapi import APIRouter, Depends
 from typing import List
 
+from app.lib.cache import key_for_space
 from app.models import RoomDto, TeamInfoDto
 from app.features.spaces.utils import get_space
 from app.models import TeamDto
 from app.models import RoomUserDto
-from app.lib.rocket import obtain_rocket_instance, key_for_space, rocket_request, rocket_query_args
+from app.lib.rocket import obtain_rocket_instance, rocket_request, rocket_query_args
 
 router = APIRouter()
 
