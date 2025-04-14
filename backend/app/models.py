@@ -79,15 +79,15 @@ class RoomInfoDto(BaseModel):
 
 class CreateSpaceRequest(BaseModel):
     url: HttpUrl
-    login: str
-    password: str
+    user_id: str
+    token: str
     name: str
 
 
 class SpaceModel(DbModel):
     url: HttpUrl
-    login: str
-    password: str
+    user_id: str
+    token: str
     name: str
 
 
