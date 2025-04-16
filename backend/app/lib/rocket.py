@@ -20,8 +20,8 @@ async def obtain_rocket_instance(key: SpaceCacheKey) -> RocketChat:
 async def create_rocket_instance(key: SpaceCacheKey) -> RocketChat:
     rocket = await rocket_interaction(
         RocketChat,
-        user=key.login,
-        password=key.password,
+        user_id=key.user_id,
+        auth_token=key.token,
         server_url=key.url
     )
 
