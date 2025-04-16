@@ -17,7 +17,7 @@ function UsersPage() {
                     <div className={"flex flex-col m-6  py-4 ml-6"}>
                         <span className={"text-4xl"}>Пользователи</span>
                         <div>
-                            <UserTableView users={loaded(users).data}></UserTableView>
+                            <UserTableView data={loaded(users).data}></UserTableView>
                         </div>
                     </div>
                 }

@@ -16,7 +16,7 @@ function TeamsPage() {
                     <div className={"flex flex-col m-6  py-4 ml-6"}>
                         <span className={"text-4xl"}>Команды</span>
                         <div>
-                            <TeamsTableView users={loaded(teams).data}></TeamsTableView>
+                            <TeamsTableView data={loaded(teams).data}></TeamsTableView>
                         </div>
                     </div>
                 }

@@ -3,7 +3,8 @@ import {Checkbox} from "@/components/ui/checkbox.tsx";
 import {ApiTeamModel} from "@/store/global-store.ts";
 import {TypedColumnDef} from "@/store/columnsUser.tsx";
 import dayjs from 'dayjs';
-import {CheckboxRenderer, MonoRenderer, OptRenderer} from "@/components/app/ValueRenderers.tsx";
+import {MonoRenderer} from "@/components/app/table/cell/CellRenderers.tsx";
+import {CheckboxRenderer} from "@/components/app/ValueRenderers.tsx";
 
 
 //TODO: вынести в отдельный компонент
@@ -29,7 +30,7 @@ const typesType = {
     "0": "Открытый канал"
 }
 
-export const columnsTeam = [
+export const columnsShortTeam = [
     {
         id: "select",
         header: ({table}) => (
@@ -98,49 +99,6 @@ export const columnsTeam = [
         },
     },
     {
-        id: "createdAt",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Создано в"/>
-            )
-        },
-        accessorFn: (row) => {
-            return dayjs(row.createdAt)
-        },
-        meta: {
-            title: "Создано в",
-            type: 'string'
-        },
-        sortingFn: customSortingFn
-    },
-    {
-        accessorKey: "createdBy._id",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Создатель"/>
-            )
-        },
-        meta: {
-            title: "Создатель",
-            type: 'string'
-        },
-        sortingFn: customSortingFn,
-        cell: ({cell}) => <MonoRenderer value={cell.getValue()} />
-    },
-    {
-        accessorKey: "updatedAt",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Обновлено в"/>
-            )
-        },
-        meta: {
-            title: "Обновлено в",
-            type: 'boolean'
-        },
-        cell: ({cell}) => <OptRenderer value={cell.getValue()} />
-    },
-    {
         accessorKey: "roomId",
         header: ({column}) => {
             return (
@@ -153,29 +111,5 @@ export const columnsTeam = [
         },
         sortingFn: customSortingFn,
         cell: ({cell}) => <MonoRenderer value={cell.getValue()} />
-    },
-    {
-        accessorKey: "rooms",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Комнаты"/>
-            )
-        },
-        meta: {
-            title: "Комнаты",
-            type: 'number'
-        },
-    },
-    {
-        accessorKey: "numberOfUsers",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Количество пользователей"/>
-            )
-        },
-        meta: {
-            title: "Количество пользователей",
-            type: 'number'
-        },
     },
 ] as TypedColumnDef<ApiTeamModel>[]
