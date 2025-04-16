@@ -1,3 +1,6 @@
 mongo:
   uri: mongodb://localhost:27017
   database: rocketmanager
+
+app:
+  batch_delay: 0.2

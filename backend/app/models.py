@@ -122,3 +122,18 @@ class SmtpSettingsModel(DbModel):
 
 class SmtpSettingsResponseDto(BaseModel):
     value: Optional[SmtpSettingsDto]
+
+class UsersToChangePasswordDto(BaseModel):
+    users: List[str]
+    sendEmail: bool
+
+class Result[T](BaseModel):
+    value: Optional[T] = None
+    error: Optional[str] = None
+
+class ChangedPasswordDto(BaseModel):
+    user: str
+    password: Optional[str] = None
+    password_error: Optional[str] = None
+    email_sent: bool = False
+    email_send_error: Optional[str] = None
