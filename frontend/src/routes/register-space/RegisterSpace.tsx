@@ -1,6 +1,6 @@
 import {
     Form,
-    FormControl,
+    FormControl, FormDescription,
     FormField,
     FormItem,
     FormLabel,
@@ -110,10 +110,15 @@ function RegisterSpace() {
                                 name="token"
                                 render={({field}) => (
                                     <FormItem>
-                                        <FormLabel>Токен (Должен быть сгенерирован с опцией обхода двухфакторной авторизации)</FormLabel>
+                                        <FormLabel>
+                                            Токен
+                                        </FormLabel>
                                         <FormControl>
                                             <Input {...field} type="password"/>
                                         </FormControl>
+                                        <FormDescription>
+                                            Токен должен быть сгенерирован с опцией обхода двухфакторной авторизации.
+                                        </FormDescription>
                                         <FormMessage/>
                                     </FormItem>
                                 )}
