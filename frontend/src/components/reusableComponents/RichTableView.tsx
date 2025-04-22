@@ -316,7 +316,8 @@ function RichTableView<TData, TValue>({
                 onOpenChange={setShowDialogExport}
                 table={table}
                 selectedCount={Object.keys(rowSelection).length}
-                onExport={()=>{}}
+                data={dataAtom.users}
+                // onExport={()=>{}}
             />
         </div>
     );
