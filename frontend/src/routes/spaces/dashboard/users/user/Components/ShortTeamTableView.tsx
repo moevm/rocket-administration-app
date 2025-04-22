@@ -1,17 +1,17 @@
 import RichTableView from "@/components/app/table/RichTableView.tsx";
-import {columnsRoom} from "@/store/columnsRoom.tsx";
 import {ContextMenuItem} from "@/components/ui/context-menu.tsx";
-import {ApiRoomModel} from "@/store/global-store.ts";
+import {ApiUserInfoRoomModel} from "@/store/global-store.ts";
+import {columnsUserInfoRoom} from "@/store/columnsUserInfoRoom.tsx";
 
-function RoomsTableView (props: {
-    data: ApiRoomModel[]
+function ShortTeamTableView(props: {
+    data: ApiUserInfoRoomModel[]
 }) {
     return (
         <>
             <RichTableView
                 entries={props.data}
                 tableConfig={{
-                    columns: columnsRoom
+                    columns: columnsUserInfoRoom,
                 }}
                 contextMenuConfig={{
                     getLabel: (rows) =>
@@ -40,4 +40,4 @@ function RoomsTableView (props: {
     )
 }
 
-export default RoomsTableView
+export default ShortTeamTableView;

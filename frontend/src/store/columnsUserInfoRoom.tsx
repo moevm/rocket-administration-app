@@ -1,9 +1,9 @@
 import DataTableColumnHeader from "@/components/app/table/DataTableColumnHeader.tsx";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
-import {ApiTeamModel} from "@/store/global-store.ts";
+import {ApiRoomModel} from "@/store/global-store.ts";
 import {TypedColumnDef} from "@/store/columnsUser.tsx";
-import dayjs from 'dayjs';
-import {CheckboxRenderer, MonoRenderer, OptRenderer} from "@/components/app/ValueRenderers.tsx";
+import React from "react";
+import {ListRenderer, MonoRenderer, OptRenderer} from "@/components/app/ValueRenderers.tsx";
 
 
 //TODO: вынести в отдельный компонент
@@ -24,12 +24,15 @@ const customSortingFn = (rowA, rowB, columnId) => {
     return a.localeCompare(b, "ru", {numeric: true});
 };
 
-const typesType = {
-    "1": "Закрытый канал",
-    "0": "Открытый канал"
+const typesName = {
+    d: "Личные сообщения",
+    c: "Публичный канал",
+    p: "Приватный канал",
+    l: "Лайвчат",
+    v: "Omnichannel VoIP rooms"
 }
 
-export const columnsTeam = [
+export const columnsUserInfoRoom = [
     {
         id: "select",
         header: ({table}) => (
@@ -66,8 +69,8 @@ export const columnsTeam = [
             title: "id",
             type: 'string'
         },
+        cell: ({cell}) => <MonoRenderer value={cell.getValue()} />,
         sortingFn: customSortingFn,
-        cell: ({cell}) => <MonoRenderer value={cell.getValue()} />
     },
     {
         accessorKey: "name",
@@ -80,102 +83,51 @@ export const columnsTeam = [
             title: "Имя",
             type: 'string'
         },
-        sortingFn: customSortingFn
+        sortingFn: customSortingFn,
+        cell: ({cell}) => <OptRenderer value={cell.getValue()} />
     },
     {
-        id: "type",
+        id: "t",
         header: ({column}) => {
             return (
                 <DataTableColumnHeader column={column} title="Тип"/>
             )
         },
         accessorFn: (row) => {
-            return typesType[row.type]
+            return typesName[row.t] ?? row.t
         },
         meta: {
-            title: "Тип",
-            type: 'boolean'
-        },
-    },
-    {
-        id: "createdAt",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Создано в"/>
-            )
-        },
-        accessorFn: (row) => {
-            return dayjs(row.createdAt)
-        },
-        meta: {
-            title: "Создано в",
+            title: "Tип",
             type: 'string'
         },
-        sortingFn: customSortingFn
+        sortingFn: customSortingFn,
     },
     {
-        accessorKey: "createdBy._id",
+        accessorKey: "rid",
         header: ({column}) => {
             return (
-                <DataTableColumnHeader column={column} title="Создатель"/>
+                <DataTableColumnHeader column={column} title="rid"/>
             )
         },
         meta: {
-            title: "Создатель",
+            title: "rid",
             type: 'string'
         },
         sortingFn: customSortingFn,
         cell: ({cell}) => <MonoRenderer value={cell.getValue()} />
     },
     {
-        accessorKey: "updatedAt",
+        accessorKey: "roles",
         header: ({column}) => {
             return (
-                <DataTableColumnHeader column={column} title="Обновлено в"/>
+                <DataTableColumnHeader column={column} title="Роли"/>
             )
         },
         meta: {
-            title: "Обновлено в",
-            type: 'boolean'
-        },
-        cell: ({cell}) => <OptRenderer value={cell.getValue()} />
-    },
-    {
-        accessorKey: "roomId",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Id комнаты"/>
-            )
-        },
-        meta: {
-            title: "Id комнаты",
-            type: 'string'
+            title: "Роли",
+            type: 'list'
         },
         sortingFn: customSortingFn,
-        cell: ({cell}) => <MonoRenderer value={cell.getValue()} />
+        cell: ({cell}) => <ListRenderer value={cell.getValue()} />
     },
-    {
-        accessorKey: "rooms",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Комнаты"/>
-            )
-        },
-        meta: {
-            title: "Комнаты",
-            type: 'number'
-        },
-    },
-    {
-        accessorKey: "numberOfUsers",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Количество пользователей"/>
-            )
-        },
-        meta: {
-            title: "Количество пользователей",
-            type: 'number'
-        },
-    },
-] as TypedColumnDef<ApiTeamModel>[]
+] as TypedColumnDef<ApiRoomModel>[]

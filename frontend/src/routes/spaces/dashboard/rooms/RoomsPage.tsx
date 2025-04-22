@@ -16,7 +16,7 @@ function RoomsPage() {
                     <div className={"flex flex-col m-6  py-4 ml-6"}>
                         <span className={"text-4xl"}>Комнаты</span>
                         <div>
-                            <RoomsTableView users={loaded(rooms).data}></RoomsTableView>
+                            <RoomsTableView data={loaded(rooms).data}></RoomsTableView>
                         </div>
                     </div>
                 }
