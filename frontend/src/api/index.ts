@@ -32,7 +32,7 @@ const fetchClient = createFetchClient<paths>({
 });
 export const $api = createClient(fetchClient);
 
-export function loadableQuery<Value>(anAtom: Atom<AtomWithQueryResult<Awaited<Value>>>): Atom<Loadable<Value>> {
+export function loadableQuery<Value, Error>(anAtom: Atom<AtomWithQueryResult<Awaited<Value>, Error>>): Atom<Loadable<Value>> {
     return loadable(atom(async (get) => {
         return await get(anAtom).promise
     }))

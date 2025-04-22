@@ -1,46 +1,42 @@
 import RichTableView from "@/components/app/table/RichTableView.tsx";
-import {columnsUser} from "@/store/columnsUser.tsx";
 import {ContextMenuItem} from "@/components/ui/context-menu.tsx";
-import {useNavigate} from "react-router";
-import {ApiUserModel} from "@/store/global-store.ts";
+import {columnsTeam} from "@/store/columnsTeam.tsx";
+import {ApiTeamModel} from "@/store/global-store.ts";
 
-
-function UserTableView (props: {
-    data: ApiUserModel[]
+function TeamsTableView (props: {
+    data: ApiTeamModel[]
 }) {
-    const navigate = useNavigate();
-
     return (
         <>
             <RichTableView
                 entries={props.data}
                 tableConfig={{
-                    columns: columnsUser
+                    columns: columnsTeam
                 }}
                 contextMenuConfig={{
                     getLabel: (rows) =>
                         rows.length === 1 ? rows[0].getValue("username") : `Выбрано: ${rows.length}`,
                     items: (rows) => (
                         <>
-                            <ContextMenuItem>Добавить в команду</ContextMenuItem>
+                            <ContextMenuItem>Удалить команды</ContextMenuItem>
+                            <ContextMenuItem>Добавить участников</ContextMenuItem>
+                            <ContextMenuItem>Удалить участников</ContextMenuItem>
                             <ContextMenuItem>Добавить в комнату</ContextMenuItem>
-                            <ContextMenuItem>Удалить из команды</ContextMenuItem>
                             <ContextMenuItem>Удалить из комнаты</ContextMenuItem>
-                            <ContextMenuItem>Сменить пароль</ContextMenuItem>
-                            <ContextMenuItem>Удалить</ContextMenuItem>
                             {rows.length === 1 && <ContextMenuItem>Управление</ContextMenuItem>}
                         </>
                     )
                 }}
                 settings={{
                     enableSearch: true,
-                    enableExport: true,
-                    enableColumnVisibilityToggle: true,
-                    rowClickHandler: (user) => navigate(user._id)
+                    enableExport: false,
+                    enableColumnVisibilityToggle: true
+
+                    //rowClickHandler: (user) => openModal(user)
                 }}
             />
         </>
     )
 }
 
-export default UserTableView
+export default TeamsTableView

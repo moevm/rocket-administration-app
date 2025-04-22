@@ -1,6 +1,6 @@
 import {
     Form,
-    FormControl,
+    FormControl, FormDescription,
     FormField,
     FormItem,
     FormLabel,
@@ -21,8 +21,8 @@ import {useNavigate} from "react-router";
 const formSchema = z.object({
     name: z.string().min(2),
     url: z.string().url(),
-    login: z.string(),
-    password: z.string()
+    user_id: z.string(),
+    token: z.string()
 })
 
 function RegisterSpace() {
@@ -30,7 +30,7 @@ function RegisterSpace() {
     const navigate = useNavigate()
     const queryClient = useQueryClient()
     const {mutate, isPending} = $api.useMutation('post', '/spaces/', createMutationOptions({
-        onSuccess: async (data) => {
+        onSuccess: async (data: any) => {
             await queryClient.invalidateQueries({
                 queryKey: $spacesQueryOptions().queryKey
             })
@@ -49,8 +49,8 @@ function RegisterSpace() {
         mutate({
             body: {
                 url: values.url,
-                login: values.login,
-                password: values.password,
+                user_id: values.user_id,
+                token: values.token,
                 name: values.name
             },
         });
@@ -94,10 +94,10 @@ function RegisterSpace() {
                             />
                             <FormField
                                 control={form.control}
-                                name="login"
+                                name="user_id"
                                 render={({field}) => (
                                     <FormItem>
-                                        <FormLabel>Логин</FormLabel>
+                                        <FormLabel>Ваш ID (user_id)</FormLabel>
                                         <FormControl>
                                             <Input {...field} />
                                         </FormControl>
@@ -107,13 +107,18 @@ function RegisterSpace() {
                             />
                             <FormField
                                 control={form.control}
-                                name="password"
+                                name="token"
                                 render={({field}) => (
                                     <FormItem>
-                                        <FormLabel>Пароль</FormLabel>
+                                        <FormLabel>
+                                            Токен
+                                        </FormLabel>
                                         <FormControl>
                                             <Input {...field} type="password"/>
                                         </FormControl>
+                                        <FormDescription>
+                                            Токен должен быть сгенерирован с опцией обхода двухфакторной авторизации.
+                                        </FormDescription>
                                         <FormMessage/>
                                     </FormItem>
                                 )}

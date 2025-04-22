@@ -5,7 +5,7 @@ import DashboardLayout from "@/routes/spaces/dashboard/DashboardLayout.tsx";
 import SpaceLayout from "@/routes/spaces/SpaceLayout.tsx";
 import UsersPage from "@/routes/spaces/dashboard/users/UsersPage.tsx";
 import RoomsPage from "@/routes/spaces/dashboard/rooms/RoomsPage.tsx";
-import NotificationsPage from "@/routes/spaces/dashboard/notifications/NotificationsPage.tsx";
+import SettingsPage from "@/routes/spaces/dashboard/settings/SettingsPage.tsx";
 import NotFound from "@/routes/not-found/NotFound.tsx";
 import RegisterSpace from "@/routes/register-space/RegisterSpace.tsx";
 import i18next from "i18next";
@@ -17,6 +17,8 @@ import {Provider} from 'jotai/react'
 import {QueryClientProvider} from '@tanstack/react-query'
 import WelcomePage from "@/routes/welcome-page/WelcomePage.tsx";
 import {Toaster} from "sonner";
+import TeamsPage from "@/routes/spaces/dashboard/teams/TeamsPage.tsx";
+import UserPage from "@/routes/spaces/dashboard/users/user/UserPage.tsx";
 
 i18next.init({
     lng: "ru",
@@ -38,9 +40,11 @@ createRoot(document.getElementById('root')!).render(
                         <Route path="spaces/:spaceId" element={<SpaceLayout/>}>
                             <Route path="dashboard" element={<Navigate relative="path" to="users" replace/>}/>
                             <Route path="dashboard" element={<DashboardLayout/>}>
-                                <Route path="users" element={<UsersPage/>}/>
+                                <Route path="users" element={<UsersPage/>} />
+                                <Route path="users/:userId" element={<UserPage/>}/>
                                 <Route path="rooms" element={<RoomsPage/>}/>
-                                <Route path="notifications" element={<NotificationsPage/>}/>
+                                <Route path="teams" element={<TeamsPage/>}/>
+                                <Route path="notifications" element={<SettingsPage/>}/>
                             </Route>
                         </Route>
                         <Route path="register-space" element={<RegisterSpace/>}/>
