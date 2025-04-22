@@ -5,7 +5,7 @@ import {Label} from "@/components/ui/label";
 import {useEffect, useState} from "react";
 import {DialogBase} from "@/components/ui/DialogBase.tsx";
 import {Button} from "@/components/ui/button.tsx";
-import {exportData, Format, writeData} from "@/utils/exportFiles.ts";
+import {exportData, Format, writeData} from "@/utils/exportImportUtils.ts";
 
 interface ExportDialogProps<TData> {
     open: boolean;
@@ -30,26 +30,6 @@ export const ExportDialog = ({
         // onExport(format, selectedFields);
         console.log("format: ", format, "\nfiles: ", selectedFields, "\ndata: ", data, JSON.stringify(data));
 
-        // if (format === "JSON") {
-        //     const filteredData = data.map(item =>
-        //         selectedFields.reduce((acc, field) => {
-        //             acc[field] = item[field];
-        //             return acc;
-        //         }, {} as Record<string, any>)
-        //     );
-        //
-        //     const json = JSON.stringify(filteredData, null, 2);
-        //     const blob = new Blob([json], { type: "application/json" });
-        //     const url = URL.createObjectURL(blob);
-        //
-        //     const link = document.createElement("a");
-        //     link.href = url;
-        //     link.download = "export.json";
-        //     link.click();
-        //
-        //     URL.revokeObjectURL(url); // очистка
-        // }
-
         const exportFile = writeData(format, data, selectedFields);
         exportData(format, exportFile);
 
@@ -59,7 +39,7 @@ export const ExportDialog = ({
 
     useEffect(() => {
         if (open) {
-            setSelectedFields(null);
+            setSelectedFields([]);
         }
     }, [open]);
 
@@ -88,7 +68,7 @@ export const ExportDialog = ({
                         onValueChange={setFormat}
                         className="grid grid-cols-3 gap-2"
                     >
-                        {["CSV", "JSON", "XLS"].map((value) => (
+                        {["CSV", "JSON", "XLSX"].map((value) => (
                             <div key={value} className="flex items-center space-x-2">
                                 <RadioGroupItem value={value} id={value}/>
                                 <Label htmlFor={value}>{value}</Label>

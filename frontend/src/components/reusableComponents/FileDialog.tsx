@@ -1,9 +1,9 @@
-
 import { Input } from "@/components/ui/input";
 import {DialogBase} from "@/components/ui/DialogBase.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {useEffect, useState} from "react";
 import {toast} from "sonner";
+import {detectFormatFromFileName, parseData} from "@/utils/exportImportUtils.ts";
 
 interface FileDialogProps {
     open: boolean;
@@ -47,12 +47,43 @@ export const FileDialog = ({
         }
     };
 
-    const handleSubmit = () => {
-        if (selectedFile) {
-            onSubmit(selectedFile);
-            setSelectedFile(null);
-            onOpenChange(false);
+    // const handleSubmit = () => {
+    //     if (selectedFile) {
+    //         onSubmit(selectedFile);
+    //         setSelectedFile(null);
+    //         onOpenChange(false);
+    //     }
+    // };
+
+    // TODO: ПОКА ЧТО СТАБИЛЕН ТОЛЬКО JSON ДЛЯ ИМПОРТА
+    const handleSubmit = async () => {
+        if (!selectedFile) return;
+
+        const format = detectFormatFromFileName(selectedFile.name);
+        if (!format) {
+            toast.error("Неподдерживаемый формат файла");
+            return;
         }
+
+        const reader = new FileReader();
+
+        reader.onload = () => {
+            const result = reader.result;
+            try {
+                let parsedData: object[] = [];
+
+                parsedData = parseData(format, result as string);
+
+                console.warn(parsedData);
+                toast.success("Файл был успешно загружен (нет, конечно, смотри логи)");
+                onOpenChange(false);
+                setSelectedFile(null);
+            } catch (e) {
+                toast.error("Ошибка при чтении файла.");
+            }
+        };
+
+        reader.readAsText(selectedFile);
     };
 
     useEffect(() => {
