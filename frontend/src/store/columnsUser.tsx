@@ -1,9 +1,9 @@
-import {ColumnDef, RowData} from "@tanstack/table-core";
-import DataTableColumnHeader from "@/components/app/table/DataTableColumnHeader.tsx";
+import {ColumnDef} from "@tanstack/table-core";
+import DataTableColumnHeader from "@/components/reusableComponents/DataTableColumnHeader.tsx";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
+import {User} from "@/store/types/user.ts";
+import {RowData} from "@tanstack/table-core/src/types.ts";
 import {ColumnMeta} from "@tanstack/react-table";
-import {ApiUserModel} from "@/store/global-store.ts";
-import {CheckboxRenderer, ListRenderer, MonoRenderer, OptRenderer} from "@/components/app/ValueRenderers.tsx";
 
 // TODO точно куда-то переместить (весь файл)
 
@@ -35,11 +35,6 @@ export const relationFullName = {
     'lt': "меньше, чем",
     'ge': "больше или равно",
     'le': "меньше или равно"
-}
-
-const typesUserType = {
-    'bot': "Бот",
-    'user': "Пользователь"
 }
 
 const customSortingFn = (rowA, rowB, columnId) => {
@@ -97,7 +92,6 @@ export const columnsUser = [
             type: 'string'
         },
         sortingFn: customSortingFn,
-        cell: ({cell}) => <MonoRenderer value={cell.getValue()} />
     },
     {
         accessorKey: "username",
@@ -111,7 +105,7 @@ export const columnsUser = [
             type: 'string'
         },
         sortingFn: customSortingFn,
-        cell: ({cell}) => <OptRenderer value={cell.getValue()} />
+        cell: ({row}) => row.original?.username || "-",
     },
     {
         id: "emails",
@@ -119,7 +113,7 @@ export const columnsUser = [
             if (Array.isArray(row.emails) && row.emails.length > 0) {
                 return row.emails[0].address; // Возвращаем адрес первого email
             }
-            return "–";
+            return "Нет email";
         },
         header: ({column}) => {
             return (
@@ -144,7 +138,7 @@ export const columnsUser = [
             type: 'list'
         },
         sortingFn: customSortingFn,
-        cell: ({cell}) => <OptRenderer value={cell.getValue()} />
+        cell: ({row}) => row.original?.status || "-",
     },
     {
         accessorKey: "roles",
@@ -158,7 +152,7 @@ export const columnsUser = [
             type: 'list'
         },
         sortingFn: customSortingFn,
-        cell: ({cell}) => <ListRenderer value={cell.getValue()} />
+        cell: ({row}) => row.original?.roles || "-",
     },
     {
         accessorKey: "active",
@@ -171,21 +165,17 @@ export const columnsUser = [
             title: "Активен",
             type: 'boolean'
         },
-        cell: ({cell}) => <CheckboxRenderer value={cell.getValue()} />
     },
     {
-        id: "type",
+        accessorKey: "type",
         header: ({column}) => {
             return (
                 <DataTableColumnHeader column={column} title="Тип"/>
             )
-        },
-        accessorFn: (row) => {
-            return typesUserType[row.type] ?? row.type
         },
         meta: {
             title: "Тип",
             type: 'string'
         },
     },
-] as TypedColumnDef<ApiUserModel>[]
+] as TypedColumnDef<User>[]

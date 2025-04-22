@@ -1,7 +1,7 @@
 from fastapi import Depends, HTTPException
 from starlette import status
 
-from app.models import SpaceModel
+from app.features.spaces.models import SpaceModel
 from app.services.db import get_db, validate_object_id
 
 

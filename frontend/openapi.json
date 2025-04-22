@@ -14,191 +14,7 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {
-
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/spaces/{space_id}/teams/": {
-      "get": {
-        "summary": "Get Teams",
-        "operationId": "get_teams_spaces__space_id__teams__get",
-        "parameters": [
-          {
-            "name": "space_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Space Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/TeamDto"
-                  },
-                  "title": "Response Get Teams Spaces  Space Id  Teams  Get"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/spaces/{space_id}/teams/{team_id}": {
-      "get": {
-        "summary": "Get Team Information",
-        "operationId": "get_team_information_spaces__space_id__teams__team_id__get",
-        "parameters": [
-          {
-            "name": "team_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Team Id"
-            }
-          },
-          {
-            "name": "space_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Space Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TeamInfoDto"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/spaces/{space_id}/rooms/": {
-      "get": {
-        "summary": "Get Rooms",
-        "operationId": "get_rooms_spaces__space_id__rooms__get",
-        "parameters": [
-          {
-            "name": "space_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Space Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/RoomDto"
-                  },
-                  "title": "Response Get Rooms Spaces  Space Id  Rooms  Get"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/spaces/{space_id}/rooms/{room_id}": {
-      "get": {
-        "summary": "Get Room Information",
-        "operationId": "get_room_information_spaces__space_id__rooms__room_id__get",
-        "parameters": [
-          {
-            "name": "room_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Room Id"
-            }
-          },
-          {
-            "name": "space_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Space Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RoomInfoDto"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
+                "schema": {}
               }
             }
           }
@@ -276,6 +92,70 @@
               "type": "string",
               "title": "Space Id"
             }
+          },
+          {
+            "name": "query",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Query"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sort"
+            }
+          },
+          {
+            "name": "count",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Count"
+            }
           }
         ],
         "responses": {
@@ -284,59 +164,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/UserDto"
-                  },
-                  "title": "Response Get Users Spaces  Space Id  Users  Get"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/spaces/{space_id}/users/{user_id}": {
-      "get": {
-        "summary": "Get User Information",
-        "operationId": "get_user_information_spaces__space_id__users__user_id__get",
-        "parameters": [
-          {
-            "name": "user_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "User Id"
-            }
-          },
-          {
-            "name": "space_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Space Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserInfoDto"
+                  "$ref": "#/components/schemas/UsersResponseDto"
                 }
               }
             }
@@ -375,11 +203,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/RoleDto"
-                  },
-                  "title": "Response Get Roles Spaces  Space Id  Roles  Get"
+                  "$ref": "#/components/schemas/RolesResponseDto"
                 }
               }
             }
@@ -397,76 +221,26 @@
         }
       }
     },
-    "/spaces/{space_id}/settings/smtp": {
-      "get": {
-        "summary": "Get Smtp Settings",
-        "operationId": "get_smtp_settings_spaces__space_id__settings_smtp_get",
-        "parameters": [
-          {
-            "name": "space_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Space Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SmtpSettingsResponseDto"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      },
+    "/send-email": {
       "post": {
-        "summary": "Set Smtp Settings",
-        "operationId": "set_smtp_settings_spaces__space_id__settings_smtp_post",
-        "parameters": [
-          {
-            "name": "space_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Space Id"
-            }
-          }
-        ],
+        "summary": "Send Email",
+        "operationId": "send_email_send_email_post",
         "requestBody": {
-          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/SmtpSettingsDto"
+                "$ref": "#/components/schemas/EmailRequest"
               }
             }
-          }
+          },
+          "required": true
         },
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {
-
-                }
+                "schema": {}
               }
             }
           },
@@ -495,13 +269,13 @@
             "format": "uri",
             "title": "Url"
           },
-          "user_id": {
+          "login": {
             "type": "string",
-            "title": "User Id"
+            "title": "Login"
           },
-          "token": {
+          "password": {
             "type": "string",
-            "title": "Token"
+            "title": "Password"
           },
           "name": {
             "type": "string",
@@ -511,11 +285,35 @@
         "type": "object",
         "required": [
           "url",
-          "user_id",
-          "token",
+          "login",
+          "password",
           "name"
         ],
         "title": "CreateSpaceRequest"
+      },
+      "EmailRequest": {
+        "properties": {
+          "subject": {
+            "type": "string",
+            "title": "Subject"
+          },
+          "recipient": {
+            "type": "string",
+            "format": "email",
+            "title": "Recipient"
+          },
+          "body": {
+            "type": "string",
+            "title": "Body"
+          }
+        },
+        "type": "object",
+        "required": [
+          "subject",
+          "recipient",
+          "body"
+        ],
+        "title": "EmailRequest"
       },
       "HTTPValidationError": {
         "properties": {
@@ -568,268 +366,21 @@
         ],
         "title": "RoleDto"
       },
-      "RoomDto": {
+      "RolesResponseDto": {
         "properties": {
-          "_id": {
-            "type": "string",
-            "title": "Id"
-          },
-          "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Description"
-          },
-          "broadcast": {
-            "anyOf": [
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Broadcast"
-          },
-          "name": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Name"
-          },
-          "t": {
-            "type": "string",
-            "title": "T"
-          },
-          "msgs": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Msgs"
-          },
-          "usersCount": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Userscount"
-          },
-          "u": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/ShortUserDto"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "ro": {
-            "anyOf": [
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Ro"
-          },
-          "default": {
-            "anyOf": [
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Default"
-          },
-          "topic": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Topic"
-          },
-          "announcement": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Announcement"
-          }
-        },
-        "type": "object",
-        "required": [
-          "_id"
-        ],
-        "title": "RoomDto"
-      },
-      "RoomInfoDto": {
-        "properties": {
-          "team": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/ShortTeamDto"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "members": {
+          "roles": {
             "items": {
-              "$ref": "#/components/schemas/RoomUserDto"
+              "$ref": "#/components/schemas/RoleDto"
             },
             "type": "array",
-            "title": "Members"
-          }
-        },
-        "type": "object",
-        "title": "RoomInfoDto"
-      },
-      "RoomUserDto": {
-        "properties": {
-          "_id": {
-            "type": "string",
-            "title": "Id"
-          },
-          "username": {
-            "type": "string",
-            "title": "Username"
-          },
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
-          "status": {
-            "type": "string",
-            "title": "Status"
+            "title": "Roles"
           }
         },
         "type": "object",
         "required": [
-          "_id",
-          "username",
-          "name",
-          "status"
+          "roles"
         ],
-        "title": "RoomUserDto"
-      },
-      "ShortTeamDto": {
-        "properties": {
-          "_id": {
-            "type": "string",
-            "title": "Id"
-          },
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
-          "roomId": {
-            "type": "string",
-            "title": "Roomid"
-          },
-          "type": {
-            "type": "integer",
-            "title": "Type"
-          }
-        },
-        "type": "object",
-        "required": [
-          "_id",
-          "name",
-          "roomId",
-          "type"
-        ],
-        "title": "ShortTeamDto"
-      },
-      "ShortUserDto": {
-        "properties": {
-          "_id": {
-            "type": "string",
-            "title": "Id"
-          },
-          "username": {
-            "type": "string",
-            "title": "Username"
-          }
-        },
-        "type": "object",
-        "required": [
-          "_id",
-          "username"
-        ],
-        "title": "ShortUserDto"
-      },
-      "SmtpSettingsDto": {
-        "properties": {
-          "host": {
-            "type": "string",
-            "minLength": 1,
-            "format": "uri",
-            "title": "Host"
-          },
-          "sender": {
-            "type": "string",
-            "format": "email",
-            "title": "Sender"
-          }
-        },
-        "type": "object",
-        "required": [
-          "host",
-          "sender"
-        ],
-        "title": "SmtpSettingsDto"
-      },
-      "SmtpSettingsResponseDto": {
-        "properties": {
-          "value": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/SmtpSettingsDto"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          }
-        },
-        "type": "object",
-        "required": [
-          "value"
-        ],
-        "title": "SmtpSettingsResponseDto"
+        "title": "RolesResponseDto"
       },
       "SpaceDto": {
         "properties": {
@@ -851,13 +402,13 @@
             "format": "uri",
             "title": "Url"
           },
-          "user_id": {
+          "login": {
             "type": "string",
-            "title": "User Id"
+            "title": "Login"
           },
-          "token": {
+          "password": {
             "type": "string",
-            "title": "Token"
+            "title": "Password"
           },
           "name": {
             "type": "string",
@@ -867,113 +418,11 @@
         "type": "object",
         "required": [
           "url",
-          "user_id",
-          "token",
+          "login",
+          "password",
           "name"
         ],
         "title": "SpaceDto"
-      },
-      "TeamDto": {
-        "properties": {
-          "_id": {
-            "type": "string",
-            "title": "Id"
-          },
-          "name": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Name"
-          },
-          "type": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Type"
-          },
-          "createdAt": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Createdat"
-          },
-          "createdBy": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/ShortUserDto"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "updatedAt": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Updatedat"
-          },
-          "roomId": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Roomid"
-          }
-        },
-        "type": "object",
-        "required": [
-          "_id"
-        ],
-        "title": "TeamDto"
-      },
-      "TeamInfoDto": {
-        "properties": {
-          "users": {
-            "items": {
-              "$ref": "#/components/schemas/RoomUserDto"
-            },
-            "type": "array",
-            "title": "Users"
-          },
-          "rooms": {
-            "items": {
-              "$ref": "#/components/schemas/RoomDto"
-            },
-            "type": "array",
-            "title": "Rooms"
-          }
-        },
-        "type": "object",
-        "required": [
-          "users",
-          "rooms"
-        ],
-        "title": "TeamInfoDto"
       },
       "UserDto": {
         "properties": {
@@ -1081,71 +530,36 @@
         ],
         "title": "UserEmailDto"
       },
-      "UserInfoDto": {
+      "UsersResponseDto": {
         "properties": {
-          "teams": {
-            "items": {
-              "$ref": "#/components/schemas/ShortTeamDto"
-            },
-            "type": "array",
-            "title": "Teams"
+          "count": {
+            "type": "integer",
+            "title": "Count"
           },
-          "rooms": {
+          "offset": {
+            "type": "integer",
+            "title": "Offset"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "users": {
             "items": {
-              "$ref": "#/components/schemas/UserInfoRoomDto"
+              "$ref": "#/components/schemas/UserDto"
             },
             "type": "array",
-            "title": "Rooms"
+            "title": "Users"
           }
         },
         "type": "object",
         "required": [
-          "teams",
-          "rooms"
+          "count",
+          "offset",
+          "total",
+          "users"
         ],
-        "title": "UserInfoDto"
-      },
-      "UserInfoRoomDto": {
-        "properties": {
-          "_id": {
-            "type": "string",
-            "title": "Id"
-          },
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
-          "rid": {
-            "type": "string",
-            "title": "Rid"
-          },
-          "t": {
-            "type": "string",
-            "title": "T"
-          },
-          "roles": {
-            "anyOf": [
-              {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Roles"
-          }
-        },
-        "type": "object",
-        "required": [
-          "_id",
-          "name",
-          "rid",
-          "t"
-        ],
-        "title": "UserInfoRoomDto"
+        "title": "UsersResponseDto"
       },
       "ValidationError": {
         "properties": {

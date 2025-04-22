@@ -1,19 +1,13 @@
-import RichTableView from "@/components/app/table/RichTableView.tsx";
+import RichTableView from "@/components/reusableComponents/RichTableView.tsx";
 import {columnsUser} from "@/store/columnsUser.tsx";
 import {ContextMenuItem} from "@/components/ui/context-menu.tsx";
-import {useNavigate} from "react-router";
-import {ApiUserModel} from "@/store/global-store.ts";
 
-
-function UserTableView (props: {
-    data: ApiUserModel[]
-}) {
-    const navigate = useNavigate();
-
+function UserTableView (data: any) {
+    console.info(data)
     return (
         <>
             <RichTableView
-                entries={props.data}
+                dataAtom={data}
                 tableConfig={{
                     columns: columnsUser
                 }}
@@ -35,8 +29,9 @@ function UserTableView (props: {
                 settings={{
                     enableSearch: true,
                     enableExport: true,
-                    enableColumnVisibilityToggle: true,
-                    rowClickHandler: (user) => navigate(user._id)
+                    enableColumnVisibilityToggle: true
+
+                    //rowClickHandler: (user) => openModal(user)
                 }}
             />
         </>

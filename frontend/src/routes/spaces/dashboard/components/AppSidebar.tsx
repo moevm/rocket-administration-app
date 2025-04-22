@@ -1,6 +1,6 @@
 import {Sidebar, SidebarContent, SidebarGroup, SidebarHeader} from "@/components/ui/sidebar.tsx"
 import {Button} from "@/components/ui/button.tsx";
-import {LucideRocket, Mail, SettingsIcon, User, Users} from "lucide-react";
+import {LucideRocket, Mail, User, Users} from "lucide-react";
 import SpacePicker from "@/routes/spaces/dashboard/components/SpacePicker.tsx";
 import {NavLink} from "react-router";
 import {ApiSpaceModel} from "@/store/global-store.ts";
@@ -33,13 +33,8 @@ function AppSidebar(props: {
                         </NavLink>
                     </Button>
                     <Button asChild variant="ghost" className="justify-start px-3">
-                        <NavLink to="teams">
-                            <Users/> Команды
-                        </NavLink>
-                    </Button>
-                    <Button asChild variant="ghost" className="justify-start px-3">
                         <NavLink to="notifications">
-                            <SettingsIcon/> Настройки
+                            <Mail/> Уведомления
                         </NavLink>
                     </Button>
                 </SidebarGroup>

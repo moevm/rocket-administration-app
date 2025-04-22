@@ -1,27 +1,42 @@
 import urllib
 from asyncio import to_thread
-from pprint import pprint
 
 import requests
 from fastapi import HTTPException
 from rocketchat_API.APIExceptions.RocketExceptions import RocketAuthenticationException, RocketConnectionException
 from rocketchat_API.rocketchat import RocketChat
+from dataclasses import dataclass
 
-from app.lib.cache import SpaceCacheKey
+from app.features.spaces.models import SpaceModel
 
 cache = {}
 
-async def obtain_rocket_instance(key: SpaceCacheKey) -> RocketChat:
+
+@dataclass
+class RocketInstanceKey:
+    login: str
+    password: str
+    url: str
+
+    def __hash__(self):
+        return hash((self.login, self.password, self.url))
+
+
+def key_for_space(space: SpaceModel) -> RocketInstanceKey:
+    return RocketInstanceKey(space.login, space.password, str(space.url))
+
+
+async def obtain_rocket_instance(key: RocketInstanceKey) -> RocketChat:
     if key not in cache:
         cache[key] = await create_rocket_instance(key)
     return cache[key]
 
 
-async def create_rocket_instance(key: SpaceCacheKey) -> RocketChat:
+async def create_rocket_instance(key: RocketInstanceKey) -> RocketChat:
     rocket = await rocket_interaction(
         RocketChat,
-        user_id=key.user_id,
-        auth_token=key.token,
+        user=key.login,
+        password=key.password,
         server_url=key.url
     )
 
@@ -36,15 +51,11 @@ async def rocket_request(func, /, *args, **kwargs):
     response = await rocket_interaction(func, *args, **kwargs)
 
     if not (response.status_code == 200 and response.json()['success'] == True):
-        pprint(response.status_code)
-        pprint(response.json())
         raise HTTPException(status_code=400, detail="Ошибка запроса к RocketChat")
 
     json = response.json()
     del json['success']
-    pprint(json)
     return json
-
 
 async def rocket_interaction(func, /, *args, **kwargs):
     try:
@@ -54,7 +65,6 @@ async def rocket_interaction(func, /, *args, **kwargs):
     except (RocketConnectionException, requests.exceptions.ConnectionError):
         raise HTTPException(status_code=400,
                             detail="Ошибка доступа к RocketChat: Недействительный URL или проблема с подключением к серверу")
-
 
 def rocket_query_args(**kwargs):
     def include_arg(key, value):
@@ -67,4 +77,4 @@ def rocket_query_args(**kwargs):
             return urllib.parse.quote(value)
         return value
 
-    return {key: map_value(value) for key, value in kwargs.items() if include_arg(key, value)}
+    return { key: map_value(value) for key, value in kwargs.items() if include_arg(key, value) }
