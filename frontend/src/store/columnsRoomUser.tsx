@@ -1,8 +1,9 @@
 import DataTableColumnHeader from "@/components/app/table/DataTableColumnHeader.tsx";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
-import {ApiShortTeamModel} from "@/store/global-store.ts";
+import {ApiRoomUserModel} from "@/store/global-store.ts";
 import {TypedColumnDef} from "@/store/columnsUser.tsx";
-import {MonoRenderer} from "@/components/app/ValueRenderers.tsx";
+import React from "react";
+import {MonoRenderer, OptRenderer} from "@/components/app/ValueRenderers.tsx";
 
 
 //TODO: вынести в отдельный компонент
@@ -23,12 +24,7 @@ const customSortingFn = (rowA, rowB, columnId) => {
     return a.localeCompare(b, "ru", {numeric: true});
 };
 
-const typesType = {
-    "1": "Закрытый канал",
-    "0": "Открытый канал"
-}
-
-export const columnsShortTeam = [
+export const columnsRoomUser = [
     {
         id: "select",
         header: ({table}) => (
@@ -65,8 +61,8 @@ export const columnsShortTeam = [
             title: "id",
             type: 'string'
         },
+        cell: ({cell}) => <MonoRenderer value={cell.getValue()}/>,
         sortingFn: customSortingFn,
-        cell: ({cell}) => <MonoRenderer value={cell.getValue()} />
     },
     {
         accessorKey: "name",
@@ -79,35 +75,35 @@ export const columnsShortTeam = [
             title: "Имя",
             type: 'string'
         },
-        sortingFn: customSortingFn
+        sortingFn: customSortingFn,
+        cell: ({cell}) => <OptRenderer value={cell.getValue()}/>
     },
     {
-        id: "type",
+        accessorKey: "username",
         header: ({column}) => {
             return (
-                <DataTableColumnHeader column={column} title="Тип"/>
-            )
-        },
-        accessorFn: (row) => {
-            return typesType[row.type]
-        },
-        meta: {
-            title: "Тип",
-            type: 'boolean'
-        },
-    },
-    {
-        accessorKey: "roomId",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Id комнаты"/>
+                <DataTableColumnHeader column={column} title="Логин"/>
             )
         },
         meta: {
-            title: "Id комнаты",
+            title: "Логин",
             type: 'string'
         },
         sortingFn: customSortingFn,
-        cell: ({cell}) => <MonoRenderer value={cell.getValue()} />
+        cell: ({cell}) => <OptRenderer value={cell.getValue()}/>
     },
-] as TypedColumnDef<ApiShortTeamModel>[]
+    {
+        accessorKey: "status",
+        header: ({column}) => {
+            return (
+                <DataTableColumnHeader column={column} title="Статус"/>
+            )
+        },
+        meta: {
+            title: "Статус",
+            type: 'string'
+        },
+        sortingFn: customSortingFn,
+        cell: ({cell}) => <OptRenderer value={cell.getValue()}/>
+    },
+] as TypedColumnDef<ApiRoomUserModel>[]

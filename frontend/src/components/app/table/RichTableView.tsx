@@ -24,6 +24,10 @@ import {getColumnTypeRelations, relationFullName} from "@/store/columnsUser.tsx"
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover.tsx";
 
+export interface ContextMenuConfig<TData>{
+    getLabel?: (rows: Row<TData>[]) => string;
+    items: (rows: Row<TData>[]) => React.ReactNode;
+}
 
 interface RichTableViewProps<TData, TValue> {
     entries: TData[]; // состояние с данными
@@ -31,10 +35,7 @@ interface RichTableViewProps<TData, TValue> {
         columns: ColumnDef<TData, TValue>[];
         globalFilterFn?: any; // кастомный фильтр
     };
-    contextMenuConfig: {
-        getLabel?: (rows: Row<TData>[]) => string;
-        items: (rows: Row<TData>[]) => React.ReactNode;
-    };
+    contextMenuConfig: ContextMenuConfig<TData>
     settings?: {
         enableSearch?: boolean;
         enableExport?: boolean;

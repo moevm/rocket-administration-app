@@ -19,6 +19,8 @@ import WelcomePage from "@/routes/welcome-page/WelcomePage.tsx";
 import {Toaster} from "sonner";
 import TeamsPage from "@/routes/spaces/dashboard/teams/TeamsPage.tsx";
 import UserPage from "@/routes/spaces/dashboard/users/user/UserPage.tsx";
+import RoomPage from "@/routes/spaces/dashboard/rooms/room/RoomPage.tsx";
+import TeamPage from "@/routes/spaces/dashboard/teams/team/TeamPage.tsx";
 
 i18next.init({
     lng: "ru",
@@ -43,7 +45,9 @@ createRoot(document.getElementById('root')!).render(
                                 <Route path="users" element={<UsersPage/>} />
                                 <Route path="users/:userId" element={<UserPage/>}/>
                                 <Route path="rooms" element={<RoomsPage/>}/>
+                                <Route path="rooms/:roomId" element={<RoomPage/>}/>
                                 <Route path="teams" element={<TeamsPage/>}/>
+                                <Route path="teams/:teamId" element={<TeamPage/>}/>
                                 <Route path="notifications" element={<SettingsPage/>}/>
                             </Route>
                         </Route>

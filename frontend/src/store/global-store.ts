@@ -9,6 +9,8 @@ export type ApiRoomModel = components['schemas']['RoomDto']
 export type ApiTeamModel = components['schemas']['TeamDto']
 export type ApiSpaceModel = components['schemas']['SpaceDto']
 export type ApiUserInfoRoomModel = components['schemas']['UserInfoRoomDto']
+export type ApiRoomUserModel = components['schemas']["RoomUserDto"]
+export type ApiShortTeamModel = components['schemas']['ShortTeamDto']
 
 export const $spacesQueryOptions = () => $api.queryOptions('get', '/spaces/', {})
 export const $spacesQuery = atomWithQuery(() => $spacesQueryOptions())
@@ -181,4 +183,85 @@ export const $userInfoQuery = atomWithQuery((get) => {
 export const $userInfo = loadableQuery($userInfoQuery)
 
 
+export const $selectedRoomId = atom<string | null>(null)
 
+export const $selectedRoom = loadable(atom(async (get) => {
+    const rooms = await get($roomsQuery).promise
+    const selectedRoomId = get($selectedRoomId)
+    const result = rooms.find(it => it._id === selectedRoomId)
+
+    if (!result) {
+        throw Error('Room not found: ' + selectedRoomId)
+    }
+
+    return result
+}))
+
+export const $roomInfoQueryOptions = (spaceId: string, roomId: string, enabled: boolean) => $api.queryOptions(
+    'get',
+    `/spaces/{space_id}/rooms/{room_id}`,
+    {
+        params: {
+            path: {
+                space_id: spaceId,
+                room_id: roomId
+            }
+        },
+    },
+    {
+        enabled
+    }
+);
+
+export const $roomInfoQuery = atomWithQuery((get) => {
+    const selectedSpace = get($selectedSpace);
+    const selectedRoom = get($selectedRoom);
+    const enabled = selectedSpace.state === 'hasData' && selectedRoom.state === "hasData";
+    const spaceId = enabled ? selectedSpace.data._id! : ''
+    const roomId = enabled ? selectedRoom.data._id! : ''
+    return $roomInfoQueryOptions(spaceId, roomId, enabled)
+})
+
+export const $roomInfo = loadableQuery($roomInfoQuery)
+
+
+export const $selectedTeamId = atom<string | null>(null)
+
+export const $selectedTeam = loadable(atom(async (get) => {
+    const teams = await get($teamsQuery).promise
+    const selectedTeamId = get($selectedTeamId)
+    const result = teams.find(it => it._id === selectedTeamId)
+
+    if (!result) {
+        throw Error('Team not found: ' + selectedTeamId)
+    }
+
+    return result
+}))
+
+export const $teamInfoQueryOptions = (spaceId: string, teamId: string, enabled: boolean) => $api.queryOptions(
+    'get',
+    `/spaces/{space_id}/teams/{team_id}`,
+    {
+        params: {
+            path: {
+                space_id: spaceId,
+                team_id: teamId
+            }
+        },
+    },
+    {
+        enabled
+    }
+);
+
+export const $teamInfoQuery = atomWithQuery((get) => {
+    const selectedSpace = get($selectedSpace);
+    const selectedTeam = get($selectedTeam);
+    const enabled = selectedSpace.state === 'hasData' && selectedTeam.state === "hasData";
+    const spaceId = enabled ? selectedSpace.data._id! : ''
+    const teamId = enabled ? selectedTeam.data._id! : ''
+    return $teamInfoQueryOptions(spaceId, teamId, enabled)
+})
+
+export const $teamInfo = loadableQuery($teamInfoQuery)
