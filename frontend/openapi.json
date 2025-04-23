@@ -14,7 +14,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+
+                }
               }
             }
           }
@@ -462,7 +464,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+
+                }
               }
             }
           },
@@ -491,13 +495,13 @@
             "format": "uri",
             "title": "Url"
           },
-          "login": {
+          "user_id": {
             "type": "string",
-            "title": "Login"
+            "title": "User Id"
           },
-          "password": {
+          "token": {
             "type": "string",
-            "title": "Password"
+            "title": "Token"
           },
           "name": {
             "type": "string",
@@ -507,8 +511,8 @@
         "type": "object",
         "required": [
           "url",
-          "login",
-          "password",
+          "user_id",
+          "token",
           "name"
         ],
         "title": "CreateSpaceRequest"
@@ -847,13 +851,13 @@
             "format": "uri",
             "title": "Url"
           },
-          "login": {
+          "user_id": {
             "type": "string",
-            "title": "Login"
+            "title": "User Id"
           },
-          "password": {
+          "token": {
             "type": "string",
-            "title": "Password"
+            "title": "Token"
           },
           "name": {
             "type": "string",
@@ -863,8 +867,8 @@
         "type": "object",
         "required": [
           "url",
-          "login",
-          "password",
+          "user_id",
+          "token",
           "name"
         ],
         "title": "SpaceDto"
