@@ -41,8 +41,8 @@ async def rocket_request(func, /, *args, **kwargs):
         raise HTTPException(status_code=400, detail="Ошибка запроса к RocketChat")
 
     json = response.json()
-    del json['success']
-    pprint(json)
+    if 'success' in json:
+        del json['success']
     return json
 
 
