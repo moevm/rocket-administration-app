@@ -48,7 +48,7 @@ async def get_user_information(user_id: str, space=Depends(get_space)) -> UserIn
 async def change_user_passwords(body: UsersToChangePasswordDto, space=Depends(get_space), db=Depends(get_db)) -> List[ChangedPasswordDto]:
     rocket = await obtain_rocket_instance(key_for_space(space))
 
-    if send_email:
+    if body.sendEmail:
         smtp_settings = await require_smtp_settings(db, space.id);
 
     async def _process(user: str, password: str): 
