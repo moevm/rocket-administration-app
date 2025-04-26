@@ -1,11 +1,15 @@
 import RichTableView from "@/components/app/table/RichTableView.tsx";
-import {ContextMenuItem} from "@/components/ui/context-menu.tsx";
 import {columnsTeam} from "@/store/columnsTeam.tsx";
-import {ApiTeamModel} from "@/store/global-store.ts";
+import {$selectedSpaceId, ApiTeamModel} from "@/store/global-store.ts";
+import {useNavigate} from "react-router";
+import {teamContextMenuConfig} from "@/components/app/table/ContextMenuConfigs.tsx";
+import {useAtomValue} from "jotai/index";
 
-function TeamsTableView (props: {
+function TeamsTableView(props: {
     data: ApiTeamModel[]
 }) {
+    const navigate = useNavigate();
+    const selectedSpaceId = useAtomValue($selectedSpaceId)
     return (
         <>
             <RichTableView
@@ -13,26 +17,14 @@ function TeamsTableView (props: {
                 tableConfig={{
                     columns: columnsTeam
                 }}
-                contextMenuConfig={{
-                    getLabel: (rows) =>
-                        rows.length === 1 ? rows[0].getValue("username") : `Выбрано: ${rows.length}`,
-                    items: (rows) => (
-                        <>
-                            <ContextMenuItem>Удалить команды</ContextMenuItem>
-                            <ContextMenuItem>Добавить участников</ContextMenuItem>
-                            <ContextMenuItem>Удалить участников</ContextMenuItem>
-                            <ContextMenuItem>Добавить в комнату</ContextMenuItem>
-                            <ContextMenuItem>Удалить из комнаты</ContextMenuItem>
-                            {rows.length === 1 && <ContextMenuItem>Управление</ContextMenuItem>}
-                        </>
-                    )
-                }}
+                contextMenuConfig={
+                    teamContextMenuConfig
+                }
                 settings={{
                     enableSearch: true,
                     enableExport: false,
-                    enableColumnVisibilityToggle: true
-
-                    //rowClickHandler: (user) => openModal(user)
+                    enableColumnVisibilityToggle: true,
+                    rowClickHandler: (team) => navigate(`/spaces/${selectedSpaceId}/dashboard/teams/${team._id}`)
                 }}
             />
         </>

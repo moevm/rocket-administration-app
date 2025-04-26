@@ -1,5 +1,6 @@
 import {Loadable} from "jotai/vanilla/utils/loadable";
 import * as React from "react";
+import {errorMessage} from "@/api";
 
 
 export const BatchLoader = ({states, loadingMessage, display}: {
@@ -9,7 +10,7 @@ export const BatchLoader = ({states, loadingMessage, display}: {
 }) => {
     const errorState = states.find(it => it.state === 'hasError')
     if (errorState) {
-        return (<div>{"Ошибка: " + String(errorState.error)}</div>)
+        return (<div>{"Ошибка: " + errorMessage(errorState.error)}</div>)
     }
     const someLoading = states.some(it => it.state === 'loading')
     if (someLoading) {

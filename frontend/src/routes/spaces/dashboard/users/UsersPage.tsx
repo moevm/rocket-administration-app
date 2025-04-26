@@ -1,7 +1,7 @@
 import {$roles, $users} from "@/store/global-store.ts";
 import {useAtomValue} from "jotai/index";
 import {BatchLoader} from "@/components/app/DataLoader.tsx";
-import UserTableView from "@/routes/spaces/dashboard/users/Components/UserTableView.tsx";
+import UserTableView from "@/routes/spaces/dashboard/users/components/UserTableView.tsx";
 import {loaded} from "@/api";
 
 function UsersPage() {

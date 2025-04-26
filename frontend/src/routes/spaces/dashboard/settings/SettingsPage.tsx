@@ -8,7 +8,7 @@ import {Button} from "@/components/ui/button.tsx";
 import {$api, createMutationOptions, loaded} from "@/api";
 import {$smtpSettings, $selectedSpaceId} from "@/store/global-store.ts";
 import {useAtomValue} from "jotai/index";
-import UserTableView from "@/routes/spaces/dashboard/users/Components/UserTableView.tsx";
+import UserTableView from "@/routes/spaces/dashboard/users/components/UserTableView.tsx";
 import {BatchLoader} from "@/components/app/DataLoader.tsx";
 import {useState} from "react";
 import {Loader2} from "lucide-react";

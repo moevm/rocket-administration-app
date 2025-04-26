@@ -11,16 +11,15 @@ import {
     $selectedUserId,
     $userInfo
 } from "@/store/global-store.ts";
-import {Link, NavLink, useParams} from "react-router";
+import {NavLink, useParams} from "react-router";
 import {Label} from "@/components/ui/label.tsx";
 import {loaded} from "@/api";
-import {Card, CardContent} from "@/components/ui/card.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {useSetAtom} from "jotai/react";
 import {useEffect} from "react";
 import {BatchLoader} from "@/components/app/DataLoader.tsx";
-import UserInfoRoomTableView from "@/routes/spaces/dashboard/users/user/Components/UserInfoRoomsTableView.tsx";
-import ShortTeamTableView from "@/routes/spaces/dashboard/users/user/Components/ShortTeamTableView.tsx";
+import UserInfoRoomTableView from "@/components/app/table/UserInfoRoomTableView.tsx";
+import ShortTeamTableView from "@/components/app/table/ShortTeamTableView.tsx";
 import EntityCard from "@/components/app/EntityCard.tsx";
 import {ListRenderer, MonoRenderer, OptRenderer} from "@/components/app/ValueRenderers.tsx";
 
@@ -28,6 +27,8 @@ function UserPageContent() {
     const user = loaded(useAtomValue($selectedUser)).data
     const selectedSpaceId = useAtomValue($selectedSpaceId)!
     const {teams, rooms} = loaded(useAtomValue($userInfo)).data
+    console.log("teams")
+    console.log(teams)
 
     return (
         <div className="flex flex-col py-6 mx-6">
@@ -49,12 +50,13 @@ function UserPageContent() {
 
                 <EntityCard
                     items={[
-                        ['id', <MonoRenderer value={user._id} />],
-                        ['Ник', user.username],
-                        ['Email', <ListRenderer value={user.emails?.map(it => it.address)} />],
+                        ['id', <MonoRenderer value={user._id}/>],
+                        ['Никнейм', user.username],
+                        ['Email', <ListRenderer value={user.emails?.map(it => it.address)}/>],
                         ['Статус', user.status],
-                        ['Активен', <OptRenderer value={user.active} />],
-                        ['Роли', <ListRenderer value={user.roles} />],
+                        ['Роли', <ListRenderer value={user.roles}/>],
+                        ['Активен', <OptRenderer value={user.active}/>],
+                        ['Тип', user.type],
                     ]}
                 />
                 <div className={"flex justify-between gap-6"}>
@@ -71,8 +73,6 @@ function UserPageContent() {
                         <Button variant="outline">
                             Удалить из команды
                         </Button>
-                    </div>
-                    <div className="flex justify-between gap-2">
                         <Button variant="outline">
                             Сменить пароль
                         </Button>
@@ -83,7 +83,6 @@ function UserPageContent() {
                 </div>
             </div>
 
-            {/*{JSON.stringify({teams, rooms})}*/}
             <div className={"pt-8"}>
                 <Label className={"text-3xl"}>Комнаты</Label>
                 <UserInfoRoomTableView data={rooms}/>
@@ -93,8 +92,6 @@ function UserPageContent() {
                 <Label className={"text-3xl"}>Команды</Label>
                 <ShortTeamTableView data={teams}/>
             </div>
-            {/*<ShortTeamTableView data={teams} />*/}
-
         </div>
     )
 }

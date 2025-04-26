@@ -49,7 +49,7 @@ export function DataTablePagination<TData>({
                     </Select>
                 </div>
 
-                {((table.getState().pagination.pageIndex + 1) !== table.getPageCount()) && <>
+                {(1 !== table.getPageCount()) && <>
                     <div className="flex w-[100px] items-center justify-center text-sm font-medium">
                         Стр. {table.getState().pagination.pageIndex + 1} из{" "}
                         {table.getPageCount()}

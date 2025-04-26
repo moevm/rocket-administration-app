@@ -1,6 +1,6 @@
 import DataTableColumnHeader from "@/components/app/table/DataTableColumnHeader.tsx";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
-import {ApiRoomModel} from "@/store/global-store.ts";
+import {ApiUserInfoRoomModel} from "@/store/global-store.ts";
 import {TypedColumnDef} from "@/store/columnsUser.tsx";
 import React from "react";
 import {ListRenderer, MonoRenderer, OptRenderer} from "@/components/app/ValueRenderers.tsx";
@@ -130,4 +130,4 @@ export const columnsUserInfoRoom = [
         sortingFn: customSortingFn,
         cell: ({cell}) => <ListRenderer value={cell.getValue()} />
     },
-] as TypedColumnDef<ApiRoomModel>[]
+] as TypedColumnDef<ApiUserInfoRoomModel>[]
