@@ -45,7 +45,7 @@ export function loaded<T> (loadable: Loadable<T>) {
     }
 }
 
-const errorMessage: (error: unknown) => string = error => {
+export const errorMessage: (error: unknown) => string = error => {
     if (typeof error === "string") {
         return error
     }
