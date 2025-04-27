@@ -1,21 +1,21 @@
 import RichTableView from "@/components/app/table/RichTableView.tsx";
-import {columnsRoom} from "@/store/columnsRoom.tsx";
-import {$selectedSpaceId, ApiRoomModel} from "@/store/global-store.ts";
+import {$selectedSpaceId, ApiUserInfoRoomModel} from "@/store/global-store.ts";
+import {columnsUserInfoRoom} from "@/store/columnsUserInfoRoom.tsx";
 import {useNavigate} from "react-router";
 import {roomContextMenuConfig} from "@/components/app/table/ContextMenuConfigs.tsx";
 import {useAtomValue} from "jotai";
 
-function RoomsTableView(props: {
-    data: ApiRoomModel[]
+function UserInfoRoomTableView(props: {
+    data: ApiUserInfoRoomModel[]
 }) {
-    const navigate = useNavigate();
+    const navigate = useNavigate()
     const selectedSpaceId = useAtomValue($selectedSpaceId)
     return (
         <>
             <RichTableView
                 entries={props.data}
                 tableConfig={{
-                    columns: columnsRoom
+                    columns: columnsUserInfoRoom,
                 }}
                 contextMenuConfig={
                     roomContextMenuConfig
@@ -24,11 +24,11 @@ function RoomsTableView(props: {
                     enableSearch: true,
                     enableExport: true,
                     enableColumnVisibilityToggle: true,
-                    rowClickHandler: (room) => navigate(`/spaces/${selectedSpaceId}/dashboard/rooms/${room._id}`)
+                    rowClickHandler: (room) => navigate(`/spaces/${selectedSpaceId}/dashboard/rooms/${room.rid}`)
                 }}
             />
         </>
     )
 }
 
-export default RoomsTableView
+export default UserInfoRoomTableView

@@ -1,34 +1,34 @@
 import RichTableView from "@/components/app/table/RichTableView.tsx";
-import {columnsRoom} from "@/store/columnsRoom.tsx";
-import {$selectedSpaceId, ApiRoomModel} from "@/store/global-store.ts";
+import {$selectedSpaceId, ApiShortTeamModel} from "@/store/global-store.ts";
+import {columnsShortTeam} from "@/store/columnsShortTeam.tsx";
 import {useNavigate} from "react-router";
-import {roomContextMenuConfig} from "@/components/app/table/ContextMenuConfigs.tsx";
+import {teamContextMenuConfig} from "@/components/app/table/ContextMenuConfigs.tsx";
 import {useAtomValue} from "jotai";
 
-function RoomsTableView(props: {
-    data: ApiRoomModel[]
+function ShortTeamTableView(props: {
+    data: ApiShortTeamModel[]
 }) {
-    const navigate = useNavigate();
+    const navigate = useNavigate()
     const selectedSpaceId = useAtomValue($selectedSpaceId)
     return (
         <>
             <RichTableView
                 entries={props.data}
                 tableConfig={{
-                    columns: columnsRoom
+                    columns: columnsShortTeam,
                 }}
                 contextMenuConfig={
-                    roomContextMenuConfig
+                    teamContextMenuConfig
                 }
                 settings={{
                     enableSearch: true,
                     enableExport: true,
                     enableColumnVisibilityToggle: true,
-                    rowClickHandler: (room) => navigate(`/spaces/${selectedSpaceId}/dashboard/rooms/${room._id}`)
+                    rowClickHandler: (team) => navigate(`/spaces/${selectedSpaceId}/dashboard/teams/${team._id}`)
                 }}
             />
         </>
     )
 }
 
-export default RoomsTableView
+export default ShortTeamTableView;

@@ -3,7 +3,7 @@ import {Checkbox} from "@/components/ui/checkbox.tsx";
 import {ApiTeamModel} from "@/store/global-store.ts";
 import {TypedColumnDef} from "@/store/columnsUser.tsx";
 import dayjs from 'dayjs';
-import {CheckboxRenderer, MonoRenderer, OptRenderer} from "@/components/app/ValueRenderers.tsx";
+import {MonoRenderer, OptRenderer} from "@/components/app/ValueRenderers.tsx";
 
 
 //TODO: вынести в отдельный компонент
@@ -165,6 +165,7 @@ export const columnsTeam = [
             title: "Комнаты",
             type: 'number'
         },
+        cell: ({cell}) => <OptRenderer value={cell.getValue()} />
     },
     {
         accessorKey: "numberOfUsers",
@@ -177,5 +178,6 @@ export const columnsTeam = [
             title: "Количество пользователей",
             type: 'number'
         },
+        cell: ({cell}) => <OptRenderer value={cell.getValue()} />
     },
 ] as TypedColumnDef<ApiTeamModel>[]
