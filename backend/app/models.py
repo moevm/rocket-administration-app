@@ -137,3 +137,11 @@ class ChangedPasswordDto(BaseModel):
     password_error: Optional[str] = None
     email_sent: bool = False
     email_send_error: Optional[str] = None
+
+class UsersAndRoomsDto(BaseModel):
+    users: List[str]
+    rooms: List[str]
+
+class UsersAndRoomsResDto(BaseModel):
+    success: bool = True
+    msg: Optional[str] = None
