@@ -26,7 +26,7 @@ function WelcomePage() {
                 states={[spaces]}
                 loadingMessage={"Загрузка..."}
                 display={() =>
-                    spaces.state.length === 0
+                    loaded(spaces).data.length === 0
                         ?
                         <Label className={"text-foreground/60"}>
                             Приступим к настройке вашего первого пространства

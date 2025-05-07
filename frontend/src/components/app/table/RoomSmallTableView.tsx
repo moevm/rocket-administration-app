@@ -1,21 +1,24 @@
 import RichTableView from "@/components/app/table/RichTableView.tsx";
-import {$selectedSpaceId, ApiUserInfoRoomModel} from "@/store/global-store.ts";
-import {columnsUserInfoRoom} from "@/store/columnsUserInfoRoom.tsx";
-import {useNavigate} from "react-router";
 import {roomContextMenuConfig} from "@/components/app/ContextMenuConfigs.tsx";
-import {useAtomValue} from "jotai";
+import {columnsRoomSmall} from "@/store/columnsRoomSmall.tsx";
+import {RowSelectionState} from "@tanstack/react-table";
+import {Row} from "@tanstack/table-core/src/types.ts";
 
-function UserInfoRoomTableView(props: {
-    data: ApiUserInfoRoomModel[]
+export interface RoomSmallTableViewTData {
+    _id: string
+    name: string | null | undefined
+}
+
+export default function RoomSmallTableView(props: {
+    data: RoomSmallTableViewTData[],
+    onSelectionUpdated?: (data: Row<RoomSmallTableViewTData>[]) => void
 }) {
-    const navigate = useNavigate()
-    const selectedSpaceId = useAtomValue($selectedSpaceId)
     return (
         <>
             <RichTableView
                 entries={props.data}
                 tableConfig={{
-                    columns: columnsUserInfoRoom,
+                    columns: columnsRoomSmall
                 }}
                 contextMenuConfig={
                     roomContextMenuConfig
@@ -24,11 +27,11 @@ function UserInfoRoomTableView(props: {
                     enableSearch: true,
                     enableExport: true,
                     enableColumnVisibilityToggle: true,
-                    rowClickHandler: (room) => navigate(`/spaces/${selectedSpaceId}/dashboard/rooms/${room.rid}`)
+                }}
+                onSelectionUpdated={(data) => {
+                    props.onSelectionUpdated?.(data)
                 }}
             />
         </>
     )
 }
-
-export default UserInfoRoomTableView

@@ -2,7 +2,7 @@ import RichTableView from "@/components/app/table/RichTableView.tsx";
 import {columnsTeam} from "@/store/columnsTeam.tsx";
 import {$selectedSpaceId, ApiTeamModel} from "@/store/global-store.ts";
 import {useNavigate} from "react-router";
-import {teamContextMenuConfig} from "@/components/app/table/ContextMenuConfigs.tsx";
+import {teamContextMenuConfig} from "@/components/app/ContextMenuConfigs.tsx";
 import {useAtomValue} from "jotai/index";
 
 function TeamsTableView(props: {
