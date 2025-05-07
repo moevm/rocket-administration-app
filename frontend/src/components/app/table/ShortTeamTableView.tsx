@@ -2,7 +2,7 @@ import RichTableView from "@/components/app/table/RichTableView.tsx";
 import {$selectedSpaceId, ApiShortTeamModel} from "@/store/global-store.ts";
 import {columnsShortTeam} from "@/store/columnsShortTeam.tsx";
 import {useNavigate} from "react-router";
-import {teamContextMenuConfig} from "@/components/app/table/ContextMenuConfigs.tsx";
+import {teamContextMenuConfig} from "@/components/app/ContextMenuConfigs.tsx";
 import {useAtomValue} from "jotai";
 
 function ShortTeamTableView(props: {

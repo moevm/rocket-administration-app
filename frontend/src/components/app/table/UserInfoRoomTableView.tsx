@@ -2,7 +2,7 @@ import RichTableView from "@/components/app/table/RichTableView.tsx";
 import {$selectedSpaceId, ApiUserInfoRoomModel} from "@/store/global-store.ts";
 import {columnsUserInfoRoom} from "@/store/columnsUserInfoRoom.tsx";
 import {useNavigate} from "react-router";
-import {roomContextMenuConfig} from "@/components/app/table/ContextMenuConfigs.tsx";
+import {roomContextMenuConfig} from "@/components/app/ContextMenuConfigs.tsx";
 import {useAtomValue} from "jotai";
 
 function UserInfoRoomTableView(props: {

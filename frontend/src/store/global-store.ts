@@ -265,3 +265,8 @@ export const $teamInfoQuery = atomWithQuery((get) => {
 })
 
 export const $teamInfo = loadableQuery($teamInfoQuery)
+
+export const $selectedUsersData = atom<{
+    _id: string,
+    username: string
+}[]>([])

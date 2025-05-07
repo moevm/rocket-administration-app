@@ -14,9 +14,7 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {
-
-                }
+                "schema": {}
               }
             }
           }
@@ -354,6 +352,59 @@
         }
       }
     },
+    "/spaces/{space_id}/users/change-passwords": {
+      "post": {
+        "summary": "Change User Passwords",
+        "operationId": "change_user_passwords_spaces__space_id__users_change_passwords_post",
+        "parameters": [
+          {
+            "name": "space_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Space Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UsersToChangePasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ChangedPasswordDto"
+                  },
+                  "title": "Response Change User Passwords Spaces  Space Id  Users Change Passwords Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/spaces/{space_id}/roles/": {
       "get": {
         "summary": "Get Roles",
@@ -464,8 +515,59 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
                 "schema": {
-
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spaces/{space_id}/user_room/add": {
+      "post": {
+        "summary": "Add Users To Channel",
+        "operationId": "add_users_to_channel_spaces__space_id__user_room_add_post",
+        "parameters": [
+          {
+            "name": "space_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Space Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UsersAndRoomsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UsersAndRoomsResDto"
+                  },
+                  "title": "Response Add Users To Channel Spaces  Space Id  User Room Add Post"
                 }
               }
             }
@@ -486,6 +588,57 @@
   },
   "components": {
     "schemas": {
+      "ChangedPasswordDto": {
+        "properties": {
+          "user": {
+            "type": "string",
+            "title": "User"
+          },
+          "password": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Password"
+          },
+          "password_error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Password Error"
+          },
+          "email_sent": {
+            "type": "boolean",
+            "title": "Email Sent",
+            "default": false
+          },
+          "email_send_error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email Send Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user"
+        ],
+        "title": "ChangedPasswordDto"
+      },
       "CreateSpaceRequest": {
         "properties": {
           "url": {
@@ -1146,6 +1299,73 @@
           "t"
         ],
         "title": "UserInfoRoomDto"
+      },
+      "UsersAndRoomsDto": {
+        "properties": {
+          "users": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Users"
+          },
+          "rooms": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Rooms"
+          }
+        },
+        "type": "object",
+        "required": [
+          "users",
+          "rooms"
+        ],
+        "title": "UsersAndRoomsDto"
+      },
+      "UsersAndRoomsResDto": {
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "title": "Success",
+            "default": true
+          },
+          "msg": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Msg"
+          }
+        },
+        "type": "object",
+        "title": "UsersAndRoomsResDto"
+      },
+      "UsersToChangePasswordDto": {
+        "properties": {
+          "users": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Users"
+          },
+          "sendEmail": {
+            "type": "boolean",
+            "title": "Sendemail"
+          }
+        },
+        "type": "object",
+        "required": [
+          "users",
+          "sendEmail"
+        ],
+        "title": "UsersToChangePasswordDto"
       },
       "ValidationError": {
         "properties": {
