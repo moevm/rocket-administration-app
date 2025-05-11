@@ -14,11 +14,12 @@ from app.config import settings
 
 router = APIRouter()
 
-@router.post("/add")
+@router.post("/")
 async def add_users_to_channel(body: UsersAndRoomsDto, space=Depends(get_space)) -> List[UsersAndRoomsResDto]:
     rocket = await obtain_rocket_instance(key_for_space(space))
     
     async def _process(users: List[str], room: str) -> UsersAndRoomsResDto:
+        result = UsersAndRoomsResDto(success=False, user_list=users, room=room)
         ddp_call = {
             "msg": "method",
             "method": "addUsersToRoom",
@@ -33,9 +34,10 @@ async def add_users_to_channel(body: UsersAndRoomsDto, space=Depends(get_space))
             )
         )
         if json.loads(result.get('message')).get('error'):
-            error = UsersAndRoomsResDto(success=False, msg=json.loads(result.get('message')).get('error').get('reason'))
-            return error
-        return UsersAndRoomsResDto()
+            result.msg = json.loads(result.get('message')).get('error').get('reason')
+        else:
+            result.success = True
+        return result
     
     return await batch_execute(
             _process,
