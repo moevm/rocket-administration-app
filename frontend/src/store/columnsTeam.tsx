@@ -64,7 +64,8 @@ export const columnsTeam = [
         },
         meta: {
             title: "id",
-            type: 'string'
+            type: 'string',
+            selectFromFile: true,
         },
         sortingFn: customSortingFn,
         cell: ({cell}) => <MonoRenderer value={cell.getValue()} />
@@ -78,7 +79,8 @@ export const columnsTeam = [
         },
         meta: {
             title: "Имя",
-            type: 'string'
+            type: 'string',
+            selectFromFile: true,
         },
         sortingFn: customSortingFn
     },
@@ -149,7 +151,8 @@ export const columnsTeam = [
         },
         meta: {
             title: "Id комнаты",
-            type: 'string'
+            type: 'string',
+            selectFromFile: true,
         },
         sortingFn: customSortingFn,
         cell: ({cell}) => <MonoRenderer value={cell.getValue()} />

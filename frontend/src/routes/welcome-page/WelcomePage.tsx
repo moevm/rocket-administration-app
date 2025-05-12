@@ -26,7 +26,7 @@ function WelcomePage() {
                 states={[spaces]}
                 loadingMessage={"Загрузка..."}
                 display={() =>
-                    spaces.state.length === 0
+                    loaded(spaces).data.length === 0
                         ?
                         <Label className={"text-foreground/60"}>
                             Приступим к настройке вашего первого пространства
@@ -48,7 +48,7 @@ function WelcomePage() {
                                             <DropdownMenuItem
                                                 key={space._id}
                                                 onClick={() => navigate(`/spaces/${space._id}/dashboard`)}
-                                                className="gap-2 p-2"
+                                                className="gap-2 p-2 cursor-pointer"
                                             >
                                                 {space.name}
                                             </DropdownMenuItem>

@@ -63,7 +63,8 @@ export const columnsShortTeam = [
         },
         meta: {
             title: "id",
-            type: 'string'
+            type: 'string',
+            selectFromFile: true,
         },
         sortingFn: customSortingFn,
         cell: ({cell}) => <MonoRenderer value={cell.getValue()} />
@@ -77,7 +78,8 @@ export const columnsShortTeam = [
         },
         meta: {
             title: "Имя",
-            type: 'string'
+            type: 'string',
+            selectFromFile: true,
         },
         sortingFn: customSortingFn
     },

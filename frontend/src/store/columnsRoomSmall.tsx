@@ -1,8 +1,6 @@
 import DataTableColumnHeader from "@/components/app/table/DataTableColumnHeader.tsx";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
-import {ApiRoomUserModel} from "@/store/global-store.ts";
 import {TypedColumnDef} from "@/store/columnsUser.tsx";
-import React from "react";
 import {MonoRenderer, OptRenderer} from "@/components/app/ValueRenderers.tsx";
 
 
@@ -24,7 +22,7 @@ const customSortingFn = (rowA, rowB, columnId) => {
     return a.localeCompare(b, "ru", {numeric: true});
 };
 
-export const columnsRoomUser = [
+export const columnsRoomSmall = [
     {
         id: "select",
         header: ({table}) => (
@@ -80,33 +78,4 @@ export const columnsRoomUser = [
         sortingFn: customSortingFn,
         cell: ({cell}) => <OptRenderer value={cell.getValue()}/>
     },
-    {
-        accessorKey: "username",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Логин"/>
-            )
-        },
-        meta: {
-            title: "Логин",
-            type: 'string',
-            selectFromFile: true,
-        },
-        sortingFn: customSortingFn,
-        cell: ({cell}) => <OptRenderer value={cell.getValue()}/>
-    },
-    {
-        accessorKey: "status",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Статус"/>
-            )
-        },
-        meta: {
-            title: "Статус",
-            type: 'string'
-        },
-        sortingFn: customSortingFn,
-        cell: ({cell}) => <OptRenderer value={cell.getValue()}/>
-    },
-] as TypedColumnDef<ApiRoomUserModel>[]
+] as TypedColumnDef<{ _id: string, name: string | null | undefined }>[]

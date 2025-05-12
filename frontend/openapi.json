@@ -14,9 +14,7 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {
-
-                }
+                "schema": {}
               }
             }
           }
@@ -49,6 +47,57 @@
                     "$ref": "#/components/schemas/TeamDto"
                   },
                   "title": "Response Get Teams Spaces  Space Id  Teams  Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create Teams",
+        "operationId": "create_teams_spaces__space_id__teams__post",
+        "parameters": [
+          {
+            "name": "space_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Space Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TeamsImportRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ImportedTeamResultDto"
+                  },
+                  "title": "Response Create Teams Spaces  Space Id  Teams  Post"
                 }
               }
             }
@@ -205,6 +254,112 @@
         }
       }
     },
+    "/spaces/{space_id}/rooms/groups/": {
+      "post": {
+        "summary": "Create Groups",
+        "operationId": "create_groups_spaces__space_id__rooms_groups__post",
+        "parameters": [
+          {
+            "name": "space_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Space Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoomsImportRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ImportedRoomResultDto"
+                  },
+                  "title": "Response Create Groups Spaces  Space Id  Rooms Groups  Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spaces/{space_id}/rooms/channels/": {
+      "post": {
+        "summary": "Create Channel",
+        "operationId": "create_channel_spaces__space_id__rooms_channels__post",
+        "parameters": [
+          {
+            "name": "space_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Space Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoomsImportRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ImportedRoomResultDto"
+                  },
+                  "title": "Response Create Channel Spaces  Space Id  Rooms Channels  Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/spaces/": {
       "get": {
         "summary": "Get Spaces",
@@ -304,6 +459,57 @@
             }
           }
         }
+      },
+      "post": {
+        "summary": "Create Users",
+        "operationId": "create_users_spaces__space_id__users__post",
+        "parameters": [
+          {
+            "name": "space_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Space Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UsersImportRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ImportedUserResultDto"
+                  },
+                  "title": "Response Create Users Spaces  Space Id  Users  Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/spaces/{space_id}/users/{user_id}": {
@@ -337,6 +543,59 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/UserInfoDto"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spaces/{space_id}/users/change-passwords": {
+      "post": {
+        "summary": "Change User Passwords",
+        "operationId": "change_user_passwords_spaces__space_id__users_change_passwords_post",
+        "parameters": [
+          {
+            "name": "space_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Space Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UsersToChangePasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ChangedPasswordDto"
+                  },
+                  "title": "Response Change User Passwords Spaces  Space Id  Users Change Passwords Post"
                 }
               }
             }
@@ -464,8 +723,59 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
                 "schema": {
-
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spaces/{space_id}/user_room/": {
+      "post": {
+        "summary": "Add Users To Channel",
+        "operationId": "add_users_to_channel_spaces__space_id__user_room__post",
+        "parameters": [
+          {
+            "name": "space_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Space Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UsersAndRoomsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UsersAndRoomsResDto"
+                  },
+                  "title": "Response Add Users To Channel Spaces  Space Id  User Room  Post"
                 }
               }
             }
@@ -486,6 +796,57 @@
   },
   "components": {
     "schemas": {
+      "ChangedPasswordDto": {
+        "properties": {
+          "user": {
+            "type": "string",
+            "title": "User"
+          },
+          "password": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Password"
+          },
+          "password_error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Password Error"
+          },
+          "email_sent": {
+            "type": "boolean",
+            "title": "Email Sent",
+            "default": false
+          },
+          "email_send_error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email Send Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user"
+        ],
+        "title": "ChangedPasswordDto"
+      },
       "CreateSpaceRequest": {
         "properties": {
           "url": {
@@ -530,6 +891,129 @@
         "type": "object",
         "title": "HTTPValidationError"
       },
+      "ImportedRoomResultDto": {
+        "properties": {
+          "request": {
+            "$ref": "#/components/schemas/RoomCreateDto"
+          },
+          "created_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created Id"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "request"
+        ],
+        "title": "ImportedRoomResultDto"
+      },
+      "ImportedTeamResultDto": {
+        "properties": {
+          "request": {
+            "$ref": "#/components/schemas/TeamCreateDto"
+          },
+          "created_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created Id"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "request"
+        ],
+        "title": "ImportedTeamResultDto"
+      },
+      "ImportedUserResultDto": {
+        "properties": {
+          "request": {
+            "$ref": "#/components/schemas/UserCreateDto"
+          },
+          "created_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created Id"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "password": {
+            "type": "string",
+            "title": "Password"
+          },
+          "email_sent": {
+            "type": "boolean",
+            "title": "Email Sent",
+            "default": false
+          },
+          "email_error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "request",
+          "password"
+        ],
+        "title": "ImportedUserResultDto"
+      },
       "RoleDto": {
         "properties": {
           "_id": {
@@ -567,6 +1051,40 @@
           "protected"
         ],
         "title": "RoleDto"
+      },
+      "RoomCreateDto": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "readOnly": {
+            "type": "boolean",
+            "title": "Readonly",
+            "default": false
+          },
+          "excludeSelf": {
+            "type": "boolean",
+            "title": "Excludeself",
+            "default": false
+          },
+          "teamId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Teamid"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "title": "RoomCreateDto"
       },
       "RoomDto": {
         "properties": {
@@ -745,6 +1263,22 @@
         ],
         "title": "RoomUserDto"
       },
+      "RoomsImportRequestDto": {
+        "properties": {
+          "rooms": {
+            "items": {
+              "$ref": "#/components/schemas/RoomCreateDto"
+            },
+            "type": "array",
+            "title": "Rooms"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rooms"
+        ],
+        "title": "RoomsImportRequestDto"
+      },
       "ShortTeamDto": {
         "properties": {
           "_id": {
@@ -873,6 +1407,24 @@
         ],
         "title": "SpaceDto"
       },
+      "TeamCreateDto": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "team_type": {
+            "type": "integer",
+            "title": "Team Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "team_type"
+        ],
+        "title": "TeamCreateDto"
+      },
       "TeamDto": {
         "properties": {
           "_id": {
@@ -974,6 +1526,46 @@
           "rooms"
         ],
         "title": "TeamInfoDto"
+      },
+      "TeamsImportRequestDto": {
+        "properties": {
+          "teams": {
+            "items": {
+              "$ref": "#/components/schemas/TeamCreateDto"
+            },
+            "type": "array",
+            "title": "Teams"
+          }
+        },
+        "type": "object",
+        "required": [
+          "teams"
+        ],
+        "title": "TeamsImportRequestDto"
+      },
+      "UserCreateDto": {
+        "properties": {
+          "username": {
+            "type": "string",
+            "title": "Username"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "title": "Email"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "username",
+          "email",
+          "name"
+        ],
+        "title": "UserCreateDto"
       },
       "UserDto": {
         "properties": {
@@ -1146,6 +1738,124 @@
           "t"
         ],
         "title": "UserInfoRoomDto"
+      },
+      "UsersAndRoomsDto": {
+        "properties": {
+          "users": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Users"
+          },
+          "rooms": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Rooms"
+          }
+        },
+        "type": "object",
+        "required": [
+          "users",
+          "rooms"
+        ],
+        "title": "UsersAndRoomsDto"
+      },
+      "UsersAndRoomsResDto": {
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "title": "Success",
+            "default": true
+          },
+          "msg": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Msg"
+          },
+          "user_list": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "User List"
+          },
+          "room": {
+            "type": "string",
+            "title": "Room"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_list",
+          "room"
+        ],
+        "title": "UsersAndRoomsResDto"
+      },
+      "UsersImportRequestDto": {
+        "properties": {
+          "users": {
+            "items": {
+              "$ref": "#/components/schemas/UserCreateDto"
+            },
+            "type": "array",
+            "title": "Users"
+          },
+          "verified": {
+            "type": "boolean",
+            "title": "Verified",
+            "default": false
+          },
+          "requirePasswordChange": {
+            "type": "boolean",
+            "title": "Requirepasswordchange",
+            "default": false
+          },
+          "joinDefaultChannels": {
+            "type": "boolean",
+            "title": "Joindefaultchannels",
+            "default": true
+          },
+          "sendEmail": {
+            "type": "boolean",
+            "title": "Sendemail",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "users"
+        ],
+        "title": "UsersImportRequestDto"
+      },
+      "UsersToChangePasswordDto": {
+        "properties": {
+          "users": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Users"
+          },
+          "sendEmail": {
+            "type": "boolean",
+            "title": "Sendemail"
+          }
+        },
+        "type": "object",
+        "required": [
+          "users",
+          "sendEmail"
+        ],
+        "title": "UsersToChangePasswordDto"
       },
       "ValidationError": {
         "properties": {

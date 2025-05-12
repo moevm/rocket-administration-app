@@ -27,8 +27,6 @@ function UserPageContent() {
     const user = loaded(useAtomValue($selectedUser)).data
     const selectedSpaceId = useAtomValue($selectedSpaceId)!
     const {teams, rooms} = loaded(useAtomValue($userInfo)).data
-    console.log("teams")
-    console.log(teams)
 
     return (
         <div className="flex flex-col py-6 mx-6">
