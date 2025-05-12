@@ -280,7 +280,12 @@ function RichTableView<TData, TValue>({
                                     key={row.id}
                                     data-state={row.getIsSelected() && "selected"}
                                     // TODO: проваливание здесь
-                                    onClick={e => settings.rowClickHandler?.(row.original)}
+                                    onClick={(e) => {
+                                        const isCheckboxClick = (e.target as HTMLElement).closest('.row-select-checkbox');
+                                        if (!isCheckboxClick && settings.rowClickHandler) {
+                                            settings.rowClickHandler(row.original);
+                                        }
+                                    }}
                                     onContextMenu={(e) => {
                                         e.preventDefault();
                                         contextMenuPosition.current = {x: e.clientX, y: e.clientY};
