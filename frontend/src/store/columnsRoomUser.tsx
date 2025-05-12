@@ -59,7 +59,8 @@ export const columnsRoomUser = [
         },
         meta: {
             title: "id",
-            type: 'string'
+            type: 'string',
+            selectFromFile: true,
         },
         cell: ({cell}) => <MonoRenderer value={cell.getValue()}/>,
         sortingFn: customSortingFn,
@@ -73,7 +74,8 @@ export const columnsRoomUser = [
         },
         meta: {
             title: "Имя",
-            type: 'string'
+            type: 'string',
+            selectFromFile: true,
         },
         sortingFn: customSortingFn,
         cell: ({cell}) => <OptRenderer value={cell.getValue()}/>
@@ -87,7 +89,8 @@ export const columnsRoomUser = [
         },
         meta: {
             title: "Логин",
-            type: 'string'
+            type: 'string',
+            selectFromFile: true,
         },
         sortingFn: customSortingFn,
         cell: ({cell}) => <OptRenderer value={cell.getValue()}/>

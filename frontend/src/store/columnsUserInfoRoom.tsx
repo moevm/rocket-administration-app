@@ -67,7 +67,8 @@ export const columnsUserInfoRoom = [
         },
         meta: {
             title: "id",
-            type: 'string'
+            type: 'string',
+            selectFromFile: true,
         },
         cell: ({cell}) => <MonoRenderer value={cell.getValue()} />,
         sortingFn: customSortingFn,
@@ -81,7 +82,8 @@ export const columnsUserInfoRoom = [
         },
         meta: {
             title: "Имя",
-            type: 'string'
+            type: 'string',
+            selectFromFile: true,
         },
         sortingFn: customSortingFn,
         cell: ({cell}) => <OptRenderer value={cell.getValue()} />
@@ -111,7 +113,8 @@ export const columnsUserInfoRoom = [
         },
         meta: {
             title: "rid",
-            type: 'string'
+            type: 'string',
+            selectFromFile: true,
         },
         sortingFn: customSortingFn,
         cell: ({cell}) => <MonoRenderer value={cell.getValue()} />

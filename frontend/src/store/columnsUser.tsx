@@ -9,7 +9,7 @@ import {CheckboxRenderer, ListRenderer, MonoRenderer, OptRenderer} from "@/compo
 
 // TODO а это куда-нибудь вынести
 export type ColumnType = 'string' | 'number' | 'list' | 'none'
-export type TypedColumnDef<T extends RowData> = ColumnDef<T> & { meta: ColumnMeta<T, unknown> & { type: ColumnType } }
+export type TypedColumnDef<T extends RowData> = ColumnDef<T> & { meta: ColumnMeta<T, unknown> & { type: ColumnType, selectFromFile?: true } }
 
 export const getColumnTypeRelations: (type: ColumnType) => string[] = type => {
     switch (type) {
@@ -94,7 +94,8 @@ export const columnsUser = [
         },
         meta: {
             title: "id",
-            type: 'string'
+            type: 'string',
+            selectFromFile: true,
         },
         sortingFn: customSortingFn,
         cell: ({cell}) => <MonoRenderer value={cell.getValue()} />
@@ -108,7 +109,23 @@ export const columnsUser = [
         },
         meta: {
             title: "Никнейм",
-            type: 'string'
+            type: 'string',
+            selectFromFile: true,
+        },
+        sortingFn: customSortingFn,
+        cell: ({cell}) => <OptRenderer value={cell.getValue()} />
+    },
+    {
+        accessorKey: 'name',
+        header: ({column}) => {
+            return (
+                <DataTableColumnHeader column={column} title="Имя"/>
+            )
+        },
+        meta: {
+            title: "Имя",
+            type: 'string',
+            selectFromFile: true,
         },
         sortingFn: customSortingFn,
         cell: ({cell}) => <OptRenderer value={cell.getValue()} />
@@ -128,7 +145,7 @@ export const columnsUser = [
         },
         meta: {
             title: "Email",
-            type: 'list'
+            type: 'list',
         },
         sortingFn: customSortingFn,
     },
