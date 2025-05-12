@@ -4,6 +4,38 @@ from app.services.db import DbModel
 from datetime import datetime
 
 
+class RoomCreateDto(BaseModel):
+    name: str
+    readOnly: bool = False
+    excludeSelf: bool = False
+    teamId: Optional[str] = None
+
+
+class RoomsImportRequestDto(BaseModel):
+    rooms: List[RoomCreateDto]
+
+
+class ImportedRoomResultDto(BaseModel):
+    request: RoomCreateDto
+    created_id: Optional[str] = None
+    error: Optional[str] = None
+
+
+class TeamCreateDto(BaseModel):
+    name: str
+    team_type: int
+
+
+class TeamsImportRequestDto(BaseModel):
+    teams: List[TeamCreateDto]
+
+
+class ImportedTeamResultDto(BaseModel):
+    request: TeamCreateDto
+    created_id: Optional[str] = None
+    error: Optional[str] = None
+
+
 class ShortUserDto(BaseModel):
     id: str = Field(alias='_id')
     username: str
@@ -58,12 +90,14 @@ class RoomDto(BaseModel):
     topic: Optional[str] = None
     announcement: Optional[str] = None
 
+
 class UserInfoRoomDto(BaseModel):
     id: str = Field(alias='_id')
     name: str
     rid: str
     t: str
     roles: Optional[List[str]] = None
+
 
 class RoomUserDto(BaseModel):
     id: str = Field(alias='_id')
@@ -104,32 +138,40 @@ class TeamDto(BaseModel):
     updatedAt: Optional[str] = None
     roomId: Optional[str] = None
 
+
 class TeamInfoDto(BaseModel):
     users: List[RoomUserDto]
     rooms: List[RoomDto]
+
 
 class UserInfoDto(BaseModel):
     teams: List[ShortTeamDto]
     rooms: List[UserInfoRoomDto]
 
+
 class SmtpSettingsDto(BaseModel):
     host: AnyUrl
     sender: EmailStr
+
 
 class SmtpSettingsModel(DbModel):
     host: AnyUrl
     sender: EmailStr
 
+
 class SmtpSettingsResponseDto(BaseModel):
     value: Optional[SmtpSettingsDto]
+
 
 class UsersToChangePasswordDto(BaseModel):
     users: List[str]
     sendEmail: bool
 
+
 class Result[T](BaseModel):
     value: Optional[T] = None
     error: Optional[str] = None
+
 
 class ChangedPasswordDto(BaseModel):
     user: str
