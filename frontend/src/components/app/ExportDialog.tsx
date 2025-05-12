@@ -1,6 +1,5 @@
 import {MultiSelect} from "@/components/ui/multi-select";
 import {Table} from "@tanstack/react-table";
-import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
 import {Label} from "@/components/ui/label";
 import {useEffect, useState} from "react";
 import {Button} from "@/components/ui/button.tsx";
@@ -8,6 +7,7 @@ import {exportData, Format, writeData} from "@/lib/importExport.ts";
 import {DialogBase} from "@/components/app/DialogBase.tsx";
 import {SettingsIcon} from "lucide-react";
 import * as React from "react";
+import {RadioGroup, RadioGroupItem} from "@radix-ui/react-radio-group";
 
 interface ExportDialogProps<TData> {
     open: boolean;

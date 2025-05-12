@@ -5,6 +5,7 @@ import {ApiSpaceModel} from "@/store/global-store.ts";
 import AddUserInRoomDialog from "@/components/app/dialogs/AddUserInRoomDialog.tsx";
 
 import PasswordChangeDialog from "@/components/app/dialogs/PasswordChangeDialog.tsx";
+import AddNewTeamDialog from "@/components/app/dialogs/AddNewTeamDialog.tsx";
 
 function DashboardLayout() {
     const context = useOutletContext<{
@@ -15,6 +16,7 @@ function DashboardLayout() {
         <>
             <AddUserInRoomDialog/>
             <PasswordChangeDialog/>
+            <AddNewTeamDialog/>
             <div>
                 <SidebarProvider>
                     <AppSidebar spaces={context.spaces} selectedSpace={context.selectedSpace}/>

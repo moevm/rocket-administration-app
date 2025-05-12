@@ -1,11 +1,11 @@
 import React from 'react';
 import {ContextMenuItem} from "@/components/ui/context-menu.tsx";
 import {ContextMenuConfig} from "@/components/app/table/RichTableView.tsx";
-import {showAddUserInRoomDialogAtom} from "@/components/app/dialogs/AddUserInRoomDialog.tsx";
 import {showPasswordChangeDialogAtom} from "@/components/app/dialogs/PasswordChangeDialog.tsx";
 import {useSetAtom} from "jotai/react";
 import {$selectedUsersData} from "@/store/global-store.ts";
 import {Row} from "@tanstack/react-table";
+import {showAddUserInRoomDialogAtom} from "@/components/app/dialogs/AddUserInRoomDialog.tsx";
 
 const RoomContextMenuItems = ({ rows }: { rows: Row<{ _id: string }>[] }) => {
     return (

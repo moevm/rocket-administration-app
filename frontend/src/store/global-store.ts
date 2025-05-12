@@ -270,3 +270,5 @@ export const $selectedUsersData = atom<{
     _id: string,
     username: string
 }[]>([])
+
+export const showAddNewTeamDialogAtom = atom(false)

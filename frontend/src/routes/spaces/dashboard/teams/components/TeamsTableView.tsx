@@ -1,17 +1,24 @@
 import RichTableView from "@/components/app/table/RichTableView.tsx";
 import {columnsTeam} from "@/store/columnsTeam.tsx";
-import {$selectedSpaceId, ApiTeamModel} from "@/store/global-store.ts";
+import {$selectedSpaceId, ApiTeamModel, showAddNewTeamDialogAtom} from "@/store/global-store.ts";
 import {useNavigate} from "react-router";
 import {teamContextMenuConfig} from "@/components/app/ContextMenuConfigs.tsx";
 import {useAtomValue} from "jotai/index";
+import {Button} from "@/components/ui/button.tsx";
+import {useSetAtom} from "jotai/react";
 
 function TeamsTableView(props: {
     data: ApiTeamModel[]
 }) {
     const navigate = useNavigate();
     const selectedSpaceId = useAtomValue($selectedSpaceId)
+    const setAddNewTeamDialogOpen = useSetAtom(showAddNewTeamDialogAtom)
+
     return (
         <>
+            <Button onClick={() => {setAddNewTeamDialogOpen(true)}}>
+                Создать новую команду
+            </Button>
             <RichTableView
                 entries={props.data}
                 tableConfig={{
