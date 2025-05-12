@@ -35,6 +35,7 @@
 ## Презентационные материалы по итерациям
 - [Итерация 1](https://drive.google.com/drive/folders/1cgXuRVM2eAp7yFS5OYtudYH-PBtbQSNq?usp=sharing)
 - [Итерация 2](https://drive.google.com/drive/folders/1SJm08sUdA8MLXN2RVRCKJ4dqcyaZYY6z?usp=sharing)
+- [Итерация 3](https://drive.google.com/drive/folders/1t6ETYGQydHmT-OFfqr1GdcGjVoDtWogv?usp=sharing)
 
 ## Макет проекта в фигме
 [Ссылка на макет](https://www.figma.com/design/1Fm0lzr0mrgXzQTRJC4MYu/RocketManager?node-id=0-1&t=BaHwGUoHsekZdO76-1)
