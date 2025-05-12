@@ -27,7 +27,7 @@ function UserTableView(props: {
                     enableImport: true,
                     // enableSelectFromFile: true,
                     enableColumnVisibilityToggle: true,
-                    // rowClickHandler: (user) => navigate(`/spaces/${selectedSpaceId}/dashboard/users/${user._id}`)
+                    rowClickHandler: (user) => navigate(`/spaces/${selectedSpaceId}/dashboard/users/${user._id}`)
                 }}
             />
         </>
