@@ -2,8 +2,8 @@ import RichTableView from "@/components/app/table/RichTableView.tsx";
 import {columnsUser} from "@/store/columnsUser.tsx";
 import {useNavigate} from "react-router";
 import {$selectedSpaceId, ApiUserModel} from "@/store/global-store.ts";
-import {userContextMenuConfig} from "@/components/app/table/ContextMenuConfigs.tsx";
 import {useAtomValue} from "jotai/index";
+import {userContextMenuConfig} from "@/components/app/ContextMenuConfigs.tsx";
 
 
 function UserTableView(props: {
@@ -27,7 +27,7 @@ function UserTableView(props: {
                     enableImport: true,
                     // enableSelectFromFile: true,
                     enableColumnVisibilityToggle: true,
-                    rowClickHandler: (user) => navigate(`/spaces/${selectedSpaceId}/dashboard/users/${user._id}`)
+                    // rowClickHandler: (user) => navigate(`/spaces/${selectedSpaceId}/dashboard/users/${user._id}`)
                 }}
             />
         </>

@@ -2,7 +2,7 @@ import * as React from "react";
 import {
     ColumnFiltersState, flexRender,
     getCoreRowModel, getFilteredRowModel,
-    getPaginationRowModel, getSortedRowModel, Row,
+    getPaginationRowModel, getSortedRowModel, Row, RowSelectionState,
     SortingState,
     useReactTable,
     VisibilityState
@@ -48,13 +48,15 @@ interface RichTableViewProps<TData, TValue> {
         enableColumnVisibilityToggle?: boolean;
         rowClickHandler?: (data: TData) => void;
     };
+    onSelectionUpdated?: (data: Row<TData>[]) => void;
 }
 
 function RichTableView<TData, TValue>({
                                           entries,
                                           tableConfig,
                                           contextMenuConfig,
-                                          settings = {}
+                                          settings = {},
+                                          onSelectionUpdated
                                       }: RichTableViewProps<TData, TValue>) {
     console.info({
         entries: entries
@@ -90,7 +92,12 @@ function RichTableView<TData, TValue>({
             columnFilters
         },
         onSortingChange: setSorting,
-        onRowSelectionChange: setRowSelection,
+        onRowSelectionChange: data => {
+            setRowSelection(data)
+            setTimeout(() => {
+                onSelectionUpdated?.(table.getSelectedRowModel().rows)
+            }, 0)
+        },
         onColumnVisibilityChange: setColumnVisibility,
         onColumnFiltersChange: setColumnFilters,
         getCoreRowModel: getCoreRowModel(),
@@ -273,7 +280,7 @@ function RichTableView<TData, TValue>({
                                     key={row.id}
                                     data-state={row.getIsSelected() && "selected"}
                                     // TODO: проваливание здесь
-                                    onClick={() => settings.rowClickHandler?.(row.original)}
+                                    onClick={e => settings.rowClickHandler?.(row.original)}
                                     onContextMenu={(e) => {
                                         e.preventDefault();
                                         contextMenuPosition.current = {x: e.clientX, y: e.clientY};
