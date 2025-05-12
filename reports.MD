@@ -30,6 +30,7 @@
 
 ## Созвоны
 - 19.02 "Установочный созвон с заказчиком" - [Видео созвона](https://drive.google.com/file/d/1fuV6T1Pz0x65xq_crpFkzh3fJxcRnu-M/view?usp=drive_link),[Протокол созвона](https://docs.google.com/document/d/13HYdbLqcll7nwrs00wcXWWKeJ4-dftQDDA2424svJtc/edit?usp=drive_link)
+- 28.04 "Созовон с заказчиком" - [Видео созвона](https://drive.google.com/file/d/1us8EU02PRC8MiZrD6LZcyddWHmM8m7--/view?usp=sharing),[Протокол созвона](https://docs.google.com/document/d/1QdUJP7gTy0UDSMEBgGXwyO2gufR9L35N2ET2OIKvchg/edit?usp=sharing)
 
 ## Презентационные материалы по итерациям
 - [Итерация 1](https://drive.google.com/drive/folders/1cgXuRVM2eAp7yFS5OYtudYH-PBtbQSNq?usp=sharing)
