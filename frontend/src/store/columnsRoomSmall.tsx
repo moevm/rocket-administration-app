@@ -57,7 +57,8 @@ export const columnsRoomSmall = [
         },
         meta: {
             title: "id",
-            type: 'string'
+            type: 'string',
+            selectFromFile: true,
         },
         cell: ({cell}) => <MonoRenderer value={cell.getValue()}/>,
         sortingFn: customSortingFn,
@@ -71,7 +72,8 @@ export const columnsRoomSmall = [
         },
         meta: {
             title: "Имя",
-            type: 'string'
+            type: 'string',
+            selectFromFile: true,
         },
         sortingFn: customSortingFn,
         cell: ({cell}) => <OptRenderer value={cell.getValue()}/>

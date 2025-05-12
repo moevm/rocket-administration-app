@@ -12,8 +12,7 @@ import {$rooms, $selectedSpaceId, $selectedUsersData} from "@/store/global-store
 import {Plus} from "lucide-react";
 import {BatchLoader} from "@/components/app/DataLoader.tsx";
 import {useState} from "react";
-import RoomSmallTableView, {RoomSmallTableViewTData} from "@/components/app/table/RoomSmallTableView.tsx";
-import {RowSelectionState} from "@tanstack/react-table";
+import RoomSmallTableView from "@/components/app/table/RoomSmallTableView.tsx";
 
 export const showAddUserInRoomDialogAtom = atom(false)
 
@@ -28,7 +27,7 @@ function AddUserInRoomContent(props: {
     const {
         mutate,
         isPending
-    } = $api.useMutation('post', '/spaces/{space_id}/user_room/add', createMutationOptions({
+    } = $api.useMutation('post', '/spaces/{space_id}/user_room/', createMutationOptions({
         onSuccess: async (data) => {
             console.log(data)
         }
@@ -48,15 +47,8 @@ function AddUserInRoomContent(props: {
         })
     };
 
-    const handleDialogOpenChange = (isOpen) => {
-        if (isPending) {
-            return;
-        }
-        setOpen(isOpen);
-    };
-
     return (
-        <Dialog open={open} onOpenChange={handleDialogOpenChange}>
+        <Dialog open={open} onOpenChange={setOpen}>
             <DialogContent className="max-w-2xl">
                 <DialogHeader>
                     <DialogTitle>Добавить в комнату</DialogTitle>
@@ -89,13 +81,11 @@ function AddUserInRoomContent(props: {
 const AddUserInRoomDialog = () => {
     const rooms = useAtomValue($rooms)
 
-    const smallRooms = loaded(rooms).data.map(({_id, name}) => ({_id, name}))
-
     return (
         <BatchLoader
             states={[rooms]}
             loadingMessage='Загрузка комнат'
-            display={() => <AddUserInRoomContent smallRooms={smallRooms}/>}
+            display={() => <AddUserInRoomContent smallRooms={loaded(rooms).data.map(({_id, name}) => ({_id, name}))}/>}
         />
     )
 }

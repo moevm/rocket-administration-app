@@ -48,7 +48,7 @@ function WelcomePage() {
                                             <DropdownMenuItem
                                                 key={space._id}
                                                 onClick={() => navigate(`/spaces/${space._id}/dashboard`)}
-                                                className="gap-2 p-2"
+                                                className="gap-2 p-2 cursor-pointer"
                                             >
                                                 {space.name}
                                             </DropdownMenuItem>
