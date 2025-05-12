@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.features import spaces, users, roles, rooms, teams, settings
+from app.features.relations import user_room
 from app.services.db import database_lifespan
 
 logger = logging.getLogger(__name__)
@@ -30,4 +31,5 @@ app.include_router(spaces.router, prefix="/spaces")
 app.include_router(users.router, prefix="/spaces/{space_id}/users")
 app.include_router(roles.router, prefix="/spaces/{space_id}/roles")
 app.include_router(settings.router, prefix="/spaces/{space_id}/settings")
+app.include_router(user_room.router, prefix="/spaces/{space_id}/user_room")
 

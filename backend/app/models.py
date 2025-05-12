@@ -35,6 +35,28 @@ class ImportedTeamResultDto(BaseModel):
     created_id: Optional[str] = None
     error: Optional[str] = None
 
+class UserCreateDto(BaseModel):
+    username: str
+    email: EmailStr
+    name: str
+
+class UsersImportRequestDto(BaseModel):
+    users: List[UserCreateDto]
+    verified: bool = False
+    requirePasswordChange: bool = False
+    joinDefaultChannels: bool = True
+    sendEmail: bool = False
+
+
+class ImportedUserResultDto(BaseModel):
+    request: UserCreateDto
+    created_id: Optional[str] = None
+    error: Optional[str] = None
+    password: str
+    email_sent: bool = False
+    email_error: Optional[str] = None
+
+
 
 class ShortUserDto(BaseModel):
     id: str = Field(alias='_id')
@@ -179,3 +201,15 @@ class ChangedPasswordDto(BaseModel):
     password_error: Optional[str] = None
     email_sent: bool = False
     email_send_error: Optional[str] = None
+
+
+class UsersAndRoomsDto(BaseModel):
+    users: List[str]
+    rooms: List[str]
+
+class UsersAndRoomsResDto(BaseModel):
+    success: bool = True
+    msg: Optional[str] = None
+    user_list: List[str]
+    room: str
+
