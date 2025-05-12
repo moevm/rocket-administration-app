@@ -15,7 +15,7 @@ from app.config import settings
 router = APIRouter()
 
 @router.post("/")
-async def add_users_to_channel(body: UsersAndRoomsDto, space=Depends(get_space)) -> List[UsersAndRoomsResDto]:
+async def add_users_to_rooms(body: UsersAndRoomsDto, space=Depends(get_space)) -> List[UsersAndRoomsResDto]:
     rocket = await obtain_rocket_instance(key_for_space(space))
     
     async def _process(users: List[str], room: str) -> UsersAndRoomsResDto:
@@ -26,15 +26,15 @@ async def add_users_to_channel(body: UsersAndRoomsDto, space=Depends(get_space))
             "id": str(uuid.uuid4()),
             "params": [{"rid": room, "users": users}]
         }
-        result = await rocket_request(
+        tmp = await rocket_request(
             rocket.call_api_post,
             "method.call/addUsersToRoom",
             **rocket_query_args(
             message=json.dumps(ddp_call)
             )
         )
-        if json.loads(result.get('message')).get('error'):
-            result.msg = json.loads(result.get('message')).get('error').get('reason')
+        if json.loads(tmp.get('message')).get('error'):
+            result.msg = json.loads(tmp.get('message')).get('error').get('reason')
         else:
             result.success = True
         return result
