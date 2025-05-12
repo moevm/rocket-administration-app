@@ -2,6 +2,8 @@ import {Outlet, useOutletContext} from "react-router";
 import {SidebarProvider} from "@/components/ui/sidebar.tsx";
 import AppSidebar from "@/routes/spaces/dashboard/components/AppSidebar";
 import {ApiSpaceModel} from "@/store/global-store.ts";
+import AddUserInRoomDialog from "@/components/app/dialogs/AddUserInRoomDialog.tsx";
+
 import PasswordChangeDialog from "@/components/app/dialogs/PasswordChangeDialog.tsx";
 
 function DashboardLayout() {
@@ -11,6 +13,7 @@ function DashboardLayout() {
     }>()
     return (
         <>
+            <AddUserInRoomDialog/>
             <PasswordChangeDialog/>
             <div>
                 <SidebarProvider>

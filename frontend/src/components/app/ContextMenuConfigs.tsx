@@ -1,6 +1,7 @@
 import React from 'react';
 import {ContextMenuItem} from "@/components/ui/context-menu.tsx";
 import {ContextMenuConfig} from "@/components/app/table/RichTableView.tsx";
+import {showAddUserInRoomDialogAtom} from "@/components/app/dialogs/AddUserInRoomDialog.tsx";
 import {showPasswordChangeDialogAtom} from "@/components/app/dialogs/PasswordChangeDialog.tsx";
 import {useSetAtom} from "jotai/react";
 import {$selectedUsersData} from "@/store/global-store.ts";
@@ -35,6 +36,7 @@ export const roomContextMenuConfig: ContextMenuConfig<{
 
 const UserContextMenuItems = ({ rows }: { rows: Row<{ _id: string }>[] }) => {
     const setPasswordChangeDialogOpen = useSetAtom(showPasswordChangeDialogAtom)
+    const setAddUserInRoomDialogOpen = useSetAtom(showAddUserInRoomDialogAtom)
     const setSelectedUsersData = useSetAtom($selectedUsersData)
     const data = rows.map(it => ({
         _id: it.getValue('_id') as string,
@@ -43,7 +45,10 @@ const UserContextMenuItems = ({ rows }: { rows: Row<{ _id: string }>[] }) => {
     return (
         <>
             <ContextMenuItem>Добавить в команду</ContextMenuItem>
-            <ContextMenuItem>Добавить в комнату</ContextMenuItem>
+            <ContextMenuItem onClick={() => {
+                setSelectedUsersData(data)
+                setAddUserInRoomDialogOpen(true)
+            }}>Добавить в комнату</ContextMenuItem>
             <ContextMenuItem>Удалить из команды</ContextMenuItem>
             <ContextMenuItem>Удалить из комнаты</ContextMenuItem>
             <ContextMenuItem onClick={() => {
