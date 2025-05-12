@@ -1,6 +1,6 @@
 import {
     Form,
-    FormControl,
+    FormControl, FormDescription,
     FormField,
     FormItem,
     FormLabel,
@@ -15,24 +15,25 @@ import {Card, CardContent, CardHeader} from "@/components/ui/card.tsx";
 import {$api, createMutationOptions} from "@/api";
 import {Loader2} from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query"
-import {$spaces, $spacesQuery, $spacesQueryOptions,} from "@/store/global-store.ts";
+import {$spacesQueryOptions,} from "@/store/global-store.ts";
 import {useNavigate} from "react-router";
 
 const formSchema = z.object({
-    //TODO validation
     name: z.string().min(2),
     url: z.string().url(),
-    login: z.string(),
-    password: z.string()
+    user_id: z.string(),
+    token: z.string()
 })
 
 function RegisterSpace() {
 
     const navigate = useNavigate()
     const queryClient = useQueryClient()
-    const {mutate, isPending} = $api.useMutation('post', '/spaces', createMutationOptions({
-        onSuccess: async (data, variables, context) => {
-            await queryClient.invalidateQueries($spacesQueryOptions.queryKey)
+    const {mutate, isPending} = $api.useMutation('post', '/spaces/', createMutationOptions({
+        onSuccess: async (data: any) => {
+            await queryClient.invalidateQueries({
+                queryKey: $spacesQueryOptions().queryKey
+            })
             navigate(`/spaces/${data._id}`)
         }
     }))
@@ -45,12 +46,11 @@ function RegisterSpace() {
     })
 
     function onSubmit(values: z.infer<typeof formSchema>) {
-        console.log(values)
         mutate({
             body: {
                 url: values.url,
-                login: values.login,
-                password: values.password,
+                user_id: values.user_id,
+                token: values.token,
                 name: values.name
             },
         });
@@ -64,7 +64,7 @@ function RegisterSpace() {
                     Регистрация пространства
                 </CardHeader>
                 <CardContent>
-                    <Form {...form} className={""}>
+                    <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                             <FormField
                                 control={form.control}
@@ -94,10 +94,10 @@ function RegisterSpace() {
                             />
                             <FormField
                                 control={form.control}
-                                name="login"
+                                name="user_id"
                                 render={({field}) => (
                                     <FormItem>
-                                        <FormLabel>Логин</FormLabel>
+                                        <FormLabel>Ваш ID (user_id)</FormLabel>
                                         <FormControl>
                                             <Input {...field} />
                                         </FormControl>
@@ -107,13 +107,18 @@ function RegisterSpace() {
                             />
                             <FormField
                                 control={form.control}
-                                name="password"
+                                name="token"
                                 render={({field}) => (
                                     <FormItem>
-                                        <FormLabel>Пароль</FormLabel>
+                                        <FormLabel>
+                                            Токен
+                                        </FormLabel>
                                         <FormControl>
                                             <Input {...field} type="password"/>
                                         </FormControl>
+                                        <FormDescription>
+                                            Токен должен быть сгенерирован с опцией обхода двухфакторной авторизации.
+                                        </FormDescription>
                                         <FormMessage/>
                                     </FormItem>
                                 )}

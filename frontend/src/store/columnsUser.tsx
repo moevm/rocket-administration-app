@@ -1,15 +1,15 @@
-import {ColumnDef} from "@tanstack/table-core";
-import DataTableColumnHeader from "@/components/reusableComponents/DataTableColumnHeader.tsx";
+import {ColumnDef, RowData} from "@tanstack/table-core";
+import DataTableColumnHeader from "@/components/app/table/DataTableColumnHeader.tsx";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
-import {User} from "@/store/types/user.ts";
-import {RowData} from "@tanstack/table-core/src/types.ts";
 import {ColumnMeta} from "@tanstack/react-table";
+import {ApiUserModel} from "@/store/global-store.ts";
+import {CheckboxRenderer, ListRenderer, MonoRenderer, OptRenderer} from "@/components/app/ValueRenderers.tsx";
 
 // TODO точно куда-то переместить (весь файл)
 
 // TODO а это куда-нибудь вынести
 export type ColumnType = 'string' | 'number' | 'list' | 'none'
-export type TypedColumnDef<T extends RowData> = ColumnDef<T> & { meta: ColumnMeta<T, unknown> & { type: ColumnType } }
+export type TypedColumnDef<T extends RowData> = ColumnDef<T> & { meta: ColumnMeta<T, unknown> & { type: ColumnType, selectFromFile?: true } }
 
 export const getColumnTypeRelations: (type: ColumnType) => string[] = type => {
     switch (type) {
@@ -35,6 +35,11 @@ export const relationFullName = {
     'lt': "меньше, чем",
     'ge': "больше или равно",
     'le': "меньше или равно"
+}
+
+const typesUserType = {
+    'bot': "Бот",
+    'user': "Пользователь"
 }
 
 const customSortingFn = (rowA, rowB, columnId) => {
@@ -89,9 +94,11 @@ export const columnsUser = [
         },
         meta: {
             title: "id",
-            type: 'string'
+            type: 'string',
+            selectFromFile: true,
         },
         sortingFn: customSortingFn,
+        cell: ({cell}) => <MonoRenderer value={cell.getValue()} />
     },
     {
         accessorKey: "username",
@@ -102,10 +109,26 @@ export const columnsUser = [
         },
         meta: {
             title: "Никнейм",
-            type: 'string'
+            type: 'string',
+            selectFromFile: true,
         },
         sortingFn: customSortingFn,
-        cell: ({row}) => row.original?.username || "-",
+        cell: ({cell}) => <OptRenderer value={cell.getValue()} />
+    },
+    {
+        accessorKey: 'name',
+        header: ({column}) => {
+            return (
+                <DataTableColumnHeader column={column} title="Имя"/>
+            )
+        },
+        meta: {
+            title: "Имя",
+            type: 'string',
+            selectFromFile: true,
+        },
+        sortingFn: customSortingFn,
+        cell: ({cell}) => <OptRenderer value={cell.getValue()} />
     },
     {
         id: "emails",
@@ -113,7 +136,7 @@ export const columnsUser = [
             if (Array.isArray(row.emails) && row.emails.length > 0) {
                 return row.emails[0].address; // Возвращаем адрес первого email
             }
-            return "Нет email";
+            return "–";
         },
         header: ({column}) => {
             return (
@@ -122,7 +145,7 @@ export const columnsUser = [
         },
         meta: {
             title: "Email",
-            type: 'list'
+            type: 'list',
         },
         sortingFn: customSortingFn,
     },
@@ -138,7 +161,7 @@ export const columnsUser = [
             type: 'list'
         },
         sortingFn: customSortingFn,
-        cell: ({row}) => row.original?.status || "-",
+        cell: ({cell}) => <OptRenderer value={cell.getValue()} />
     },
     {
         accessorKey: "roles",
@@ -152,7 +175,7 @@ export const columnsUser = [
             type: 'list'
         },
         sortingFn: customSortingFn,
-        cell: ({row}) => row.original?.roles || "-",
+        cell: ({cell}) => <ListRenderer value={cell.getValue()} />
     },
     {
         accessorKey: "active",
@@ -165,17 +188,21 @@ export const columnsUser = [
             title: "Активен",
             type: 'boolean'
         },
+        cell: ({cell}) => <CheckboxRenderer value={cell.getValue()} />
     },
     {
-        accessorKey: "type",
+        id: "type",
         header: ({column}) => {
             return (
                 <DataTableColumnHeader column={column} title="Тип"/>
             )
+        },
+        accessorFn: (row) => {
+            return typesUserType[row.type] ?? row.type
         },
         meta: {
             title: "Тип",
             type: 'string'
         },
     },
-] as TypedColumnDef<User>[]
+] as TypedColumnDef<ApiUserModel>[]

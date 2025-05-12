@@ -1,26 +1,16 @@
 import {Label} from "@/components/ui/label.tsx";
 import {Button} from "@/components/ui/button.tsx";
-import {NavLink, Outlet, useNavigate} from "react-router";
-import DataLoader from "@/components/reusableComponents/DataLoader.tsx";
+import {NavLink, useNavigate} from "react-router";
+import {BatchLoader} from "@/components/app/DataLoader.tsx";
 import {useAtomValue} from "jotai/index";
 import {$spaces} from "@/store/global-store.ts";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuLabel, DropdownMenuSeparator,
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu.tsx";
-import {SidebarMenuButton} from "@/components/ui/sidebar.tsx";
-import {ChevronsUpDown, Plus} from "lucide-react";
-import {
-    NavigationMenu,
-    NavigationMenuContent,
-    NavigationMenuItem, NavigationMenuLink,
-    NavigationMenuList
-} from "@/components/ui/navigation-menu.tsx";
-import {cn} from "@/lib/utils.ts";
-import * as React from "react";
+import {loaded} from "@/api";
 
 
 function WelcomePage() {
@@ -32,11 +22,11 @@ function WelcomePage() {
             <Label className={"text-2xl"}>
                 Добро пожаловать в <span className={"text-primary"}>RocketManager</span>
             </Label>
-            <DataLoader
-                state={spaces}
+            <BatchLoader
+                states={[spaces]}
                 loadingMessage={"Загрузка..."}
-                display={(data) =>
-                    data.length === 0
+                display={() =>
+                    loaded(spaces).data.length === 0
                         ?
                         <Label className={"text-foreground/60"}>
                             Приступим к настройке вашего первого пространства
@@ -54,11 +44,11 @@ function WelcomePage() {
                                     align="start"
                                 >
                                     {
-                                        data.map((space) => (
+                                        loaded(spaces).data.map((space) => (
                                             <DropdownMenuItem
                                                 key={space._id}
                                                 onClick={() => navigate(`/spaces/${space._id}/dashboard`)}
-                                                className="gap-2 p-2"
+                                                className="gap-2 p-2 cursor-pointer"
                                             >
                                                 {space.name}
                                             </DropdownMenuItem>

@@ -5,6 +5,7 @@ from typing import Any, Annotated, Union, Optional, TypeVar, Type
 from bson import ObjectId
 from pydantic import BaseModel, HttpUrl, AfterValidator, PlainSerializer, WithJsonSchema, Field, ConfigDict
 from pymongo import AsyncMongoClient
+from pymongo.asynchronous.database import AsyncDatabase
 from pymongo.errors import ConnectionFailure
 
 from app.config import settings
@@ -30,7 +31,7 @@ async def database_lifespan(_):
     await mongodb_client.aclose()
 
 
-async def get_db():
+async def get_db() -> AsyncDatabase:
     return mongodb_client[settings.mongo.database]
 
 
