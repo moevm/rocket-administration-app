@@ -9,6 +9,10 @@ from app.features.spaces.utils import get_space
 from app.models import TeamDto
 from app.models import RoomUserDto
 from app.lib.rocket import obtain_rocket_instance, rocket_request, rocket_query_args
+from app.services.db import get_db
+from app.lib.utils import batch_execute, generate_password, extract_exception_message
+from app.config import settings
+from app.models import TeamsImportRequestDto, ImportedTeamResultDto, TeamCreateDto
 
 router = APIRouter()
 
@@ -39,3 +43,41 @@ async def get_team_information(team_id: str, space=Depends(get_space)) -> TeamIn
         'users': [member['user'] for member in team_users_raw['members']],
         'rooms': team_rooms_raw['rooms']
     })
+
+@router.post("/")
+async def create_teams(
+    body: TeamsImportRequestDto,
+    space=Depends(get_space)
+) -> List[ImportedTeamResultDto]:
+    rocket = await obtain_rocket_instance(key_for_space(space))
+
+    async def _process_team_creation(team_data: TeamCreateDto):
+
+        result = ImportedTeamResultDto(
+            request=team_data
+        )
+
+        try:
+            create_args = team_data.model_dump(exclude_unset=True)
+
+            responce_data = await rocket_request(
+                rocket.teams_create,
+                **rocket_query_args(**create_args)
+            )
+
+            create_team = responce_data['team']
+            result.created_id = create_team['_id']
+
+        except Exception as e:
+            result.error = extract_exception_message(e)
+
+        return result
+
+    tasks_args = [(teams,) for teams in body.teams]
+    results: List[ImportedTeamResultDto] = await batch_execute(
+        _process_team_creation,
+        tasks_args,
+        settings.app.batch_delay
+    )
+
+    return results

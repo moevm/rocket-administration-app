@@ -4,6 +4,37 @@ from app.services.db import DbModel
 from datetime import datetime
 
 
+class RoomCreateDto(BaseModel):
+    name: str
+    readOnly: bool = False
+    excludeSelf: bool = False
+    teamId: Optional[str] = None
+
+
+class RoomsImportRequestDto(BaseModel):
+    rooms: List[RoomCreateDto]
+
+
+class ImportedRoomResultDto(BaseModel):
+    request: RoomCreateDto
+    created_id: Optional[str] = None
+    error: Optional[str] = None
+
+
+class TeamCreateDto(BaseModel):
+    name: str
+    team_type: int
+
+
+class TeamsImportRequestDto(BaseModel):
+    teams: List[TeamCreateDto]
+
+
+class ImportedTeamResultDto(BaseModel):
+    request: TeamCreateDto
+    created_id: Optional[str] = None
+    error: Optional[str] = None
+
 class UserCreateDto(BaseModel):
     username: str
     email: EmailStr
@@ -24,6 +55,7 @@ class ImportedUserResultDto(BaseModel):
     password: str
     email_sent: bool = False
     email_error: Optional[str] = None
+
 
 
 class ShortUserDto(BaseModel):
