@@ -44,6 +44,7 @@ export const columnsTeam = [
         ),
         cell: ({row}) => (
             <Checkbox
+                className="row-select-checkbox"
                 checked={row.getIsSelected()}
                 onCheckedChange={(value) => row.toggleSelected(!!value)}
                 aria-label="Выбрать"
