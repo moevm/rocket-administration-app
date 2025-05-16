@@ -124,9 +124,12 @@ export function exportData(format: Format, exportFile: string) {
 
 }
 
-export function writeData(format: Format, data: object[], selectedFields: string[]): string {
-    const filteredData = data.map(item =>
-        selectedFields.reduce((acc, field) => {
+export function writeData(format: Format, data: object[], selectedFields: string[] | null): string {
+    const filteredData = data.map(item => {
+        if (selectedFields === null) {
+            return item
+        }
+        return selectedFields.reduce((acc, field) => {
             let value = item[field];
             // не уверен, что верное решение, но нормально. Просто вложенность превращаем в строку
             // для excel, например
@@ -136,7 +139,7 @@ export function writeData(format: Format, data: object[], selectedFields: string
             acc[field] = value;
             return acc;
         }, {} as Record<string, any>)
-    );
+    });
 
     switch (format) {
         case 'JSON':

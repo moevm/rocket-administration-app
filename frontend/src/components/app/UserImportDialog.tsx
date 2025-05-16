@@ -157,6 +157,7 @@ export const UserImportDialog = ({
                     object = Object.fromEntries(Object.entries(object).map(([k, v]) => ([k.toLowerCase(), v])))
 
                     if (!object.hasOwnProperty('username')|| String(object['username']) == 'null') {
+                        console.info({error: object})
                         toast.error('Не найден обязательный параметр username')
                         return
                     }

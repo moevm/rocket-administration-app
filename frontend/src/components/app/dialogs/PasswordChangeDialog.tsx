@@ -9,9 +9,15 @@ import {useAtom, useAtomValue} from "jotai/index";
 import {atom} from "jotai";
 import {Button} from "@/components/ui/button.tsx";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
-import {useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import {$api, createMutationOptions} from "@/api";
 import {$selectedSpaceId, $selectedUsersData} from "@/store/global-store.ts";
+import {exportData, Format, writeData} from "@/lib/importExport.ts";
+import {any} from "zod";
+import {Label} from "@/components/ui/label.tsx";
+import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group.tsx";
+import {MultiSelect} from "@/components/ui/multi-select.tsx";
+import * as React from "react";
 
 export const showPasswordChangeDialogAtom = atom(false)
 
@@ -23,6 +29,17 @@ const PasswordChangeDialog = () => {
     const selectedUsersData = useAtomValue($selectedUsersData)
     const [changedPasswordNumber, setChangedPasswordNumber] = useState(0)
     const [emailSendNumber, setEmailSendNumber] = useState(0)
+    const [changedPasswordsData, setChangedPasswordsData] = useState<object[]>([])
+
+    useEffect(() => {
+        if (!open) {
+            setDialogStep(1)
+            setIsSendingEmailChecked(false)
+            setChangedPasswordNumber(0)
+            setEmailSendNumber(0)
+            setChangedPasswordsData([])
+        }
+    }, [open]);
 
     const {
         mutate,
@@ -31,6 +48,9 @@ const PasswordChangeDialog = () => {
         onSuccess: async (data) => {
             setChangedPasswordNumber(data.filter(item => item.password_error === null).length)
             setEmailSendNumber(data.filter(item => item.email_send_error === null).length)
+
+            console.log('changed passwords data', data)
+            setChangedPasswordsData(data)
             setDialogStep(0);
         }
     }))
@@ -64,6 +84,19 @@ const PasswordChangeDialog = () => {
         setOpen(isOpen);
     };
 
+    //Копипаст Экспорта
+    const [format, setFormat] = useState<Format>("CSV");
+    const [selectedFields, setSelectedFields] = useState<string[]>([]);
+
+    const handleExport = useCallback(() => {
+        // onExport(format, selectedFields);
+        const exportFile = writeData(format, changedPasswordsData, null);
+        exportData(format, exportFile);
+
+        setSelectedFields([]);
+    }, [changedPasswordsData, format, selectedFields])
+
+
     return (
         <Dialog open={open} onOpenChange={handleDialogOpenChange}>
             <DialogContent className="sm:max-w-md">
@@ -95,25 +128,22 @@ const PasswordChangeDialog = () => {
                         </label>
                     </div>
                     :
-                    <div className="flex flex-col space-y-2">
-                        <label
-                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                            В каком формате скачать пароли?
-                        </label>
 
-                        <div className="flex items-center space-x-2">
-                            <div className="flex items-center">
-                                <Checkbox id="CSV"/>
-                                <label htmlFor="CSV" className="ml-2 text-sm">CSV</label>
-                            </div>
-                            <div className="flex items-center">
-                                <Checkbox id="XLS"/>
-                                <label htmlFor="XLS" className="ml-2 text-sm">XLS</label>
-                            </div>
-                            <div className="flex items-center">
-                                <Checkbox id="JSON"/>
-                                <label htmlFor="JSON" className="ml-2 text-sm">JSON</label>
-                            </div>
+                    <div className="flex flex-col w-full gap-4">
+                        <div className="flex flex-col items-start gap-2 w-full">
+                            <Label>Формат</Label>
+                            <RadioGroup
+                                value={format}
+                                onValueChange={setFormat}
+                                className="grid grid-cols-3 gap-2"
+                            >
+                                {["CSV", "JSON", "XLSX"].map((value) => (
+                                    <div key={value} className="flex items-center space-x-2">
+                                        <RadioGroupItem value={value} id={value}/>
+                                        <Label htmlFor={value}>{value}</Label>
+                                    </div>
+                                ))}
+                            </RadioGroup>
                         </div>
                     </div>
                 }
@@ -126,8 +156,12 @@ const PasswordChangeDialog = () => {
                     ) : (
                         <>
                             <DialogClose asChild>
-                                <Button type="button" variant="default" onClick={handleDownloadClick}>
-                                    Скачать
+                                <Button
+                                    type="submit"
+                                    className="w-full"
+                                    onClick={handleExport}
+                                >
+                                    Экспорт
                                 </Button>
                             </DialogClose>
                         </>

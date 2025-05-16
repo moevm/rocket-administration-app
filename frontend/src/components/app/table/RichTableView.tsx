@@ -319,7 +319,7 @@ function RichTableView<TData, TValue>({
                 onOpenChange={setShowDialogExport}
                 table={table}
                 selectedCount={Object.keys(rowSelection).length}
-                data={entries}
+                data={(table.getSelectedRowModel().rows as Row<TData>[]).map(it => it.original)}
             />
             <FileDialog
                 open={showDialogSelectFromFile}

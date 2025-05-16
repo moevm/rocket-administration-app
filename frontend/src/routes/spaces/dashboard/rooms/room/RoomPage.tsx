@@ -113,9 +113,9 @@ function RoomPage() {
     const selectedRoom = useAtomValue($selectedRoom)
     const selectedRoomInfo = useAtomValue($roomInfo)
 
-    useEffect(() => {
+ `   useEffect(() => {
         setSelectedRoomId(roomId!)
-    }, [setSelectedRoomId, roomId]);
+    }, [setSelectedRoomId, roomId]);`
 
     return (
         <BatchLoader
