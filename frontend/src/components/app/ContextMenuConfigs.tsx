@@ -6,8 +6,12 @@ import {useSetAtom} from "jotai/react";
 import {$selectedUsersData} from "@/store/global-store.ts";
 import {Row} from "@tanstack/react-table";
 import {showAddUserInRoomDialogAtom} from "@/components/app/dialogs/AddUserInRoomDialog.tsx";
+import {showAddUserInTeamDialogAtom} from "@/components/app/dialogs/AddUserInTeamDialog.tsx";
+import {showDeleteUserFromRoomDialogAtom} from "@/components/app/dialogs/DeleteUserFromRoomDialog.tsx";
+import {showDeleteUserFromTeamDialogAtom} from "@/components/app/dialogs/DeleteUserFromTeamDialog.tsx";
+import {showDeleteUserDialogAtom} from "@/components/app/dialogs/DeleteUserDialog.tsx";
 
-const RoomContextMenuItems = ({ rows }: { rows: Row<{ _id: string }>[] }) => {
+const RoomContextMenuItems = ({rows}: { rows: Row<{ _id: string }>[] }) => {
     return (
         <>
             <ContextMenuItem>Удалить комнату</ContextMenuItem>
@@ -34,9 +38,13 @@ export const roomContextMenuConfig: ContextMenuConfig<{
     )
 };
 
-const UserContextMenuItems = ({ rows }: { rows: Row<{ _id: string }>[] }) => {
+const UserContextMenuItems = ({rows}: { rows: Row<{ _id: string }>[] }) => {
     const setPasswordChangeDialogOpen = useSetAtom(showPasswordChangeDialogAtom)
     const setAddUserInRoomDialogOpen = useSetAtom(showAddUserInRoomDialogAtom)
+    const setAddUserInTeamDialogOpen = useSetAtom(showAddUserInTeamDialogAtom)
+    const setDeleteUserFromRoomDialogOpen = useSetAtom(showDeleteUserFromRoomDialogAtom)
+    const setDeleteUserFromTeamDialogOpen = useSetAtom(showDeleteUserFromTeamDialogAtom)
+    const setDeleteUserDialogOpen = useSetAtom(showDeleteUserDialogAtom)
     const setSelectedUsersData = useSetAtom($selectedUsersData)
     const data = rows.map(it => ({
         _id: it.getValue('_id') as string,
@@ -44,18 +52,30 @@ const UserContextMenuItems = ({ rows }: { rows: Row<{ _id: string }>[] }) => {
     }))
     return (
         <>
-            <ContextMenuItem>Добавить в команду</ContextMenuItem>
+            <ContextMenuItem onClick={() => {
+                setSelectedUsersData(data)
+                setAddUserInTeamDialogOpen(true)
+            }}>Добавить в команду</ContextMenuItem>
             <ContextMenuItem onClick={() => {
                 setSelectedUsersData(data)
                 setAddUserInRoomDialogOpen(true)
             }}>Добавить в комнату</ContextMenuItem>
-            <ContextMenuItem>Удалить из команды</ContextMenuItem>
-            <ContextMenuItem>Удалить из комнаты</ContextMenuItem>
+            <ContextMenuItem onClick={() => {
+                setSelectedUsersData(data)
+                setDeleteUserFromTeamDialogOpen(true)
+            }}>Удалить из команды</ContextMenuItem>
+            <ContextMenuItem onClick={() => {
+                setSelectedUsersData(data)
+                setDeleteUserFromRoomDialogOpen(true)
+            }}>Удалить из комнаты</ContextMenuItem>
             <ContextMenuItem onClick={() => {
                 setSelectedUsersData(data)
                 setPasswordChangeDialogOpen(true)
             }}>Сменить пароль</ContextMenuItem>
-            <ContextMenuItem>Удалить</ContextMenuItem>
+            <ContextMenuItem onClick={() => {
+                setSelectedUsersData(data)
+                setDeleteUserDialogOpen(true)
+            }}>Удалить</ContextMenuItem>
             {rows.length === 1 && <ContextMenuItem>Управление</ContextMenuItem>}
         </>
     )
@@ -73,7 +93,7 @@ export const userContextMenuConfig: ContextMenuConfig<{
     )
 };
 
-const TeamContextMenuItems = ({ rows }: { rows: Row<{ _id: string }>[] }) => {
+const TeamContextMenuItems = ({rows}: { rows: Row<{ _id: string }>[] }) => {
     return (
         <>
             <ContextMenuItem>Удалить команды</ContextMenuItem>

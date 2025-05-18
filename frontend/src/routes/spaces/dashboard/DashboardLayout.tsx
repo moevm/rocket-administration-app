@@ -6,6 +6,10 @@ import AddUserInRoomDialog from "@/components/app/dialogs/AddUserInRoomDialog.ts
 
 import PasswordChangeDialog from "@/components/app/dialogs/PasswordChangeDialog.tsx";
 import AddNewTeamDialog from "@/components/app/dialogs/AddNewTeamDialog.tsx";
+import AddUserInTeamDialog from "@/components/app/dialogs/AddUserInTeamDialog.tsx";
+import DeleteUserFromRoomDialog from "@/components/app/dialogs/DeleteUserFromRoomDialog.tsx";
+import DeleteUserFromTeamDialog from "@/components/app/dialogs/DeleteUserFromTeamDialog.tsx";
+import DeleteUserDialog from "@/components/app/dialogs/DeleteUserDialog.tsx";
 
 function DashboardLayout() {
     const context = useOutletContext<{
@@ -17,6 +21,10 @@ function DashboardLayout() {
             <AddUserInRoomDialog/>
             <PasswordChangeDialog/>
             <AddNewTeamDialog/>
+            <AddUserInTeamDialog/>
+            <DeleteUserFromRoomDialog/>
+            <DeleteUserFromTeamDialog/>
+            <DeleteUserDialog/>
             <div>
                 <SidebarProvider>
                     <AppSidebar spaces={context.spaces} selectedSpace={context.selectedSpace}/>
