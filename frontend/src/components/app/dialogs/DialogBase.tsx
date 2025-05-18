@@ -5,7 +5,7 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-} from "@/components/ui/dialog";
+} from "@/components/ui/dialog.tsx";
 import { ReactNode } from "react";
 import {cn} from "@/lib/utils.ts";
 

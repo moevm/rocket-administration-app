@@ -1,9 +1,9 @@
-import {Input} from "@/components/ui/input";
+import {Input} from "@/components/ui/input.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {ReactNode, useEffect, useState} from "react";
 import {toast} from "sonner";
 import {detectFormatFromFileName, parseData} from "@/lib/importExport.ts";
-import {DialogBase} from "@/components/app/DialogBase.tsx";
+import {DialogBase} from "@/components/app/dialogs/DialogBase.tsx";
 import {errorMessage} from "@/api";
 import {Loader2} from "lucide-react";
 

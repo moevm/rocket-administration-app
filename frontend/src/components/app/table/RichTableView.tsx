@@ -20,13 +20,13 @@ import {DataTablePagination} from "@/components/app/table/DataTablePagination.ts
 import {ColumnDef} from "@tanstack/table-core";
 import ExternallyTriggeredContextMenu from "@/components/app/ExternallyTriggeredContextMenu.tsx";
 import {Label} from "@/components/ui/label.tsx";
-import {getColumnTypeRelations, relationFullName} from "@/store/columnsUser.tsx";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover.tsx";
-import {ExportDialog} from "@/components/app/ExportDialog.tsx";
-import {FileDialog} from "@/components/app/FileDialog.tsx";
+import {ExportDialog} from "@/components/app/dialogs/ExportDialog.tsx";
+import {FileDialog} from "@/components/app/dialogs/FileDialog.tsx";
 import {toast} from "sonner";
-import {UserImportDialog} from "@/components/app/UserImportDialog.tsx";
+import {UserImportDialog} from "@/components/app/dialogs/UserImportDialog.tsx";
+import {getColumnTypeRelations, relationFullName} from "@/lib/table.ts";
 
 export interface ContextMenuConfig<TData> {
     getLabel?: (rows: Row<TData>[]) => string;

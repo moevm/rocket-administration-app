@@ -1,6 +1,6 @@
 import RichTableView from "@/components/app/table/RichTableView.tsx";
 import {roomContextMenuConfig} from "@/components/app/ContextMenuConfigs.tsx";
-import {columnsRoomSmall} from "@/store/columnsRoomSmall.tsx";
+import {columnsRoomSmall} from "@/components/app/columns/columnsRoomSmall.tsx";
 import {RowSelectionState} from "@tanstack/react-table";
 import {Row} from "@tanstack/table-core/src/types.ts";
 

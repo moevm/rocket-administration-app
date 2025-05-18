@@ -1,5 +1,5 @@
 import RichTableView from "@/components/app/table/RichTableView.tsx";
-import {columnsUser} from "@/store/columnsUser.tsx";
+import {columnsUser} from "@/components/app/columns/columnsUser.tsx";
 import {useNavigate} from "react-router";
 import {$selectedSpaceId, ApiUserModel} from "@/store/global-store.ts";
 import {useAtomValue} from "jotai/index";

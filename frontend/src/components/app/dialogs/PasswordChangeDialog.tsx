@@ -18,6 +18,8 @@ import {Label} from "@/components/ui/label.tsx";
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group.tsx";
 import {MultiSelect} from "@/components/ui/multi-select.tsx";
 import * as React from "react";
+import {DialogBase} from "@/components/app/dialogs/DialogBase.tsx";
+import ExportCard from "@/components/app/dialogs/ExportCard.tsx";
 
 export const showPasswordChangeDialogAtom = atom(false)
 
@@ -69,11 +71,7 @@ const PasswordChangeDialog = () => {
         })
     };
 
-    const handleDownloadClick = () => {
-        console.log("Downloading")
-    };
-
-    const handleDialogOpenChange = (isOpen) => {
+    const onOpenChange = (isOpen) => {
         if (isPending) {
             return;
         }
@@ -98,27 +96,34 @@ const PasswordChangeDialog = () => {
 
 
     return (
-        <Dialog open={open} onOpenChange={handleDialogOpenChange}>
-            <DialogContent className="sm:max-w-md">
-                <DialogHeader>
-                    <DialogTitle>Сменить пароль</DialogTitle>
-                    <DialogDescription>
-                        {dialogStep === 1
-                            ? `Выбрано пользователей: ${selectedUsersData.length}`
-                            : (
-                                <>
-                                    <div>Пароли успешно изменены</div>
-                                    <div>Паролей изменено: {changedPasswordNumber}/{selectedUsersData.length}</div>
-                                    {isSendingEmailChecked &&
-                                        <div>Писем отправлено: {emailSendNumber}/{selectedUsersData.length}</div>
-                                    }
-                                </>
-                            )
-                        }
-                    </DialogDescription>
-                </DialogHeader>
-
-                {dialogStep === 1 ?
+        <DialogBase
+            open={open}
+            onOpenChange={setOpen}
+            title="Сменить пароль"
+            description={
+                dialogStep === 1
+                    ? `Выбрано пользователей: ${selectedUsersData.length}`
+                    : (
+                        <>
+                            <div>Пароли успешно изменены</div>
+                            <div>Паролей изменено: {changedPasswordNumber}/{selectedUsersData.length}</div>
+                            {isSendingEmailChecked &&
+                                <div>Писем отправлено: {emailSendNumber}/{selectedUsersData.length}</div>
+                            }
+                        </>
+                    )
+            }
+            footerContent={
+                dialogStep === 1 ? (
+                    <Button type="button" variant="default" onClick={handleNextClick} disabled={isPending}>
+                        Далее
+                    </Button>
+                ) : (
+                    <></>
+                )
+            }
+        >
+            {dialogStep === 1 ? (
                     <div className="flex items-center space-x-2">
                         <Checkbox id="sendingEmail" checked={isSendingEmailChecked}
                                   onCheckedChange={setIsSendingEmailChecked}/>
@@ -127,48 +132,12 @@ const PasswordChangeDialog = () => {
                             Отправить новый пароль на email?
                         </label>
                     </div>
-                    :
-
-                    <div className="flex flex-col w-full gap-4">
-                        <div className="flex flex-col items-start gap-2 w-full">
-                            <Label>Формат</Label>
-                            <RadioGroup
-                                value={format}
-                                onValueChange={setFormat}
-                                className="grid grid-cols-3 gap-2"
-                            >
-                                {["CSV", "JSON", "XLSX"].map((value) => (
-                                    <div key={value} className="flex items-center space-x-2">
-                                        <RadioGroupItem value={value} id={value}/>
-                                        <Label htmlFor={value}>{value}</Label>
-                                    </div>
-                                ))}
-                            </RadioGroup>
-                        </div>
-                    </div>
-                }
-
-                <DialogFooter className="sm:justify-start">
-                    {dialogStep === 1 ? (
-                        <Button type="button" variant="default" onClick={handleNextClick} disabled={isPending}>
-                            Далее
-                        </Button>
-                    ) : (
-                        <>
-                            <DialogClose asChild>
-                                <Button
-                                    type="submit"
-                                    className="w-full"
-                                    onClick={handleExport}
-                                >
-                                    Экспорт
-                                </Button>
-                            </DialogClose>
-                        </>
-                    )}
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
+                )
+                : (
+                    <ExportCard data={changedPasswordsData}/>
+                )
+            }
+        </DialogBase>
     )
 }
 
