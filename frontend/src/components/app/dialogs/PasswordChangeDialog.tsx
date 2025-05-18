@@ -29,16 +29,12 @@ const PasswordChangeDialog = () => {
     const [isSendingEmailChecked, setIsSendingEmailChecked] = useState(false);
     const selectedSpaceId = useAtomValue($selectedSpaceId)!
     const selectedUsersData = useAtomValue($selectedUsersData)
-    const [changedPasswordNumber, setChangedPasswordNumber] = useState(0)
-    const [emailSendNumber, setEmailSendNumber] = useState(0)
     const [changedPasswordsData, setChangedPasswordsData] = useState<object[]>([])
 
     useEffect(() => {
         if (!open) {
             setDialogStep(1)
             setIsSendingEmailChecked(false)
-            setChangedPasswordNumber(0)
-            setEmailSendNumber(0)
             setChangedPasswordsData([])
         }
     }, [open]);
@@ -48,10 +44,6 @@ const PasswordChangeDialog = () => {
         isPending
     } = $api.useMutation('post', '/spaces/{space_id}/users/change-passwords', createMutationOptions({
         onSuccess: async (data) => {
-            setChangedPasswordNumber(data.filter(item => item.password_error === null).length)
-            setEmailSendNumber(data.filter(item => item.email_send_error === null).length)
-
-            console.log('changed passwords data', data)
             setChangedPasswordsData(data)
             setDialogStep(0);
         }
@@ -71,62 +63,27 @@ const PasswordChangeDialog = () => {
         })
     };
 
-    const onOpenChange = (isOpen) => {
-        if (isPending) {
-            return;
-        }
-        if (!isOpen) {
-            setDialogStep(1);
-            setIsSendingEmailChecked(false)
-        }
-        setOpen(isOpen);
-    };
-
-    //Копипаст Экспорта
-    const [format, setFormat] = useState<Format>("CSV");
-    const [selectedFields, setSelectedFields] = useState<string[]>([]);
-
-    const handleExport = useCallback(() => {
-        // onExport(format, selectedFields);
-        const exportFile = writeData(format, changedPasswordsData, null);
-        exportData(format, exportFile);
-
-        setSelectedFields([]);
-    }, [changedPasswordsData, format, selectedFields])
-
-
     return (
         <DialogBase
             open={open}
             onOpenChange={setOpen}
             title="Сменить пароль"
             description={
-                dialogStep === 1
-                    ? `Выбрано пользователей: ${selectedUsersData.length}`
-                    : (
-                        <>
-                            <div>Пароли успешно изменены</div>
-                            <div>Паролей изменено: {changedPasswordNumber}/{selectedUsersData.length}</div>
-                            {isSendingEmailChecked &&
-                                <div>Писем отправлено: {emailSendNumber}/{selectedUsersData.length}</div>
-                            }
-                        </>
-                    )
+                dialogStep === 1 && `Выбрано пользователей: ${selectedUsersData.length}`
             }
             footerContent={
-                dialogStep === 1 ? (
+                dialogStep === 1 && (
                     <Button type="button" variant="default" onClick={handleNextClick} disabled={isPending}>
                         Далее
                     </Button>
-                ) : (
-                    <></>
                 )
             }
         >
             {dialogStep === 1 ? (
                     <div className="flex items-center space-x-2">
-                        <Checkbox id="sendingEmail" checked={isSendingEmailChecked}
-                                  onCheckedChange={setIsSendingEmailChecked}/>
+                        <Checkbox
+                            id="sendingEmail" checked={isSendingEmailChecked}
+                            onCheckedChange={setIsSendingEmailChecked}/>
                         <label
                             className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                             Отправить новый пароль на email?
@@ -134,7 +91,12 @@ const PasswordChangeDialog = () => {
                     </div>
                 )
                 : (
-                    <ExportCard data={changedPasswordsData}/>
+                    <ExportCard data={changedPasswordsData} showData={true} countedValues={[
+                        {key: 'password', display: 'Пароли сгенерированы'},
+                        {key: 'password_error', display: 'Ошибок смены пароля'},
+                        {key: 'email_sent', display: 'Письма отправлены'},
+                        {key: 'email_send_error', display: 'Ошибок отправки письма'},
+                    ]}/>
                 )
             }
         </DialogBase>

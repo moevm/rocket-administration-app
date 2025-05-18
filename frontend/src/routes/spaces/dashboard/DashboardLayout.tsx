@@ -20,7 +20,7 @@ function DashboardLayout() {
             <div>
                 <SidebarProvider>
                     <AppSidebar spaces={context.spaces} selectedSpace={context.selectedSpace}/>
-                    <main>
+                    <main className="min-w-0">
                         <Outlet context={context}/>
                     </main>
                 </SidebarProvider>
