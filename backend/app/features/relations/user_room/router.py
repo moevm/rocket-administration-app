@@ -34,7 +34,7 @@ async def add_users_to_rooms(body: UsersAndRoomsDto, space=Depends(get_space)) -
             )
         )
         if json.loads(tmp.get('message')).get('error'):
-            result.msg = json.loads(tmp.get('message')).get('error').get('reason')
+            result.error = json.loads(tmp.get('message')).get('error').get('reason')
         else:
             result.success = True
         return result
