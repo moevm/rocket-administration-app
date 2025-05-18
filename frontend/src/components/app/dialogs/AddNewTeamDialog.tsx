@@ -5,13 +5,13 @@ import {
 } from "@/components/ui/dialog.tsx";
 import {useAtom, useAtomValue} from "jotai/index";
 import {Button} from "@/components/ui/button.tsx";
-import {$api, createMutationOptions} from "@/api";
+import {$api, createMutationOptions, queryClient} from "@/api";
 import {
-    $rooms,
-    $selectedSpaceId,
+    $rooms, $roomsQuery, $roomsQueryOptions,
+    $selectedSpaceId, $usersQueryOptions,
     showAddNewTeamDialogAtom
 } from "@/store/global-store.ts";
-import {Loader2, Plus} from "lucide-react";
+import {Loader2} from "lucide-react";
 import {BatchLoader} from "@/components/app/DataLoader.tsx";
 import {Input} from "@/components/ui/input.tsx";
 import {useForm} from "react-hook-form";
@@ -20,8 +20,6 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form.tsx";
 import {toast} from "sonner";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
-
-
 
 function AddNewTeamContent() {
     const [open, setOpen] = useAtom(showAddNewTeamDialogAtom)
@@ -35,6 +33,9 @@ function AddNewTeamContent() {
             console.log(data)
             toast.success("Команда успешно создана");
             setOpen(false);
+            await queryClient.invalidateQueries({
+                queryKey: $roomsQueryOptions(selectedSpaceId!, true).queryKey
+            })
         },
         onError: async (error) => {
             console.log(error);

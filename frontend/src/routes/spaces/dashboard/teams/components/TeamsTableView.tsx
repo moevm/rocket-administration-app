@@ -14,11 +14,9 @@ function TeamsTableView(props: {
     const selectedSpaceId = useAtomValue($selectedSpaceId)
     const setAddNewTeamDialogOpen = useSetAtom(showAddNewTeamDialogAtom)
 
+
     return (
         <>
-            <Button onClick={() => {setAddNewTeamDialogOpen(true)}}>
-                Создать новую команду
-            </Button>
             <RichTableView
                 entries={props.data}
                 tableConfig={{
@@ -33,6 +31,11 @@ function TeamsTableView(props: {
                     enableColumnVisibilityToggle: true,
                     rowClickHandler: (team) => navigate(`/spaces/${selectedSpaceId}/dashboard/teams/${team._id}`)
                 }}
+                buttonsSlot={() => (
+                    <Button variant="outline" size="sm" onClick={() => {setAddNewTeamDialogOpen(true)}}>
+                        Создать команду
+                    </Button>
+                )}
             />
         </>
     )

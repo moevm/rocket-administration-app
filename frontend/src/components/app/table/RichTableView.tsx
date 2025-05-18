@@ -49,6 +49,7 @@ interface RichTableViewProps<TData, TValue> {
         rowClickHandler?: (data: TData) => void;
     };
     onSelectionUpdated?: (data: Row<TData>[]) => void;
+    buttonsSlot?: () => React.ReactNode;
 }
 
 function RichTableView<TData, TValue>({
@@ -56,7 +57,8 @@ function RichTableView<TData, TValue>({
                                           tableConfig,
                                           contextMenuConfig,
                                           settings = {},
-                                          onSelectionUpdated
+                                          onSelectionUpdated,
+                                          buttonsSlot
                                       }: RichTableViewProps<TData, TValue>) {
     console.info({
         entries: entries
@@ -251,6 +253,7 @@ function RichTableView<TData, TValue>({
                             <Button variant="outline" size="sm" onClick={() => setShowDialogSelectFromFile(true)}>
                                 <CheckIcon/> Выделить из файла
                             </Button>}
+                        {buttonsSlot && buttonsSlot()}
                     </div>
                     {settings?.enableColumnVisibilityToggle && <DataTableViewOptions table={table}/>}
                 </div>
