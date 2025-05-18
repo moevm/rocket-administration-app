@@ -29,7 +29,7 @@ def generate_password(length: int) -> str:
 
 
 def extract_exception_message(exception: Exception) -> str:
-    if exception is HTTPException:
+    if isinstance(exception, HTTPException):
         return exception.detail
     else:
         return "Непредвиденная ошибка"
