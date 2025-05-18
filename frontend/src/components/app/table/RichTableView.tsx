@@ -115,7 +115,7 @@ function RichTableView<TData, TValue>({
 
 
     return (
-        <div className={"flex w-full max-w-screen-lg flex-col"}>
+        <div className={"flex w-full flex-col"}>
             <ExternallyTriggeredContextMenu
                 open={contextMenuOpen}
                 onOpenChange={setContextMenuOpen}
@@ -265,7 +265,7 @@ function RichTableView<TData, TValue>({
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
                                 {headerGroup.headers.map((header) => (
-                                    <TableHead key={header.id} className="truncate max-w-screen-lg">
+                                    <TableHead key={header.id}>
                                         {header.isPlaceholder
                                             ? null
                                             : flexRender(header.column.columnDef.header, header.getContext())}
@@ -279,7 +279,7 @@ function RichTableView<TData, TValue>({
                         {table.getRowModel().rows.length ? (
                             table.getRowModel().rows.map((row) => (
                                 <TableRow
-                                    className={"cursor-pointer truncate max-w-screen-lg"}
+                                    className={"cursor-pointer"}
                                     key={row.id}
                                     data-state={row.getIsSelected() && "selected"}
                                     // TODO: проваливание здесь
@@ -299,7 +299,7 @@ function RichTableView<TData, TValue>({
                                     }}
                                 >
                                     {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id} className="truncate max-w-screen-lg">
+                                        <TableCell key={cell.id}>
                                             {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                         </TableCell>
                                     ))}

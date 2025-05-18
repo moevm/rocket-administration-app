@@ -40,7 +40,7 @@ export const DialogBase = ({
                     )}
                 </DialogHeader>
 
-                <div className={cn("flex flex-col gap-4", className)}>
+                <div className={cn("flex flex-col gap-4 min-w-0", className)}>
                     {children}
                 </div>
 

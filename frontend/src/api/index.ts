@@ -21,8 +21,7 @@ export const queryClient = new QueryClient({
     },
 })
 
-export const HydrateAtoms = ({ children }: { children: ReactNode }) => {
-    // @ts-ignore
+export const HydrateAtoms = ({children}: { children: ReactNode }) => {
     useHydrateAtoms(new Map([[queryClientAtom, queryClient]]))
     return children
 }
@@ -38,7 +37,7 @@ export function loadableQuery<Value, Error>(anAtom: Atom<AtomWithQueryResult<Awa
     }))
 }
 
-export function loaded<T> (loadable: Loadable<T>) {
+export function loaded<T>(loadable: Loadable<T>) {
     return loadable as {
         state: 'hasData';
         data: Awaited<T>;
@@ -60,7 +59,6 @@ export const errorMessage: (error: unknown) => string = error => {
     return 'Неизвестная ошибка'
 }
 
-// TODO show loader & toast
 export function createMutationOptions<D, E, I>(options?: Omit<UseMutationOptions<D, E, I>, "mutationKey" | "mutationFn">): Omit<UseMutationOptions<D, E, I>, "mutationKey" | "mutationFn"> {
     return {
         onMutate: (variables) => {
@@ -68,7 +66,7 @@ export function createMutationOptions<D, E, I>(options?: Omit<UseMutationOptions
         },
         onError: (error, variables, context) => {
             console.log(`mutation error`, {error, variables, context})
-            toast.error("Ошибка ", { description: errorMessage(error) })
+            toast.error("Ошибка ", {description: errorMessage(error)})
             if (options?.onError) options.onError(error, variables, context)
         },
         onSuccess: (data, variables, context) => {

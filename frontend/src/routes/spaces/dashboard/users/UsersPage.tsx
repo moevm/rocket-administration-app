@@ -1,4 +1,4 @@
-import {$roles, $users} from "@/store/global-store.ts";
+import {$users} from "@/store/global-store.ts";
 import {useAtomValue} from "jotai/index";
 import {BatchLoader} from "@/components/app/DataLoader.tsx";
 import {loaded} from "@/api";
@@ -6,12 +6,12 @@ import UserTableView from "@/routes/spaces/dashboard/users/components/UserTableV
 
 function UsersPage() {
     const users = useAtomValue($users)
-    const roles = useAtomValue($roles)
+    // const roles = useAtomValue($roles)
 
     return (
         <>
             <BatchLoader
-                states={[users, roles]}
+                states={[users]}
                 loadingMessage={"Загрузка пользователей"}
                 display={() =>
                     <div className={"flex flex-col m-6  py-4 ml-6"}>
