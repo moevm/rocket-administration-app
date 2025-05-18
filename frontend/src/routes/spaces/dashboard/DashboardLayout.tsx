@@ -2,14 +2,15 @@ import {Outlet, useOutletContext} from "react-router";
 import {SidebarProvider} from "@/components/ui/sidebar.tsx";
 import AppSidebar from "@/routes/spaces/dashboard/components/AppSidebar";
 import {ApiSpaceModel} from "@/store/global-store.ts";
-import AddUserInRoomDialog from "@/components/app/dialogs/AddUserInRoomDialog.tsx";
+import AddUserInRoomDialog from "@/components/app/dialogs/user-page-dialogs/AddUserInRoomDialog.tsx";
 
-import PasswordChangeDialog from "@/components/app/dialogs/PasswordChangeDialog.tsx";
+import PasswordChangeDialog from "@/components/app/dialogs/user-page-dialogs/PasswordChangeDialog.tsx";
 import AddNewTeamDialog from "@/components/app/dialogs/AddNewTeamDialog.tsx";
-import AddUserInTeamDialog from "@/components/app/dialogs/AddUserInTeamDialog.tsx";
-import DeleteUserFromRoomDialog from "@/components/app/dialogs/DeleteUserFromRoomDialog.tsx";
-import DeleteUserFromTeamDialog from "@/components/app/dialogs/DeleteUserFromTeamDialog.tsx";
-import DeleteUserDialog from "@/components/app/dialogs/DeleteUserDialog.tsx";
+import AddUserInTeamDialog from "@/components/app/dialogs/user-page-dialogs/AddUserInTeamDialog.tsx";
+import DeleteUserFromRoomDialog from "@/components/app/dialogs/user-page-dialogs/DeleteUserFromRoomDialog.tsx";
+import DeleteUserFromTeamDialog from "@/components/app/dialogs/user-page-dialogs/DeleteUserFromTeamDialog.tsx";
+import DeleteUserDialog from "@/components/app/dialogs/user-page-dialogs/DeleteUserDialog.tsx";
+import AddRoomsToUsersDialog from "@/components/app/dialogs/room-page-dialogs/AddRoomsToUsersDialog.tsx";
 
 function DashboardLayout() {
     const context = useOutletContext<{
@@ -25,6 +26,9 @@ function DashboardLayout() {
             <DeleteUserFromRoomDialog/>
             <DeleteUserFromTeamDialog/>
             <DeleteUserDialog/>
+
+            <AddRoomsToUsersDialog/>
+
             <div>
                 <SidebarProvider>
                     <AppSidebar spaces={context.spaces} selectedSpace={context.selectedSpace}/>

@@ -22,12 +22,12 @@ import UserInfoRoomTableView from "@/components/app/table/UserInfoRoomTableView.
 import ShortTeamTableView from "@/components/app/table/ShortTeamTableView.tsx";
 import EntityCard from "@/components/app/EntityCard.tsx";
 import {ListRenderer, MonoRenderer, OptRenderer} from "@/components/app/ValueRenderers.tsx";
-import {showPasswordChangeDialogAtom} from "@/components/app/dialogs/PasswordChangeDialog.tsx";
-import {showAddUserInRoomDialogAtom} from "@/components/app/dialogs/AddUserInRoomDialog.tsx";
-import {showAddUserInTeamDialogAtom} from "@/components/app/dialogs/AddUserInTeamDialog.tsx";
-import {showDeleteUserFromRoomDialogAtom} from "@/components/app/dialogs/DeleteUserFromRoomDialog.tsx";
-import {showDeleteUserFromTeamDialogAtom} from "@/components/app/dialogs/DeleteUserFromTeamDialog.tsx";
-import {showDeleteUserDialogAtom} from "@/components/app/dialogs/DeleteUserDialog.tsx";
+import {showPasswordChangeDialogAtom} from "@/components/app/dialogs/user-page-dialogs/PasswordChangeDialog.tsx";
+import {showAddUserInRoomDialogAtom} from "@/components/app/dialogs/user-page-dialogs/AddUserInRoomDialog.tsx";
+import {showAddUserInTeamDialogAtom} from "@/components/app/dialogs/user-page-dialogs/AddUserInTeamDialog.tsx";
+import {showDeleteUserFromRoomDialogAtom} from "@/components/app/dialogs/user-page-dialogs/DeleteUserFromRoomDialog.tsx";
+import {showDeleteUserFromTeamDialogAtom} from "@/components/app/dialogs/user-page-dialogs/DeleteUserFromTeamDialog.tsx";
+import {showDeleteUserDialogAtom} from "@/components/app/dialogs/user-page-dialogs/DeleteUserDialog.tsx";
 
 function UserPageContent() {
     const user = loaded(useAtomValue($selectedUser)).data

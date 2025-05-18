@@ -21,6 +21,7 @@ import EntityCard from "@/components/app/EntityCard.tsx";
 import {CheckboxRenderer, MonoRenderer, OptRenderer} from "@/components/app/ValueRenderers.tsx";
 import RoomUserTableView from "@/components/app/table/RoomUserTableView.tsx";
 import ShortTeamTableView from "@/components/app/table/ShortTeamTableView.tsx";
+import {showAddRoomsToUsersDialogAtom} from "@/components/app/dialogs/room-page-dialogs/AddRoomsToUsersDialog.tsx";
 
 const typesName = {
     d: "Личные сообщения",
@@ -35,6 +36,8 @@ function RoomPageContent() {
     const selectedSpaceId = useAtomValue($selectedSpaceId)!
     const {team, members} = loaded(useAtomValue($roomInfo)).data
     const teams = team ? team : []
+
+    const setAddRoomToUsersDialogOpen = useSetAtom(showAddRoomsToUsersDialogAtom)
 
     return (
         <div className="flex flex-col py-6 mx-6">
@@ -72,7 +75,7 @@ function RoomPageContent() {
                 />
                 <div className={"flex justify-between gap-6"}>
                     <div className="flex justify-between gap-2">
-                        <Button variant="outline">
+                        <Button variant="outline" onClick={() => {setAddRoomToUsersDialogOpen(true)}}>
                             Добавить участников
                         </Button>
                         <Button variant="outline">

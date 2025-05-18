@@ -1,25 +1,37 @@
 import React from 'react';
 import {ContextMenuItem} from "@/components/ui/context-menu.tsx";
 import {ContextMenuConfig} from "@/components/app/table/RichTableView.tsx";
-import {showPasswordChangeDialogAtom} from "@/components/app/dialogs/PasswordChangeDialog.tsx";
+import {showPasswordChangeDialogAtom} from "@/components/app/dialogs/user-page-dialogs/PasswordChangeDialog.tsx";
 import {useSetAtom} from "jotai/react";
-import {$selectedUsersData} from "@/store/global-store.ts";
+import {$selectedRoomsData, $selectedUsersData} from "@/store/global-store.ts";
 import {Row} from "@tanstack/react-table";
-import {showAddUserInRoomDialogAtom} from "@/components/app/dialogs/AddUserInRoomDialog.tsx";
-import {showAddUserInTeamDialogAtom} from "@/components/app/dialogs/AddUserInTeamDialog.tsx";
-import {showDeleteUserFromRoomDialogAtom} from "@/components/app/dialogs/DeleteUserFromRoomDialog.tsx";
-import {showDeleteUserFromTeamDialogAtom} from "@/components/app/dialogs/DeleteUserFromTeamDialog.tsx";
-import {showDeleteUserDialogAtom} from "@/components/app/dialogs/DeleteUserDialog.tsx";
+import {showAddUserInRoomDialogAtom} from "@/components/app/dialogs/user-page-dialogs/AddUserInRoomDialog.tsx";
+import {showAddUserInTeamDialogAtom} from "@/components/app/dialogs/user-page-dialogs/AddUserInTeamDialog.tsx";
+import {showDeleteUserFromRoomDialogAtom} from "@/components/app/dialogs/user-page-dialogs/DeleteUserFromRoomDialog.tsx";
+import {showDeleteUserFromTeamDialogAtom} from "@/components/app/dialogs/user-page-dialogs/DeleteUserFromTeamDialog.tsx";
+import {showDeleteUserDialogAtom} from "@/components/app/dialogs/user-page-dialogs/DeleteUserDialog.tsx";
+import {showAddRoomsToUsersDialogAtom} from "@/components/app/dialogs/room-page-dialogs/AddRoomsToUsersDialog.tsx";
 
 const RoomContextMenuItems = ({rows}: { rows: Row<{ _id: string }>[] }) => {
+
+    const setAddRoomToUsersDialogOpen = useSetAtom(showAddRoomsToUsersDialogAtom)
+
+    const setSelectedRoomsData = useSetAtom($selectedRoomsData)
+    const data = rows.map(it => ({
+        _id: it.getValue('_id') as string
+    }))
+
     return (
         <>
-            <ContextMenuItem>Удалить комнату</ContextMenuItem>
-            <ContextMenuItem>Скрыть комнату</ContextMenuItem>
-            <ContextMenuItem>Добавить участников</ContextMenuItem>
+            <ContextMenuItem onClick={() => {
+                setSelectedRoomsData(data)
+                setAddRoomToUsersDialogOpen(true)
+            }}>Добавить участников</ContextMenuItem>
             <ContextMenuItem>Удалить участников</ContextMenuItem>
             <ContextMenuItem>Добавить команды</ContextMenuItem>
             <ContextMenuItem>Удалить команды</ContextMenuItem>
+            <ContextMenuItem>Скрыть комнату</ContextMenuItem>
+            <ContextMenuItem>Удалить комнату</ContextMenuItem>
             {rows.length === 1 && <ContextMenuItem>Управление</ContextMenuItem>}
         </>
     )
