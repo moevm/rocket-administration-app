@@ -26,7 +26,7 @@ async def get_rooms(space=Depends(get_space)) -> List[RoomDto]:
         for room
         in (await rocket_request(
             rocket.rooms_admin_rooms,
-            **rocket_query_args(types=['discussions', 'teams', 'd', 'c', 'p'], count=0)
+            **rocket_query_args(types=['discussions', 'teams', 'c', 'p'], count=0)
         ))['rooms']
     ]
     return rooms
