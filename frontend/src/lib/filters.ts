@@ -1,5 +1,7 @@
 import {ColumnType} from "@/lib/table.ts";
 import {z} from "zod";
+import dayjs, {isDayjs} from "dayjs";
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 
 export const relationFullName = {
     'includes': "включает",
@@ -105,7 +107,16 @@ export function performFilter(filter: FilterConfig, value: any) {
     //     value.some(it => JSON.stringify(it).toLowerCase() === JSON.stringify(filter.values['value']).toLowerCase())
     // )
 
-    const valueExists = value !== undefined && value !== null && value !== ''
+    dayjs.extend(customParseFormat);
+    const valueExists =
+        value !== undefined &&
+        value !== null &&
+        !(typeof value === 'string' && (value.trim() === '' || value === '–' || value === '-')) &&
+        !(Array.isArray(value) && value.length === 0) &&
+        (!isDayjs(value) || dayjs(value, 'DD.MM.YYYY HH:mm').isValid());
+
+    console.log(valueExists, value);
+    //console.log( value.toDate().toString(), dayjs(value, 'DD.MM.YYYY HH:mm').isValid())
 
     switch (filter.relation) {
         case 'includes':
@@ -136,10 +147,22 @@ export function performFilter(filter: FilterConfig, value: any) {
             return valueExists && !value
         case "positive":
             return valueExists && !!value
-        case "datetime-after":
-            return valueExists && false
-        case "datetime-before":
-            return valueExists && false
+        case "datetime-after": {
+            if (!valueExists) return false;
+
+            const val = dayjs(value);
+            const target = dayjs(filter.values['value']);
+
+            return val.isAfter(target);
+        }
+        case "datetime-before": {
+            if (!valueExists) return false;
+
+            const val = dayjs(value);
+            const target = dayjs(filter.values['value']);
+
+            return val.isBefore(target);
+        }
         case "empty":
             return !valueExists
         case "not-empty":
