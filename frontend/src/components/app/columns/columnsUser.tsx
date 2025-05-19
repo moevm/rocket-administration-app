@@ -1,6 +1,6 @@
 import DataTableColumnHeader from "@/components/app/table/DataTableColumnHeader.tsx";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
-import {ApiUserInfoRoomModel} from "@/store/global-store.ts";
+import {ApiUserModel} from "@/store/global-store.ts";
 import {CheckboxRenderer, ListRenderer, MonoRenderer, OptRenderer} from "@/components/app/ValueRenderers.tsx";
 import {customSortingFn, TypedColumnDef} from "@/lib/table.ts";
 
@@ -171,4 +171,4 @@ export const columnsUser = [
             type: 'datetime'
         }
     }
-] as TypedColumnDef<ApiUserInfoRoomModel>[]
+] as TypedColumnDef<ApiUserModel>[]
