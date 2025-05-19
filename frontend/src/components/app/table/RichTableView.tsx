@@ -25,6 +25,8 @@ import {UserImportDialog} from "@/components/app/dialogs/UserImportDialog.tsx";
 import TableFilters from "@/components/app/table/TableFilters.tsx";
 import {FilterConfig, performFilter} from "@/lib/filters.ts";
 import {FilterMeta} from "@tanstack/table-core/src/types.ts";
+import {useAtom} from "jotai/index";
+import {showContextMenuAtom} from "@/store/global-store.ts";
 
 export interface ContextMenuConfig<TData> {
     getLabel?: (rows: Row<TData>[]) => string;
@@ -73,7 +75,7 @@ function RichTableView<TData, TValue>({
     const [searchColumns, setSearchColumns] = React.useState<string[]>([]);
 
     const contextMenuPosition = React.useRef<Point>({x: 0, y: 0});
-    const [contextMenuOpen, setContextMenuOpen] = React.useState(false);
+    const [contextMenuOpen, setContextMenuOpen] = useAtom(showContextMenuAtom)
     const contextMenuRows = React.useRef<Row<TData>[]>([]);
 
     const [showDialogExport, setShowDialogExport] = React.useState<boolean>(false);
