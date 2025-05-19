@@ -93,7 +93,7 @@ export const columnsTeam = [
         },
         meta: {
             title: "Создано в",
-            type: 'string'
+            type: 'datetime'
         },
         sortingFn: customSortingFn
     },
@@ -120,7 +120,7 @@ export const columnsTeam = [
         },
         meta: {
             title: "Обновлено в",
-            type: 'boolean'
+            type: 'datetime'
         },
         cell: ({cell}) => <OptRenderer value={cell.getValue()} />
     },

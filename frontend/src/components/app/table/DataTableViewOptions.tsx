@@ -1,10 +1,10 @@
 "use client"
 
-import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu"
-import { Table } from "@tanstack/react-table"
-import { Settings2 } from "lucide-react"
+import {DropdownMenuTrigger} from "@radix-ui/react-dropdown-menu"
+import {Table} from "@tanstack/react-table"
+import {Settings2} from "lucide-react"
 
-import { Button } from "@/components/ui/button"
+import {Button} from "@/components/ui/button"
 import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
@@ -14,10 +14,12 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 interface DataTableViewOptionsProps<TData> {
-    table: Table<TData>
+    table: Table<TData>,
+    tableId: string
 }
 
 export function DataTableViewOptions<TData>({
+                                                tableId,
                                                 table,
                                             }: DataTableViewOptionsProps<TData>) {
     return (

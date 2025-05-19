@@ -14,6 +14,7 @@ function RoomUserTableView(props: {
     return (
         <>
             <RichTableView
+                tableId={'rooms-user'}
                 entries={props.data}
                 tableConfig={{
                     columns: columnsRoomUser

@@ -18,6 +18,7 @@ function TeamsTableView(props: {
     return (
         <>
             <RichTableView
+                tableId={'teams'}
                 entries={props.data}
                 tableConfig={{
                     columns: columnsTeam
