@@ -6,7 +6,8 @@ import {
 } from "@/components/ui/breadcrumb.tsx";
 import {useAtomValue} from "jotai";
 import {
-    $selectedSpaceId, $selectedTeam, $selectedTeamId,
+    $selectedRoomsData,
+    $selectedSpaceId, $selectedTeam, $selectedTeamId, $selectedTeamsData,
     $teamInfo
 } from "@/store/global-store.ts";
 import {NavLink, useParams} from "react-router";
@@ -21,6 +22,16 @@ import {MonoRenderer, OptRenderer} from "@/components/app/ValueRenderers.tsx";
 import dayjs from "dayjs";
 import RoomUserTableView from "@/components/app/table/RoomUserTableView.tsx";
 import RoomsTableView from "@/routes/spaces/dashboard/rooms/components/RoomsTableView.tsx";
+import {showAddUserInTeamDialogAtom} from "@/components/app/dialogs/user-page-dialogs/AddUserInTeamDialog.tsx";
+import {showAddUsersToTeamDialogAtom} from "@/components/app/dialogs/team-page-dialogs/AddUsersToTeamDialog.tsx";
+import {
+    showDeleteUsersOutOfTeamDialogAtom
+} from "@/components/app/dialogs/team-page-dialogs/DeleteUsersOutOfTeamDialog.tsx";
+import {showAddTeamIntoRoomDialogAtom} from "@/components/app/dialogs/team-page-dialogs/AddTeamIntoRoomDialog.tsx";
+import {
+    showDeleteTeamFromRoomDialogAtom
+} from "@/components/app/dialogs/team-page-dialogs/DeleteTeamFromRoomDialog.tsx";
+import {showDeleteTeamDialogAtom} from "@/components/app/dialogs/team-page-dialogs/DeleteTeamDialog.tsx";
 
 
 const typesType = {
@@ -32,6 +43,20 @@ function TeamPageContent() {
     const team = loaded(useAtomValue($selectedTeam)).data
     const selectedSpaceId = useAtomValue($selectedSpaceId)!
     const {users, rooms} = loaded(useAtomValue($teamInfo)).data
+
+    const setAddUsersToTeamDialogOpen = useSetAtom(showAddUsersToTeamDialogAtom)
+    const setDeleteUsersOutOfTeamDialogOpen = useSetAtom(showDeleteUsersOutOfTeamDialogAtom)
+    const setAddTeamIntoRoomDialogOpen = useSetAtom(showAddTeamIntoRoomDialogAtom)
+    const setDeleteTeamFromRoomDialogOpen = useSetAtom(showDeleteTeamFromRoomDialogAtom)
+    const setDeleteTeamDialogOpen = useSetAtom(showDeleteTeamDialogAtom)
+
+    const setSelectedTeamsData = useSetAtom($selectedTeamsData)
+    const data = [
+        {
+            _id: team._id as string
+        }
+    ]
+    setSelectedTeamsData(data)
 
     return (
         <div className="flex flex-col py-6 mx-6">
@@ -65,20 +90,20 @@ function TeamPageContent() {
                 />
                 <div className={"flex justify-between gap-6"}>
                     <div className="flex justify-between gap-2">
-                        <Button variant="outline">
+                        <Button variant="outline" onClick={() => {setAddUsersToTeamDialogOpen(true)}}>
                             Добавить участников
                         </Button>
-                        <Button variant="outline">
+                        <Button variant="outline" onClick={() => {setDeleteUsersOutOfTeamDialogOpen(true)}}>
                             Удалить участников
                         </Button>
-                        <Button variant="outline">
+                        <Button variant="outline" onClick={() => {setAddTeamIntoRoomDialogOpen(true)}}>
                             Добавить в комнату
                         </Button>
-                        <Button variant="outline">
+                        <Button variant="outline" onClick={() => {setDeleteTeamFromRoomDialogOpen(true)}}>
                             Удалить из комнаты
                         </Button>
-                        <Button variant="outline">
-                            Удалить комнату
+                        <Button variant="outline" onClick={() => {setDeleteTeamDialogOpen(true)}}>
+                            Удалить команду
                         </Button>
                     </div>
                 </div>

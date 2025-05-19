@@ -270,5 +270,13 @@ export const $selectedUsersData = atom<{
     _id: string,
     username: string
 }[]>([])
+export const $selectedRoomsData = atom<{
+    _id: string
+}[]>([])
+export const $selectedTeamsData = atom<{
+    _id: string
+}[]>([])
 
 export const showAddNewTeamDialogAtom = atom(false)
+export const showAddNewUserDialogAtom = atom(false)
+export const showAddNewRoomDialogAtom = atom(false)

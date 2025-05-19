@@ -14,7 +14,6 @@ function TeamsTableView(props: {
     const selectedSpaceId = useAtomValue($selectedSpaceId)
     const setAddNewTeamDialogOpen = useSetAtom(showAddNewTeamDialogAtom)
 
-
     return (
         <>
             <RichTableView

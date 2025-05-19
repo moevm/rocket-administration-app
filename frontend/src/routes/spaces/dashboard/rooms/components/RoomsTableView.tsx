@@ -1,15 +1,23 @@
 import RichTableView from "@/components/app/table/RichTableView.tsx";
 import {columnsRoom} from "@/components/app/columns/columnsRoom.tsx";
-import {$selectedSpaceId, ApiRoomModel} from "@/store/global-store.ts";
+import {
+    $selectedSpaceId,
+    ApiRoomModel,
+    showAddNewRoomDialogAtom
+} from "@/store/global-store.ts";
 import {useNavigate} from "react-router";
 import {roomContextMenuConfig} from "@/components/app/ContextMenuConfigs.tsx";
 import {useAtomValue} from "jotai";
+import {Button} from "@/components/ui/button.tsx";
+import {useSetAtom} from "jotai/react";
 
 function RoomsTableView(props: {
     data: ApiRoomModel[]
 }) {
     const navigate = useNavigate();
     const selectedSpaceId = useAtomValue($selectedSpaceId)
+    const setAddNewRoomDialogOpen = useSetAtom(showAddNewRoomDialogAtom)
+
     return (
         <>
             <RichTableView
@@ -27,6 +35,11 @@ function RoomsTableView(props: {
                     enableColumnVisibilityToggle: true,
                     rowClickHandler: (room) => navigate(`/spaces/${selectedSpaceId}/dashboard/rooms/${room._id}`)
                 }}
+                buttonsSlot={() => (
+                    <Button variant="outline" size="sm" onClick={() => {setAddNewRoomDialogOpen(true)}}>
+                        Создать комнату
+                    </Button>
+                )}
             />
         </>
     )

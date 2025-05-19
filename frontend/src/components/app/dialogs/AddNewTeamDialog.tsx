@@ -7,12 +7,10 @@ import {useAtom, useAtomValue} from "jotai/index";
 import {Button} from "@/components/ui/button.tsx";
 import {$api, createMutationOptions, queryClient} from "@/api";
 import {
-    $rooms, $roomsQuery, $roomsQueryOptions,
-    $selectedSpaceId, $usersQueryOptions,
-    showAddNewTeamDialogAtom
+    $roomsQueryOptions,
+    $selectedSpaceId, showAddNewTeamDialogAtom
 } from "@/store/global-store.ts";
 import {Loader2} from "lucide-react";
-import {BatchLoader} from "@/components/app/DataLoader.tsx";
 import {Input} from "@/components/ui/input.tsx";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
@@ -135,26 +133,14 @@ function AddNewTeamContent() {
                         </form>
                     </Form>
                 </div>
-
-                {/*<DialogFooter className="sm:justify-start">*/}
-                {/*    <Button type="button" variant="default" onClick={handleAddClick} disabled={isPending}>*/}
-                {/*        Создать*/}
-                {/*    </Button>*/}
-                {/*</DialogFooter>*/}
             </DialogContent>
         </Dialog>
     )
 }
 
 const AddNewTeamDialog = () => {
-    const rooms = useAtomValue($rooms)
-
     return (
-        <BatchLoader
-            states={[rooms]}
-            loadingMessage='Загрузка комнат'
-            display={() => <AddNewTeamContent/>}
-        />
+        <AddNewTeamContent/>
     )
 }
 
