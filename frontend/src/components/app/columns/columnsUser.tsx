@@ -1,8 +1,15 @@
 import DataTableColumnHeader from "@/components/app/table/DataTableColumnHeader.tsx";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
 import {ApiUserModel} from "@/store/global-store.ts";
-import {CheckboxRenderer, ListRenderer, MonoRenderer, OptRenderer} from "@/components/app/ValueRenderers.tsx";
+import {
+    CheckboxRenderer,
+    DateRenderer,
+    ListRenderer,
+    MonoRenderer,
+    OptRenderer
+} from "@/components/app/ValueRenderers.tsx";
 import {customSortingFn, TypedColumnDef} from "@/lib/table.ts";
+import dayjs from "dayjs";
 
 const typesUserType = {
     'bot': "Бот",
@@ -164,8 +171,9 @@ export const columnsUser = [
             )
         },
         accessorFn: (row) => {
-            return row.lastLogin
+            return dayjs(row.lastLogin);
         },
+        cell: ({ cell }) => <DateRenderer value={cell.getValue()} />,
         meta: {
             title: 'Последний логин',
             type: 'datetime'

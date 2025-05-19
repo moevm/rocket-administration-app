@@ -1,4 +1,5 @@
 import {Checkbox} from "@/components/ui/checkbox.tsx";
+import {Dayjs} from "dayjs";
 
 function MissingValue() {
     return <span className={"text-foreground/70"}>–</span>
@@ -36,4 +37,12 @@ export function ListRenderer({value}: {
     return (
         <span>{value?.join(', ') ?? <MissingValue/>}</span>
     )
+}
+
+export function DateRenderer({ value }: { value: Dayjs | null | undefined }) {
+    if (!value || !value.isValid()) {
+        return <MissingValue />;
+    }
+
+    return <span>{value.format('DD.MM.YYYY HH:mm')}</span>;
 }
