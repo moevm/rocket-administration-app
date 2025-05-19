@@ -44,3 +44,26 @@ async def add_users_to_rooms(body: UsersAndRoomsDto, space=Depends(get_space)) -
             [(body.users, room) for room in body.rooms],
             settings.app.batch_delay
     )
+
+@router.post("/remove")
+async def remove_users_from_room(body: UsersAndRoomsDto, space=Depends(get_space)) -> List[UsersAndRoomsResDto]:
+    rocket = await obtain_rocket_instance(key_for_space(space))
+
+    async def _process(user: str, room: str) -> UsersAndRoomsResDto:
+        result = UsersAndRoomsResDto(success=False, user_list=[user], room=room)
+        try:
+            tmp = await rocket_request(
+                rocket.groups_kick, **rocket_query_args(room_id=room, user_id=user)
+            )
+        except Exception as e:
+            print(e)
+            result.error = extract_exception_message(e)
+        else:
+            result.success = True
+        return result
+    
+    return await batch_execute(
+            _process,
+            [(user, room) for room in body.rooms for user in body.users],
+            settings.app.batch_delay
+    )
