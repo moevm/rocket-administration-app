@@ -109,10 +109,7 @@ export function performFilter(filter: FilterConfig, value: any) {
 
     dayjs.extend(customParseFormat);
     const valueExists =
-        value !== undefined &&
-        value !== null &&
-        !(typeof value === 'string' && (value.trim() === '' || value === '–' || value === '-')) &&
-        !(Array.isArray(value) && value.length === 0) &&
+        value !== undefined && value !== null && value !== '' &&
         (!isDayjs(value) || dayjs(value, 'DD.MM.YYYY HH:mm').isValid());
 
     console.log(valueExists, value);
@@ -150,18 +147,16 @@ export function performFilter(filter: FilterConfig, value: any) {
         case "datetime-after": {
             if (!valueExists) return false;
 
-            const val = dayjs(value);
             const target = dayjs(filter.values['value']);
 
-            return val.isAfter(target);
+            return value.isAfter(target);
         }
         case "datetime-before": {
             if (!valueExists) return false;
 
-            const val = dayjs(value);
             const target = dayjs(filter.values['value']);
 
-            return val.isBefore(target);
+            return value.isBefore(target);
         }
         case "empty":
             return !valueExists

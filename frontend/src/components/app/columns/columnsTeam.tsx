@@ -78,7 +78,7 @@ export const columnsTeam = [
         },
         meta: {
             title: "Тип",
-            type: 'boolean'
+            type: 'string'
         },
     },
     {
