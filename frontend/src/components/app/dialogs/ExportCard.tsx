@@ -9,7 +9,6 @@ import {Button} from "@/components/ui/button.tsx";
 import {
     Table,
     TableBody,
-    TableCaption,
     TableCell,
     TableHead,
     TableHeader,

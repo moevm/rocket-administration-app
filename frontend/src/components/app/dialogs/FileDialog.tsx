@@ -11,8 +11,7 @@ interface FileDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     title: string;
-    buttonText: string;
-    description?: string;
+    description?: ReactNode;
     onSubmit: (data: object[]) => boolean;
     content?: ReactNode,
     loading?: boolean
@@ -30,7 +29,6 @@ export const FileDialog = ({
                                open,
                                onOpenChange,
                                title,
-                               buttonText,
                                onSubmit,
                                description,
                                content,
@@ -134,7 +132,7 @@ export const FileDialog = ({
                             <Loader2 className="animate-spin"/>
                             Загрузка</>
                         : <>
-                        {buttonText}
+                        Ипорт
                         </>
                     }
                 </Button>
