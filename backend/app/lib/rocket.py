@@ -36,9 +36,10 @@ async def rocket_request(func, /, *args, **kwargs):
     response = await rocket_interaction(func, *args, **kwargs)
 
     if not (response.status_code == 200 and response.json()['success'] == True):
-        pprint(response.status_code)
-        pprint(response.json())
-        raise HTTPException(status_code=400, detail="Ошибка запроса к RocketChat")
+        if 'error' in response.json():
+            raise HTTPException(status_code=400, detail="Ошибка запроса к RocketChat: " + str(response.json()['error']))
+        else:
+            raise HTTPException(status_code=400, detail="Ошибка запроса к RocketChat")
 
     json = response.json()
     if 'success' in json:
