@@ -280,3 +280,4 @@ export const $selectedTeamsData = atom<{
 export const showAddNewTeamDialogAtom = atom(false)
 export const showAddNewUserDialogAtom = atom(false)
 export const showAddNewRoomDialogAtom = atom(false)
+export const showContextMenuAtom = atom(false)
