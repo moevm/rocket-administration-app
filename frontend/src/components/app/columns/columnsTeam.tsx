@@ -2,7 +2,7 @@ import DataTableColumnHeader from "@/components/app/table/DataTableColumnHeader.
 import {Checkbox} from "@/components/ui/checkbox.tsx";
 import {ApiTeamModel} from "@/store/global-store.ts";
 import dayjs from 'dayjs';
-import {MonoRenderer, OptRenderer} from "@/components/app/ValueRenderers.tsx";
+import {DateRenderer, MonoRenderer, OptRenderer} from "@/components/app/ValueRenderers.tsx";
 import {customSortingFn, TypedColumnDef} from "@/lib/table.ts";
 
 const typesType = {
@@ -78,7 +78,7 @@ export const columnsTeam = [
         },
         meta: {
             title: "Тип",
-            type: 'boolean'
+            type: 'string'
         },
     },
     {
@@ -91,6 +91,7 @@ export const columnsTeam = [
         accessorFn: (row) => {
             return dayjs(row.createdAt)
         },
+        cell: ({ cell }) => <DateRenderer value={cell.getValue()} />,
         meta: {
             title: "Создано в",
             type: 'datetime'
@@ -118,11 +119,14 @@ export const columnsTeam = [
                 <DataTableColumnHeader column={column} title="Обновлено в"/>
             )
         },
+        accessorFn: (row) => {
+            return dayjs(row.createdAt)
+        },
         meta: {
             title: "Обновлено в",
             type: 'datetime'
         },
-        cell: ({cell}) => <OptRenderer value={cell.getValue()} />
+        cell: ({ cell }) => <DateRenderer value={cell.getValue()} />,
     },
     {
         accessorKey: "roomId",
