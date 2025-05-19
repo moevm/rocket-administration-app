@@ -13,6 +13,7 @@ function UserInfoRoomTableView(props: {
     return (
         <>
             <RichTableView
+                tableId={'user-info-room'}
                 entries={props.data}
                 tableConfig={{
                     columns: columnsUserInfoRoom,

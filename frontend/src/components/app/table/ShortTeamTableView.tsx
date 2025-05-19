@@ -13,6 +13,7 @@ function ShortTeamTableView(props: {
     return (
         <>
             <RichTableView
+                tableId={'short-team'}
                 entries={props.data}
                 tableConfig={{
                     columns: columnsShortTeam,

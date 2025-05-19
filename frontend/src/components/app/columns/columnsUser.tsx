@@ -156,4 +156,19 @@ export const columnsUser = [
             type: 'string'
         },
     },
+    {
+        id: "lastLogin",
+        header: ({column}) => {
+            return (
+                <DataTableColumnHeader column={column} title="Последний логин"/>
+            )
+        },
+        accessorFn: (row) => {
+            return row.lastLogin
+        },
+        meta: {
+            title: 'Последний логин',
+            type: 'datetime'
+        }
+    }
 ] as TypedColumnDef<ApiUserModel>[]

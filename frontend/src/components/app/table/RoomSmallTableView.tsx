@@ -16,6 +16,7 @@ export default function RoomSmallTableView(props: {
     return (
         <>
             <RichTableView
+                tableId={'rooms-small'}
                 entries={props.data}
                 tableConfig={{
                     columns: columnsRoomSmall

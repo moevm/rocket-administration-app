@@ -58,7 +58,7 @@ function ExportCard<TData extends object>(
     const enabled = data.length > 0 && (selectedFields === null || selectedFields.length > 0)
 
     return (
-        <div className="flex flex-col w-full gap-4">
+        <div className="flex flex-col w-full gap-4 min-w-0">
             <div className="flex flex-col items-start gap-2 w-full">
                 {
                     countedValues &&
@@ -85,7 +85,7 @@ function ExportCard<TData extends object>(
                             <TableBody>
                                 {data.map((datum) => (
                                     <TableRow>
-                                        {Object.entries(datum).map(([key, value]) => <TableCell className={"font-mono"}
+                                        {Object.entries(datum).map(([key, value]) => <TableCell className={"font-mono text-nowrap"}
                                                                                                 key={key}>{cellValue(value)}</TableCell>)}
                                     </TableRow>
                                 ))}
