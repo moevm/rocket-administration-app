@@ -25,7 +25,7 @@ function UserTableView(props: {
                 tableId={'user'}
                 entries={props.data}
                 tableConfig={{
-                    columns: columnsUser
+                    columns: columnsUser,
                 }}
                 contextMenuConfig={
                     userContextMenuConfig
