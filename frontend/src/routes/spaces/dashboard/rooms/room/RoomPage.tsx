@@ -8,7 +8,7 @@ import {useAtomValue} from "jotai";
 import {
     $selectedRoom,
     $selectedSpaceId,
-    $selectedRoomId, $roomInfo
+    $selectedRoomId, $roomInfo, $selectedRoomsData
 } from "@/store/global-store.ts";
 import {NavLink, useParams} from "react-router";
 import {Label} from "@/components/ui/label.tsx";
@@ -22,6 +22,15 @@ import {CheckboxRenderer, MonoRenderer, OptRenderer} from "@/components/app/Valu
 import RoomUserTableView from "@/components/app/table/RoomUserTableView.tsx";
 import ShortTeamTableView from "@/components/app/table/ShortTeamTableView.tsx";
 import {showAddRoomsToUsersDialogAtom} from "@/components/app/dialogs/room-page-dialogs/AddRoomsToUsersDialog.tsx";
+import {
+    showDeleteUsersOutOfRoomDialogAtom
+} from "@/components/app/dialogs/room-page-dialogs/DeleteUsersOutOfRoomsDialog.tsx";
+import {showAddTeamsToRoomsDialogAtom} from "@/components/app/dialogs/room-page-dialogs/AddTeamsToRoomsDialog.tsx";
+import {
+    showDeleteTeamsOutOfRoomsDialogAtom
+} from "@/components/app/dialogs/room-page-dialogs/DeleteTeamsOutOfRoomsDialog.tsx";
+import {showHideRoomDialogAtom} from "@/components/app/dialogs/room-page-dialogs/HideRoomDialog.tsx";
+import {showDeleteRoomDialogAtom} from "@/components/app/dialogs/room-page-dialogs/DeleteRoomDialog.tsx";
 
 const typesName = {
     d: "Личные сообщения",
@@ -38,6 +47,19 @@ function RoomPageContent() {
     const teams = team ? team : []
 
     const setAddRoomToUsersDialogOpen = useSetAtom(showAddRoomsToUsersDialogAtom)
+    const setDeleteUsersOutOfRoomDialogOpen = useSetAtom(showDeleteUsersOutOfRoomDialogAtom)
+    const setAddTeamsToRoomsDialogOpen = useSetAtom(showAddTeamsToRoomsDialogAtom)
+    const setDeleteTeamsOutOfRoomDialogOpen = useSetAtom(showDeleteTeamsOutOfRoomsDialogAtom)
+    const setHideRoomDialogOpen = useSetAtom(showHideRoomDialogAtom)
+    const setDeleteRoomDialogOpen = useSetAtom(showDeleteRoomDialogAtom)
+
+    const setSelectedRoomsData = useSetAtom($selectedRoomsData)
+    const data = [
+        {
+            _id: room._id as string
+        }
+    ]
+    setSelectedRoomsData(data)
 
     return (
         <div className="flex flex-col py-6 mx-6">
@@ -78,19 +100,19 @@ function RoomPageContent() {
                         <Button variant="outline" onClick={() => {setAddRoomToUsersDialogOpen(true)}}>
                             Добавить участников
                         </Button>
-                        <Button variant="outline">
+                        <Button variant="outline" onClick={() => {setDeleteUsersOutOfRoomDialogOpen(true)}}>
                             Удалить участников
                         </Button>
-                        <Button variant="outline">
+                        <Button variant="outline" onClick={() => {setAddTeamsToRoomsDialogOpen(true)}}>
                             Добавить команды
                         </Button>
-                        <Button variant="outline">
+                        <Button variant="outline" onClick={() => {setDeleteTeamsOutOfRoomDialogOpen(true)}}>
                             Удалить команды
                         </Button>
-                        <Button variant="outline">
+                        <Button variant="outline" onClick={() => {setHideRoomDialogOpen(true)}}>
                             Скрыть комнату
                         </Button>
-                        <Button variant="outline">
+                        <Button variant="outline" onClick={() => {setDeleteRoomDialogOpen(true)}}>
                             Удалить комнату
                         </Button>
                     </div>
