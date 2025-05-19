@@ -1,7 +1,7 @@
 import RichTableView from "@/components/app/table/RichTableView.tsx";
 import {$selectedSpaceId, ApiRoomUserModel} from "@/store/global-store.ts";
 import {useNavigate} from "react-router";
-import {columnsRoomUser} from "@/store/columnsRoomUser.tsx";
+import {columnsRoomUser} from "@/components/app/columns/columnsRoomUser.tsx";
 import {userContextMenuConfig} from "@/components/app/ContextMenuConfigs.tsx";
 import {useAtomValue} from "jotai";
 

@@ -1,26 +1,8 @@
 import DataTableColumnHeader from "@/components/app/table/DataTableColumnHeader.tsx";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
-import {TypedColumnDef} from "@/store/columnsUser.tsx";
 import {MonoRenderer, OptRenderer} from "@/components/app/ValueRenderers.tsx";
+import {customSortingFn, TypedColumnDef} from "@/lib/table.ts";
 
-
-//TODO: вынести в отдельный компонент
-const customSortingFn = (rowA, rowB, columnId) => {
-    const getValue = (row) => {
-        const value = row.getValue(columnId);
-        if (value === undefined || value === null) return "";
-        return String(value);
-    };
-
-    const a = getValue(rowA);
-    const b = getValue(rowB);
-
-    if (a === b) return 0;
-    if (a === "+" || a === "-") return 1;
-    if (b === "+" || b === "-") return -1;
-
-    return a.localeCompare(b, "ru", {numeric: true});
-};
 
 export const columnsRoomSmall = [
     {

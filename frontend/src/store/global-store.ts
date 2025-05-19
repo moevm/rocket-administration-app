@@ -51,28 +51,28 @@ export const $usersQuery = atomWithQuery((get) => {
     return $usersQueryOptions(spaceId, enabled)
 })
 export const $users = loadableQuery($usersQuery)
-
-export const $rolesQueryOptions = (spaceId: string, enabled: boolean) => $api.queryOptions(
-    'get',
-    `/spaces/{space_id}/roles/`,
-    {
-        params: {
-            path: {
-                space_id: spaceId
-            }
-        },
-    },
-    {
-        enabled
-    }
-);
-export const $rolesQuery = atomWithQuery((get) => {
-    const selectedSpace = get($selectedSpace)
-    const enabled = selectedSpace.state === 'hasData'
-    const spaceId = enabled ? selectedSpace.data._id! : ''
-    return $rolesQueryOptions(spaceId, enabled)
-})
-export const $roles = loadableQuery($rolesQuery)
+//
+// export const $rolesQueryOptions = (spaceId: string, enabled: boolean) => $api.queryOptions(
+//     'get',
+//     `/spaces/{space_id}/roles/`,
+//     {
+//         params: {
+//             path: {
+//                 space_id: spaceId
+//             }
+//         },
+//     },
+//     {
+//         enabled
+//     }
+// );
+// export const $rolesQuery = atomWithQuery((get) => {
+//     const selectedSpace = get($selectedSpace)
+//     const enabled = selectedSpace.state === 'hasData'
+//     const spaceId = enabled ? selectedSpace.data._id! : ''
+//     return $rolesQueryOptions(spaceId, enabled)
+// })
+// export const $roles = loadableQuery($rolesQuery)
 
 export const $smtpSettingsQueryOptions = (spaceId: string, enabled: boolean) => $api.queryOptions(
     'get',
@@ -270,5 +270,13 @@ export const $selectedUsersData = atom<{
     _id: string,
     username: string
 }[]>([])
+export const $selectedRoomsData = atom<{
+    _id: string
+}[]>([])
+export const $selectedTeamsData = atom<{
+    _id: string
+}[]>([])
 
 export const showAddNewTeamDialogAtom = atom(false)
+export const showAddNewUserDialogAtom = atom(false)
+export const showAddNewRoomDialogAtom = atom(false)

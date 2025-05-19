@@ -20,13 +20,13 @@ import {DataTablePagination} from "@/components/app/table/DataTablePagination.ts
 import {ColumnDef} from "@tanstack/table-core";
 import ExternallyTriggeredContextMenu from "@/components/app/ExternallyTriggeredContextMenu.tsx";
 import {Label} from "@/components/ui/label.tsx";
-import {getColumnTypeRelations, relationFullName} from "@/store/columnsUser.tsx";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover.tsx";
-import {ExportDialog} from "@/components/app/ExportDialog.tsx";
-import {FileDialog} from "@/components/app/FileDialog.tsx";
+import {ExportDialog} from "@/components/app/dialogs/ExportDialog.tsx";
+import {FileDialog} from "@/components/app/dialogs/FileDialog.tsx";
 import {toast} from "sonner";
-import {UserImportDialog} from "@/components/app/UserImportDialog.tsx";
+import {UserImportDialog} from "@/components/app/dialogs/UserImportDialog.tsx";
+import {getColumnTypeRelations, relationFullName} from "@/lib/table.ts";
 
 export interface ContextMenuConfig<TData> {
     getLabel?: (rows: Row<TData>[]) => string;
@@ -49,6 +49,7 @@ interface RichTableViewProps<TData, TValue> {
         rowClickHandler?: (data: TData) => void;
     };
     onSelectionUpdated?: (data: Row<TData>[]) => void;
+    buttonsSlot?: () => React.ReactNode;
 }
 
 function RichTableView<TData, TValue>({
@@ -56,7 +57,8 @@ function RichTableView<TData, TValue>({
                                           tableConfig,
                                           contextMenuConfig,
                                           settings = {},
-                                          onSelectionUpdated
+                                          onSelectionUpdated,
+                                          buttonsSlot
                                       }: RichTableViewProps<TData, TValue>) {
     console.info({
         entries: entries
@@ -113,7 +115,7 @@ function RichTableView<TData, TValue>({
 
 
     return (
-        <div className={"flex w-full max-w-screen-lg flex-col"}>
+        <div className={"flex w-full flex-col"}>
             <ExternallyTriggeredContextMenu
                 open={contextMenuOpen}
                 onOpenChange={setContextMenuOpen}
@@ -251,6 +253,7 @@ function RichTableView<TData, TValue>({
                             <Button variant="outline" size="sm" onClick={() => setShowDialogSelectFromFile(true)}>
                                 <CheckIcon/> Выделить из файла
                             </Button>}
+                        {buttonsSlot && buttonsSlot()}
                     </div>
                     {settings?.enableColumnVisibilityToggle && <DataTableViewOptions table={table}/>}
                 </div>
@@ -262,7 +265,7 @@ function RichTableView<TData, TValue>({
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
                                 {headerGroup.headers.map((header) => (
-                                    <TableHead key={header.id} className="truncate max-w-screen-lg">
+                                    <TableHead key={header.id}>
                                         {header.isPlaceholder
                                             ? null
                                             : flexRender(header.column.columnDef.header, header.getContext())}
@@ -276,7 +279,7 @@ function RichTableView<TData, TValue>({
                         {table.getRowModel().rows.length ? (
                             table.getRowModel().rows.map((row) => (
                                 <TableRow
-                                    className={"cursor-pointer truncate max-w-screen-lg"}
+                                    className={"cursor-pointer"}
                                     key={row.id}
                                     data-state={row.getIsSelected() && "selected"}
                                     // TODO: проваливание здесь
@@ -296,7 +299,7 @@ function RichTableView<TData, TValue>({
                                     }}
                                 >
                                     {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id} className="truncate max-w-screen-lg">
+                                        <TableCell key={cell.id}>
                                             {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                         </TableCell>
                                     ))}
