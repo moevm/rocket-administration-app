@@ -33,6 +33,7 @@ import {
     showDeleteTeamFromRoomDialogAtom
 } from "@/components/app/dialogs/team-page-dialogs/DeleteTeamFromRoomDialog.tsx";
 import {showDeleteTeamDialogAtom} from "@/components/app/dialogs/team-page-dialogs/DeleteTeamDialog.tsx";
+import {useNavigate} from "react-router";
 
 const RoomContextMenuItems = ({rows}: { rows: Row<{ _id: string }>[] }) => {
 
@@ -42,6 +43,7 @@ const RoomContextMenuItems = ({rows}: { rows: Row<{ _id: string }>[] }) => {
     const setDeleteTeamsOutOfRoomsDialogOpen = useSetAtom(showDeleteTeamsOutOfRoomsDialogAtom)
     const setHideRoomsDialogOpen = useSetAtom(showHideRoomDialogAtom)
     const setDeleteRoomsDialogOpen = useSetAtom(showDeleteRoomDialogAtom)
+    const nav = useNavigate();
 
     const setSelectedRoomsData = useSetAtom($selectedRoomsData)
     const data = rows.map(it => ({
@@ -74,7 +76,10 @@ const RoomContextMenuItems = ({rows}: { rows: Row<{ _id: string }>[] }) => {
                 setSelectedRoomsData(data)
                 setDeleteRoomsDialogOpen(true)
             }}>Удалить комнату</ContextMenuItem>
-            {rows.length === 1 && <ContextMenuItem>Управление</ContextMenuItem>}
+            {rows.length === 1 && <ContextMenuItem onClick={() => {
+                setSelectedRoomsData(data)
+                nav(`${data[0]._id}`)
+            }}>Управление</ContextMenuItem>}
         </>
     )
 };
@@ -100,6 +105,7 @@ const UserContextMenuItems = ({rows}: { rows: Row<{ _id: string }>[] }) => {
     const setDeleteUserFromTeamDialogOpen = useSetAtom(showDeleteUserFromTeamDialogAtom)
     const setDeleteUserDialogOpen = useSetAtom(showDeleteUserDialogAtom)
     const setSelectedUsersData = useSetAtom($selectedUsersData)
+    const nav = useNavigate();
     const data = rows.map(it => ({
         _id: it.getValue('_id') as string,
         username: it.getValue('username') as string
@@ -130,7 +136,10 @@ const UserContextMenuItems = ({rows}: { rows: Row<{ _id: string }>[] }) => {
                 setSelectedUsersData(data)
                 setDeleteUserDialogOpen(true)
             }}>Удалить</ContextMenuItem>
-            {rows.length === 1 && <ContextMenuItem>Управление</ContextMenuItem>}
+            {rows.length === 1 && <ContextMenuItem onClick={() => {
+                setSelectedUsersData(data)
+                nav(`${data[0]._id}`)
+            }}>Управление</ContextMenuItem>}
         </>
     )
 };
@@ -153,6 +162,7 @@ const TeamContextMenuItems = ({rows}: { rows: Row<{ _id: string }>[] }) => {
     const setAddTeamIntoRoomDialogOpen = useSetAtom(showAddTeamIntoRoomDialogAtom)
     const setDeleteTeamFromRoomDialogOpen = useSetAtom(showDeleteTeamFromRoomDialogAtom)
     const setDeleteTeamDialogOpen = useSetAtom(showDeleteTeamDialogAtom)
+    const nav = useNavigate();
 
     const setSelectedRoomsData = useSetAtom($selectedTeamsData)
     const data = rows.map(it => ({
@@ -181,7 +191,10 @@ const TeamContextMenuItems = ({rows}: { rows: Row<{ _id: string }>[] }) => {
                 setSelectedRoomsData(data)
                 setDeleteTeamDialogOpen(true)
             }}>Удалить команду</ContextMenuItem>
-            {rows.length === 1 && <ContextMenuItem>Управление</ContextMenuItem>}
+            {rows.length === 1 && <ContextMenuItem onClick={() => {
+                setSelectedRoomsData(data)
+                nav(`${data[0]._id}`)
+            }}>Управление</ContextMenuItem>}
         </>
     )
 };
