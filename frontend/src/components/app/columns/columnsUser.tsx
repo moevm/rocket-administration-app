@@ -1,63 +1,20 @@
-import {ColumnDef, RowData} from "@tanstack/table-core";
 import DataTableColumnHeader from "@/components/app/table/DataTableColumnHeader.tsx";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
-import {ColumnMeta} from "@tanstack/react-table";
 import {ApiUserModel} from "@/store/global-store.ts";
-import {CheckboxRenderer, ListRenderer, MonoRenderer, OptRenderer} from "@/components/app/ValueRenderers.tsx";
-
-// TODO точно куда-то переместить (весь файл)
-
-// TODO а это куда-нибудь вынести
-export type ColumnType = 'string' | 'number' | 'list' | 'none'
-export type TypedColumnDef<T extends RowData> = ColumnDef<T> & { meta: ColumnMeta<T, unknown> & { type: ColumnType, selectFromFile?: true } }
-
-export const getColumnTypeRelations: (type: ColumnType) => string[] = type => {
-    switch (type) {
-        case 'string':
-            return ['includes', 'not-includes', 'equals', 'not-equals']
-        case 'number':
-            return ['eq', 'not-eq', 'gt', 'lt', 'ge', 'le']
-        case 'list':
-            return []
-        default:
-            return []
-    }
-}
-
-export const relationFullName = {
-    'includes': "включает",
-    'not-includes': "не включает",
-    'equals': "соответствует",
-    'not-equals': "не соответствует",
-    'eq': "равно",
-    'not-eq': "не равно",
-    'gt': "больше, чем",
-    'lt': "меньше, чем",
-    'ge': "больше или равно",
-    'le': "меньше или равно"
-}
+import {
+    CheckboxRenderer,
+    DateRenderer,
+    ListRenderer,
+    MonoRenderer,
+    OptRenderer
+} from "@/components/app/ValueRenderers.tsx";
+import {customSortingFn, TypedColumnDef} from "@/lib/table.ts";
+import dayjs from "dayjs";
 
 const typesUserType = {
     'bot': "Бот",
     'user': "Пользователь"
 }
-
-const customSortingFn = (rowA, rowB, columnId) => {
-    const getValue = (row) => {
-        const value = row.getValue(columnId);
-        if (value === undefined || value === null) return "";
-        return String(value);
-    };
-
-    const a = getValue(rowA);
-    const b = getValue(rowB);
-
-    if (a === b) return 0;
-    if (a === "+" || a === "-") return 1;
-    if (b === "+" || b === "-") return -1;
-
-    return a.localeCompare(b, "ru", {numeric: true});
-};
 
 export const columnsUser = [
     {
@@ -206,4 +163,20 @@ export const columnsUser = [
             type: 'string'
         },
     },
+    {
+        id: "lastLogin",
+        header: ({column}) => {
+            return (
+                <DataTableColumnHeader column={column} title="Последний логин"/>
+            )
+        },
+        accessorFn: (row) => {
+            return dayjs(row.lastLogin);
+        },
+        cell: ({ cell }) => <DateRenderer value={cell.getValue()} />,
+        meta: {
+            title: 'Последний логин',
+            type: 'datetime'
+        }
+    }
 ] as TypedColumnDef<ApiUserModel>[]

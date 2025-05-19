@@ -1,30 +1,15 @@
 import DataTableColumnHeader from "@/components/app/table/DataTableColumnHeader.tsx";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
 import {ApiRoomUserModel} from "@/store/global-store.ts";
-import {TypedColumnDef} from "@/store/columnsUser.tsx";
-import React from "react";
-import {MonoRenderer, OptRenderer} from "@/components/app/ValueRenderers.tsx";
+import { MonoRenderer, OptRenderer} from "@/components/app/ValueRenderers.tsx";
+import {customSortingFn, TypedColumnDef} from "@/lib/table.ts";
 
+const typesUserType = {
+    'bot': "Бот",
+    'user': "Пользователь"
+}
 
-//TODO: вынести в отдельный компонент
-const customSortingFn = (rowA, rowB, columnId) => {
-    const getValue = (row) => {
-        const value = row.getValue(columnId);
-        if (value === undefined || value === null) return "";
-        return String(value);
-    };
-
-    const a = getValue(rowA);
-    const b = getValue(rowB);
-
-    if (a === b) return 0;
-    if (a === "+" || a === "-") return 1;
-    if (b === "+" || b === "-") return -1;
-
-    return a.localeCompare(b, "ru", {numeric: true});
-};
-
-export const columnsRoomUser = [
+export const columnsUsersSmall = [
     {
         id: "select",
         header: ({table}) => (
@@ -63,11 +48,26 @@ export const columnsRoomUser = [
             type: 'string',
             selectFromFile: true,
         },
-        cell: ({cell}) => <MonoRenderer value={cell.getValue()}/>,
         sortingFn: customSortingFn,
+        cell: ({cell}) => <MonoRenderer value={cell.getValue()} />
     },
     {
-        accessorKey: "name",
+        accessorKey: "username",
+        header: ({column}) => {
+            return (
+                <DataTableColumnHeader column={column} title="Никнейм"/>
+            )
+        },
+        meta: {
+            title: "Никнейм",
+            type: 'string',
+            selectFromFile: true,
+        },
+        sortingFn: customSortingFn,
+        cell: ({cell}) => <OptRenderer value={cell.getValue()} />
+    },
+    {
+        accessorKey: 'name',
         header: ({column}) => {
             return (
                 <DataTableColumnHeader column={column} title="Имя"/>
@@ -79,22 +79,7 @@ export const columnsRoomUser = [
             selectFromFile: true,
         },
         sortingFn: customSortingFn,
-        cell: ({cell}) => <OptRenderer value={cell.getValue()}/>
-    },
-    {
-        accessorKey: "username",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Логин"/>
-            )
-        },
-        meta: {
-            title: "Логин",
-            type: 'string',
-            selectFromFile: true,
-        },
-        sortingFn: customSortingFn,
-        cell: ({cell}) => <OptRenderer value={cell.getValue()}/>
+        cell: ({cell}) => <OptRenderer value={cell.getValue()} />
     },
     {
         accessorKey: "status",
@@ -105,9 +90,9 @@ export const columnsRoomUser = [
         },
         meta: {
             title: "Статус",
-            type: 'string'
+            type: 'list'
         },
         sortingFn: customSortingFn,
-        cell: ({cell}) => <OptRenderer value={cell.getValue()}/>
+        cell: ({cell}) => <OptRenderer value={cell.getValue()} />
     },
 ] as TypedColumnDef<ApiRoomUserModel>[]

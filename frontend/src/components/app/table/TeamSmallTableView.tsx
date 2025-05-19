@@ -4,19 +4,23 @@ import {columnsShortTeam} from "@/components/app/columns/columnsShortTeam.tsx";
 import {useNavigate} from "react-router";
 import {teamContextMenuConfig} from "@/components/app/ContextMenuConfigs.tsx";
 import {useAtomValue} from "jotai";
+import {Row} from "@tanstack/table-core/src/types.ts";
+import {RoomSmallTableViewTData} from "@/components/app/table/RoomSmallTableView.tsx";
+import {columnsTeamSmall} from "@/components/app/columns/columnsTeamSmall.tsx";
 
-function ShortTeamTableView(props: {
-    data: ApiShortTeamModel[]
+function TeamSmallTableView(props: {
+    data: ApiShortTeamModel[],
+    onSelectionUpdated?: (data: Row<ApiShortTeamModel>[]) => void
 }) {
     const navigate = useNavigate()
     const selectedSpaceId = useAtomValue($selectedSpaceId)
     return (
         <>
             <RichTableView
-                tableId={'short-team'}
+                tableId={'small-team'}
                 entries={props.data}
                 tableConfig={{
-                    columns: columnsShortTeam,
+                    columns: columnsTeamSmall,
                 }}
                 contextMenuConfig={
                     teamContextMenuConfig
@@ -25,11 +29,13 @@ function ShortTeamTableView(props: {
                     enableSearch: true,
                     enableExport: true,
                     enableColumnVisibilityToggle: true,
-                    rowClickHandler: (team) => navigate(`/spaces/${selectedSpaceId}/dashboard/teams/${team._id}`)
+                }}
+                onSelectionUpdated={(data) => {
+                    props.onSelectionUpdated?.(data)
                 }}
             />
         </>
     )
 }
 
-export default ShortTeamTableView;
+export default TeamSmallTableView;

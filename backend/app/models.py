@@ -223,6 +223,6 @@ class UsersAndRoomsDto(BaseModel):
 
 class UsersAndRoomsResDto(BaseModel):
     success: bool = True
-    msg: Optional[str] = None
+    error: Optional[str] = None
     user_list: List[str]
     room: str

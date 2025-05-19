@@ -1,4 +1,4 @@
-import {FileDialog} from "@/components/app/FileDialog.tsx";
+import {FileDialog} from "@/components/app/dialogs/FileDialog.tsx";
 import {zodResolver} from "@hookform/resolvers/zod"
 import {useForm} from "react-hook-form"
 import {z} from "zod"
@@ -7,7 +7,7 @@ import {Checkbox} from "@/components/ui/checkbox.tsx";
 import {toast} from "sonner";
 import {$api, createMutationOptions, queryClient} from "@/api";
 import {useAtomValue} from "jotai/index";
-import {$selectedSpaceId, $spacesQueryOptions, $usersQueryOptions} from "@/store/global-store.ts";
+import {$selectedSpaceId, $usersQueryOptions} from "@/store/global-store.ts";
 import React from "react";
 import {BatchResult} from "@/components/app/BatchResult.tsx";
 

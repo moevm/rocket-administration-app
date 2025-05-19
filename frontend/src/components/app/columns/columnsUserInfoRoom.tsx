@@ -1,34 +1,19 @@
 import DataTableColumnHeader from "@/components/app/table/DataTableColumnHeader.tsx";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
-import {ApiShortTeamModel} from "@/store/global-store.ts";
-import {TypedColumnDef} from "@/store/columnsUser.tsx";
-import {MonoRenderer} from "@/components/app/ValueRenderers.tsx";
+import {ApiUserInfoRoomModel} from "@/store/global-store.ts";
+import React from "react";
+import {ListRenderer, MonoRenderer, OptRenderer} from "@/components/app/ValueRenderers.tsx";
+import {customSortingFn, TypedColumnDef} from "@/lib/table.ts";
 
-
-//TODO: вынести в отдельный компонент
-const customSortingFn = (rowA, rowB, columnId) => {
-    const getValue = (row) => {
-        const value = row.getValue(columnId);
-        if (value === undefined || value === null) return "";
-        return String(value);
-    };
-
-    const a = getValue(rowA);
-    const b = getValue(rowB);
-
-    if (a === b) return 0;
-    if (a === "+" || a === "-") return 1;
-    if (b === "+" || b === "-") return -1;
-
-    return a.localeCompare(b, "ru", {numeric: true});
-};
-
-const typesType = {
-    "1": "Закрытый канал",
-    "0": "Открытый канал"
+const typesName = {
+    d: "Личные сообщения",
+    c: "Публичный канал",
+    p: "Приватный канал",
+    l: "Лайвчат",
+    v: "Omnichannel VoIP rooms"
 }
 
-export const columnsShortTeam = [
+export const columnsUserInfoRoom = [
     {
         id: "select",
         header: ({table}) => (
@@ -67,8 +52,8 @@ export const columnsShortTeam = [
             type: 'string',
             selectFromFile: true,
         },
+        cell: ({cell}) => <MonoRenderer value={cell.getValue()} />,
         sortingFn: customSortingFn,
-        cell: ({cell}) => <MonoRenderer value={cell.getValue()} />
     },
     {
         accessorKey: "name",
@@ -82,35 +67,52 @@ export const columnsShortTeam = [
             type: 'string',
             selectFromFile: true,
         },
-        sortingFn: customSortingFn
+        sortingFn: customSortingFn,
+        cell: ({cell}) => <OptRenderer value={cell.getValue()} />
     },
     {
-        id: "type",
+        id: "t",
         header: ({column}) => {
             return (
                 <DataTableColumnHeader column={column} title="Тип"/>
             )
         },
         accessorFn: (row) => {
-            return typesType[row.type]
+            return typesName[row.t] ?? row.t
         },
         meta: {
-            title: "Тип",
-            type: 'boolean'
+            title: "Tип",
+            type: 'string'
         },
+        sortingFn: customSortingFn,
     },
     {
-        accessorKey: "roomId",
+        accessorKey: "rid",
         header: ({column}) => {
             return (
-                <DataTableColumnHeader column={column} title="Id комнаты"/>
+                <DataTableColumnHeader column={column} title="rid"/>
             )
         },
         meta: {
-            title: "Id комнаты",
-            type: 'string'
+            title: "rid",
+            type: 'string',
+            selectFromFile: true,
         },
         sortingFn: customSortingFn,
         cell: ({cell}) => <MonoRenderer value={cell.getValue()} />
     },
-] as TypedColumnDef<ApiShortTeamModel>[]
+    {
+        accessorKey: "roles",
+        header: ({column}) => {
+            return (
+                <DataTableColumnHeader column={column} title="Роли"/>
+            )
+        },
+        meta: {
+            title: "Роли",
+            type: 'list'
+        },
+        sortingFn: customSortingFn,
+        cell: ({cell}) => <ListRenderer value={cell.getValue()} />
+    },
+] as TypedColumnDef<ApiUserInfoRoomModel>[]
