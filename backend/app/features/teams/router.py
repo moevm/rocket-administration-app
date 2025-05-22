@@ -84,7 +84,6 @@ async def create_teams(
     return results
 
 @router.delete("/{team_id}/{rooms}")
-@router.delete("/{team_id}/{rooms}")
 async def delete_team(
     team_id: str,
     rooms: str = Path(
