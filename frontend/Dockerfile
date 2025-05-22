@@ -9,3 +9,4 @@ RUN bun run build
 
 FROM caddy:2.9.1-alpine
 COPY --from=builder /app/dist/. /usr/share/caddy/
+COPY Caddyfile /etc/caddy/Caddyfile
