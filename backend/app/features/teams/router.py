@@ -1,6 +1,7 @@
 import asyncio
 
-from fastapi import APIRouter, Depends
+import json
+from fastapi import APIRouter, Depends, HTTPException, Path
 from typing import List
 
 from app.lib.cache import key_for_space
@@ -12,7 +13,7 @@ from app.lib.rocket import obtain_rocket_instance, rocket_request, rocket_query_
 from app.services.db import get_db
 from app.lib.utils import batch_execute, generate_password, extract_exception_message
 from app.config import settings
-from app.models import TeamsImportRequestDto, ImportedTeamResultDto, TeamCreateDto
+from app.models import TeamsImportRequestDto, ImportedTeamResultDto, TeamCreateDto, TeamDeletedDto
 
 router = APIRouter()
 
@@ -81,3 +82,32 @@ async def create_teams(
     )
 
     return results
+
+@router.delete("/{team_id}/{rooms}")
+@router.delete("/{team_id}/{rooms}")
+async def delete_team(
+    team_id: str,
+    rooms: str = Path(
+        ...,
+        title="Rooms (JSON list)",
+        description='JSON-encoded list of room IDs. Example: ["room1", "room2"]'
+    ),
+    space=Depends(get_space)
+) -> TeamDeletedDto:
+    rocket = await obtain_rocket_instance(key_for_space(space))
+    print(rooms)
+    print(team_id)
+    try:
+        rooms_to_delete = json.loads(rooms)
+        if not isinstance(rooms_to_delete, list):
+            raise ValueError("rooms must be a JSON-encoded list")
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=400, detail="Invalid JSON for 'rooms'")
+    res = TeamDeletedDto(team=team_id, rooms=rooms_to_delete, success=False)
+    try:
+        await rocket_request(rocket.teams_delete, **rocket_query_args(team_id=team_id, roomsToRemove=rooms_to_delete))
+    except Exception as e:
+        res.error = extract_exception_message(e)
+    else:
+        res.success = True
+    return res

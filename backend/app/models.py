@@ -178,6 +178,12 @@ class TeamInfoDto(BaseModel):
     users: List[RoomUserDto]
     rooms: List[RoomDto]
 
+class TeamDeletedDto(BaseModel):
+    team: str
+    rooms: List[str]
+    success: bool
+    error: Optional[str] = None
+
 
 class UserInfoDto(BaseModel):
     teams: List[ShortTeamDto]
