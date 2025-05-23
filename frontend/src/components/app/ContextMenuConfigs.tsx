@@ -28,9 +28,9 @@ import {showAddUsersToTeamDialogAtom} from "@/components/app/dialogs/team-page-d
 import {
     showDeleteUsersOutOfTeamDialogAtom
 } from "@/components/app/dialogs/team-page-dialogs/DeleteUsersOutOfTeamDialog.tsx";
-import {showAddTeamIntoRoomDialogAtom} from "@/components/app/dialogs/team-page-dialogs/AddTeamIntoRoomDialog.tsx";
+import {showAddRoomsIntoTeamDialogAtom} from "@/components/app/dialogs/team-page-dialogs/AddTeamIntoRoomDialog.tsx";
 import {
-    showDeleteTeamFromRoomDialogAtom
+    showDeleteRoomFromTeamDialogAtom
 } from "@/components/app/dialogs/team-page-dialogs/DeleteTeamFromRoomDialog.tsx";
 import {showDeleteTeamDialogAtom} from "@/components/app/dialogs/team-page-dialogs/DeleteTeamDialog.tsx";
 import {useNavigate} from "react-router";
@@ -175,8 +175,8 @@ export const userContextMenuConfig: ContextMenuConfig<{
 const TeamContextMenuItems = ({rows}: { rows: Row<{ _id: string }>[] }) => {
     const setAddUsersToTeamDialogOpen = useSetAtom(showAddUsersToTeamDialogAtom)
     const setDeleteUsersOutOfTeamDialogOpen = useSetAtom(showDeleteUsersOutOfTeamDialogAtom)
-    const setAddTeamIntoRoomDialogOpen = useSetAtom(showAddTeamIntoRoomDialogAtom)
-    const setDeleteTeamFromRoomDialogOpen = useSetAtom(showDeleteTeamFromRoomDialogAtom)
+    const setAddRoomsIntoTeamDialogOpen = useSetAtom(showAddRoomsIntoTeamDialogAtom)
+    const setDeleteRoomFromTeamDialogOpen = useSetAtom(showDeleteRoomFromTeamDialogAtom)
     const setDeleteTeamDialogOpen = useSetAtom(showDeleteTeamDialogAtom)
     const setContextMenuOpen = useSetAtom(showContextMenuAtom)
     const nav = useNavigate();
@@ -200,14 +200,14 @@ const TeamContextMenuItems = ({rows}: { rows: Row<{ _id: string }>[] }) => {
             }}>Удалить участников</ContextMenuItem>
             <ContextMenuItem onClick={() => {
                 setSelectedRoomsData(data)
-                setAddTeamIntoRoomDialogOpen(true)
+                setAddRoomsIntoTeamDialogOpen(true)
                 setContextMenuOpen(false)
-            }}>Добавить в комнату</ContextMenuItem>
+            }}>Привязать комнату</ContextMenuItem>
             <ContextMenuItem onClick={() => {
                 setSelectedRoomsData(data)
-                setDeleteTeamFromRoomDialogOpen(true)
+                setDeleteRoomFromTeamDialogOpen(true)
                 setContextMenuOpen(false)
-            }}>Удалить из комнаты</ContextMenuItem>
+            }}>Отвязать комнату</ContextMenuItem>
             <ContextMenuItem onClick={() => {
                 setSelectedRoomsData(data)
                 setDeleteTeamDialogOpen(true)

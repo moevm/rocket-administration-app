@@ -104,10 +104,10 @@ function RoomPageContent() {
                             Удалить участников
                         </Button>
                         <Button variant="outline" onClick={() => {setAddTeamsToRoomsDialogOpen(true)}}>
-                            Добавить команды
+                            Добавить в команды
                         </Button>
                         <Button variant="outline" onClick={() => {setDeleteTeamsOutOfRoomDialogOpen(true)}}>
-                            Удалить команды
+                            Удалить из команды
                         </Button>
                         <Button variant="outline" onClick={() => {setHideRoomDialogOpen(true)}}>
                             Скрыть комнату
