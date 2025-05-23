@@ -107,7 +107,8 @@ function AddTeamsToRoomsContent(props: {
                         </div>
 
                         <DialogFooter className="sm:justify-start">
-                            <Button type="button" variant="default" onClick={handleSubmit}>
+                            <Button type="button" variant="default" onClick={handleSubmit}
+                                    disabled={isPending || selectedTeamsIds.length === 0}>
                                 Добавить
                             </Button>
                         </DialogFooter>

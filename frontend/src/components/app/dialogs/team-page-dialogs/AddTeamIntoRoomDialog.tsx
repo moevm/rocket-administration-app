@@ -86,7 +86,8 @@ function AddTeamIntoRoomContent(props: {
                         </div>
 
                         <DialogFooter className="sm:justify-start">
-                            <Button type="button" variant="default" onClick={handleSubmit}>
+                            <Button type="button" variant="default" onClick={handleSubmit}
+                                    disabled={isPending || selectedRoomsIds.length === 0}>
                                 Добавить
                             </Button>
                         </DialogFooter>
@@ -97,7 +98,7 @@ function AddTeamIntoRoomContent(props: {
                             <DialogTitle>Привязка команды к комнате</DialogTitle>
                         </DialogHeader>
                         <ExportCard data={results} showData={true} countedValues={[
-                            {key: 'success', display: 'Успешно удалено'},
+                            {key: 'success', display: 'Успешно привязано'},
                             {key: 'error', display: 'Ошибок'},
                         ]} />
                     </>

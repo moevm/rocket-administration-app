@@ -8,7 +8,7 @@ import {useAtomValue} from "jotai";
 import {
     $selectedRoom,
     $selectedSpaceId,
-    $selectedRoomId, $roomInfo, $selectedRoomsData
+    $selectedRoomId, $roomInfo, $selectedRoomsData, $teams
 } from "@/store/global-store.ts";
 import {NavLink, useParams} from "react-router";
 import {Label} from "@/components/ui/label.tsx";
@@ -44,6 +44,9 @@ function RoomPageContent() {
     const room = loaded(useAtomValue($selectedRoom)).data
     const selectedSpaceId = useAtomValue($selectedSpaceId)!
     const {team, members} = loaded(useAtomValue($roomInfo)).data
+    const allTeams = useAtomValue($teams);
+    console.info("CURRENT ROOM", room)
+    console.info("TEAMS: ", allTeams);
     const teams = team ? team : []
 
     const setAddRoomToUsersDialogOpen = useSetAtom(showAddRoomsToUsersDialogAtom)
