@@ -1,6 +1,7 @@
 import asyncio
 
-from fastapi import APIRouter, Depends
+import json
+from fastapi import APIRouter, Depends, HTTPException, Path
 from typing import List
 
 from app.lib.cache import key_for_space
@@ -12,7 +13,7 @@ from app.lib.rocket import obtain_rocket_instance, rocket_request, rocket_query_
 from app.services.db import get_db
 from app.lib.utils import batch_execute, generate_password, extract_exception_message
 from app.config import settings
-from app.models import TeamsImportRequestDto, ImportedTeamResultDto, TeamCreateDto
+from app.models import TeamsImportRequestDto, ImportedTeamResultDto, TeamCreateDto, TeamsDeleteDto, TeamDeletedDto
 
 router = APIRouter()
 
@@ -81,3 +82,35 @@ async def create_teams(
     )
 
     return results
+
+@router.delete("/{team_id}/{rooms}")
+async def remove_users_from_team(body: TeamsDeleteDto, space=Depends(get_space)) -> List[TeamDeletedDto]:
+    rocket = await obtain_rocket_instance(key_for_space(space))
+    
+    async def _process(team: str):
+        res = TeamDeletedDto(team=team, success=False)
+        try:
+            rooms = []
+            if body.delete_linked_rooms:
+                rooms_list = await rocket_request(
+                    rocket.teams_list_rooms, **rocket_query_args(team_id=team)
+                )
+                rooms = [ i["_id"] for i in rooms_list["rooms"]]
+        except Exception as e:
+            res.error = extract_exception_message(e)
+            return res
+
+        res.rooms = rooms        
+        try:
+            await rocket_request(rocket.teams_delete, **rocket_query_args(team_id=team, roomsToRemove=rooms))
+        except Exception as e:
+            res.error = extract_exception_message(e)
+        else:
+            res.success = True
+        return res
+    print(body.teams)
+    return await batch_execute(
+            _process,
+            [(team,) for team in body.teams],
+            settings.app.batch_delay
+    )
