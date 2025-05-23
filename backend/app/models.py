@@ -180,7 +180,7 @@ class TeamInfoDto(BaseModel):
 
 class TeamDeletedDto(BaseModel):
     team: str
-    rooms: List[str]
+    rooms: List[str] = []
     success: bool
     error: Optional[str] = None
 
@@ -243,3 +243,7 @@ class UsersAndTeamResDto(BaseModel):
     error: Optional[str] = None
     user_list: List[str]
     team: str
+
+class TeamsDeleteDto(BaseModel):
+    teams: List[str]
+    delete_linked_rooms: bool = True
