@@ -67,6 +67,7 @@ export const UserImportDialog = ({
         <FileDialog
             open={open}
             onOpenChange={onOpenChange}
+            dialogStep={dialogStep}
             title="Импорт"
             description={
                 dialogStep === 1 && 'Обязательные поля: username, email, name'

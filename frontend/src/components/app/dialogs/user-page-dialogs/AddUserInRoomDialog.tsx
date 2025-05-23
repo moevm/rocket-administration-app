@@ -108,7 +108,11 @@ const AddUserInRoomDialog = () => {
         <BatchLoader
             states={[rooms]}
             loadingMessage='Загрузка комнат'
-            display={() => <AddUserInRoomContent smallRooms={loaded(rooms).data.map(({_id, name}) => ({_id, name}))}/>}
+            display={() => <AddUserInRoomContent smallRooms={
+                loaded(rooms).data
+                    .filter(room => room.t === "c")
+                    .map(({ _id, name }) => ({ _id, name }))
+            }/>}
         />
     )
 }
