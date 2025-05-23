@@ -20,6 +20,20 @@ async def create_space(create_space_request: CreateSpaceRequest, db=Depends(get_
     space_model = SpaceModel.model_validate(await db.spaces.find_one({"_id": insert_result.inserted_id}))
     return convert_to(SpaceDto, space_model)
 
+@router.patch("/{space_id}")
+async def update_space(update_space_request: CreateSpaceRequest, db=Depends(get_db), original_space=Depends(get_space)) -> SpaceDto:
+    space_id = original_space.id
+    space = convert_to(SpaceModel, update_space_request)
+    await obtain_rocket_instance(key_for_space(space))
+
+    space_data = space.model_dump(mode='json')
+
+    await db.spaces.replace_one({"_id": space_id}, space_data)
+
+    space_model = SpaceModel.model_validate(await db.spaces.find_one({"_id": space_id}))
+    return convert_to(SpaceDto, space_model)
+
+
 @router.get("/")
 async def get_spaces(db=Depends(get_db)) -> List[SpaceDto]:
     result = []
