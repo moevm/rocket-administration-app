@@ -11,12 +11,12 @@ interface FileDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     title: string;
-    buttonText: string;
-    description?: string;
+    description?: ReactNode;
     onSubmit: (data: object[]) => boolean;
     content?: ReactNode,
-    loading?: boolean
-    buttonDisabled?: boolean
+    loading?: boolean,
+    buttonDisabled?: boolean,
+    dialogStep?: number
 }
 
 const allowedTypes = [
@@ -30,12 +30,12 @@ export const FileDialog = ({
                                open,
                                onOpenChange,
                                title,
-                               buttonText,
                                onSubmit,
                                description,
                                content,
-    loading = false,
-    buttonDisabled = false,
+                               dialogStep,
+                               loading = false,
+                               buttonDisabled = false,
                            }: FileDialogProps) => {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [error, setError] = useState<string | null>(null);
@@ -106,7 +106,8 @@ export const FileDialog = ({
         }
     }, [open]);
 
-    const Description = (<>
+    const Description = (
+        <>
             CSV, JSON, XLS
             {description && (<>
                 <br/>
@@ -120,9 +121,10 @@ export const FileDialog = ({
             open={open}
             onOpenChange={onOpenChange}
             title={title}
-            description={Description}
-            contentClassName="w-[400px]"
+            description={dialogStep == 1 && Description}
+            contentClassName="max-h-screen overflow-y-auto"
             footerContent={
+                dialogStep == 1 &&
                 <Button
                     type="submit"
                     className="w-full"
@@ -134,20 +136,22 @@ export const FileDialog = ({
                             <Loader2 className="animate-spin"/>
                             Загрузка</>
                         : <>
-                        {buttonText}
+                            Ипорт
                         </>
                     }
                 </Button>
             }
         >
-            <div className="flex items-center justify-center w-full">
-                <Input
-                    type="file"
-                    className="w-full"
-                    onChange={handleFileChange}
-                    accept=".csv,.json,.xls,.xlsx"
-                />
-            </div>
+            {dialogStep == 1 &&
+                <div className="flex items-center justify-center w-full">
+                    <Input
+                        type="file"
+                        className="w-full"
+                        onChange={handleFileChange}
+                        accept=".csv,.json,.xls,.xlsx"
+                    />
+                </div>
+            }
             {content}
         </DialogBase>
     );

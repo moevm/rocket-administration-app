@@ -8,8 +8,9 @@ import {toast} from "sonner";
 import {$api, createMutationOptions, queryClient} from "@/api";
 import {useAtomValue} from "jotai/index";
 import {$selectedSpaceId, $usersQueryOptions} from "@/store/global-store.ts";
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {BatchResult} from "@/components/app/BatchResult.tsx";
+import ExportCard from "@/components/app/dialogs/ExportCard.tsx";
 
 interface UserImportDialogProps {
     open: boolean
@@ -31,6 +32,7 @@ export const UserImportDialog = ({
     const selectedSpaceId = useAtomValue($selectedSpaceId)!
     const [success, setSuccess] = React.useState<boolean>(false)
     const [successData, setSuccessData] = React.useState<any>(null)
+    const [dialogStep, setDialogStep] = useState(1);
 
     const {
         mutate,
@@ -40,11 +42,21 @@ export const UserImportDialog = ({
             setSuccess(true)
             console.info(data)
             setSuccessData(data)
+            console.log("successData", data)
+            setDialogStep(0)
             await queryClient.invalidateQueries({
                 queryKey: $usersQueryOptions(selectedSpaceId!, true).queryKey
             })
         }
     }))
+
+    useEffect(() => {
+        if (!open) {
+            setDialogStep(1)
+            setSuccess(false)
+            setSuccessData(null)
+        }
+    }, [open]);
 
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
@@ -55,108 +67,114 @@ export const UserImportDialog = ({
         <FileDialog
             open={open}
             onOpenChange={onOpenChange}
-            title={"Импорт"}
-            buttonText={"Импорт"}
-            description={"Обязательные поля: username, email, name"}
+            dialogStep={dialogStep}
+            title="Импорт"
+            description={
+                dialogStep === 1 && 'Обязательные поля: username, email, name'
+            }
             loading={isPending}
-            content={<>
-                <Form {...form}>
-                    <FormField
-                        control={form.control}
-                        name="verified"
-                        render={({field}) => (
-                            <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                                <FormControl>
-                                    <Checkbox
-                                        checked={field.value}
-                                        onCheckedChange={field.onChange}
-                                    />
-                                </FormControl>
-                                <div className="space-y-1 leading-none">
-                                    <FormLabel>
-                                        Автоматически подтвердить аккаунты
-                                    </FormLabel>
-                                </div>
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="requirePasswordChange"
-                        render={({field}) => (
-                            <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                                <FormControl>
-                                    <Checkbox
-                                        checked={field.value}
-                                        onCheckedChange={field.onChange}
-                                    />
-                                </FormControl>
-                                <div className="space-y-1 leading-none">
-                                    <FormLabel>
-                                        Потребовать смену пароля
-                                    </FormLabel>
-                                    <FormDescription>
-                                        Встроенная функция RocketChat
-                                    </FormDescription>
-                                </div>
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="joinDefaultChannels"
-                        render={({field}) => (
-                            <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                                <FormControl>
-                                    <Checkbox
-                                        checked={field.value}
-                                        onCheckedChange={field.onChange}
-                                    />
-                                </FormControl>
-                                <div className="space-y-1 leading-none">
-                                    <FormLabel>
-                                        Присоединиться к каналам по умолчанию
-                                    </FormLabel>
-                                </div>
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="sendEmail"
-                        render={({field}) => (
-                            <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                                <FormControl>
-                                    <Checkbox
-                                        checked={field.value}
-                                        onCheckedChange={field.onChange}
-                                    />
-                                </FormControl>
-                                <div className="space-y-1 leading-none">
-                                    <FormLabel>
-                                        Отправить письмо с паролем
-                                    </FormLabel>
-                                    <FormDescription>
-                                        Средствами RocketManager
-                                    </FormDescription>
-                                </div>
-                            </FormItem>
-                        )}
-                    />
-                </Form>
-                {success && <BatchResult countedValues={[
-                    {key: 'created_id', display: 'Успех'},
-                    {key: 'error', display: 'Ошибка'},
-                    {key: 'email_sent', display: 'Email отправлен'},
-                    {key: 'email_error', display: 'Ошибка отправки email'},
-                ]} data={successData} />}
-            </>}
+            content={
+                dialogStep === 1 ? (
+                    <Form {...form}>
+                        <FormField
+                            control={form.control}
+                            name="verified"
+                            render={({field}) => (
+                                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                                    <FormControl>
+                                        <Checkbox
+                                            checked={field.value}
+                                            onCheckedChange={field.onChange}
+                                        />
+                                    </FormControl>
+                                    <div className="space-y-1 leading-none">
+                                        <FormLabel>
+                                            Автоматически подтвердить аккаунты
+                                        </FormLabel>
+                                    </div>
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="requirePasswordChange"
+                            render={({field}) => (
+                                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                                    <FormControl>
+                                        <Checkbox
+                                            checked={field.value}
+                                            onCheckedChange={field.onChange}
+                                        />
+                                    </FormControl>
+                                    <div className="space-y-1 leading-none">
+                                        <FormLabel>
+                                            Потребовать смену пароля
+                                        </FormLabel>
+                                        <FormDescription>
+                                            Встроенная функция RocketChat
+                                        </FormDescription>
+                                    </div>
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="joinDefaultChannels"
+                            render={({field}) => (
+                                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                                    <FormControl>
+                                        <Checkbox
+                                            checked={field.value}
+                                            onCheckedChange={field.onChange}
+                                        />
+                                    </FormControl>
+                                    <div className="space-y-1 leading-none">
+                                        <FormLabel>
+                                            Присоединиться к каналам по умолчанию
+                                        </FormLabel>
+                                    </div>
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="sendEmail"
+                            render={({field}) => (
+                                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                                    <FormControl>
+                                        <Checkbox
+                                            checked={field.value}
+                                            onCheckedChange={field.onChange}
+                                        />
+                                    </FormControl>
+                                    <div className="space-y-1 leading-none">
+                                        <FormLabel>
+                                            Отправить письмо с паролем
+                                        </FormLabel>
+                                        <FormDescription>
+                                            Средствами RocketManager
+                                        </FormDescription>
+                                    </div>
+                                </FormItem>
+                            )}
+                        />
+                    </Form>
+                ) : (
+                    <ExportCard data={successData} showData={true} countedValues={[
+                        {key: 'created_id', display: 'Успех'},
+                        {key: 'error', display: 'Ошибка'},
+                        {key: 'email_sent', display: 'Email отправлен'},
+                        {key: 'email_error', display: 'Ошибка отправки email'},
+                    ]}/>
+                )
+            }
+
             onSubmit={(objects) => {
                 let newObjects: object[] = []
                 for (let object of objects) {
                     object = Object.fromEntries(Object.entries(object).map(([k, v]) => ([k.toLowerCase(), v])))
 
-                    if (!object.hasOwnProperty('username')|| String(object['username']) == 'null') {
+                    if (!object.hasOwnProperty('username') || String(object['username']) == 'null') {
                         console.info({error: object})
                         toast.error('Не найден обязательный параметр username')
                         return
@@ -185,7 +203,7 @@ export const UserImportDialog = ({
                         object['email'] = emails[0].address
                     }
 
-                    if (!object.hasOwnProperty('name')|| String(object['name']) == 'null') {
+                    if (!object.hasOwnProperty('name') || String(object['name']) == 'null') {
                         toast.error('Не найден обязательный параметр name')
                         return
                     }

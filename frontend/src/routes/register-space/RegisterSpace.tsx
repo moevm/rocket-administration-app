@@ -26,7 +26,6 @@ const formSchema = z.object({
 })
 
 function RegisterSpace() {
-
     const navigate = useNavigate()
     const queryClient = useQueryClient()
     const {mutate, isPending} = $api.useMutation('post', '/spaces/', createMutationOptions({
