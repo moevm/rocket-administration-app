@@ -12,7 +12,7 @@ from app.lib.rocket import obtain_rocket_instance, rocket_request, rocket_query_
 from app.lib.utils import batch_execute, generate_password, extract_exception_message
 from app.config import settings
 
-from app.models import RoomsImportRequestDto, ImportedRoomResultDto, RoomCreateDto
+from app.models import RoomsImportRequestDto, ImportedRoomResultDto, RoomCreateDto, RoomsDeleteDto, RoomDeleteResDto
 
 router = APIRouter()
 
@@ -31,6 +31,31 @@ async def get_rooms(space=Depends(get_space)) -> List[RoomDto]:
     ]
     return rooms
 
+@router.delete("/")
+async def delete_rooms(body: RoomsDeleteDto, space=Depends(get_space)) -> List[RoomDeleteResDto]:
+    rocket = await obtain_rocket_instance(key_for_space(space))
+
+    async def _process(room: str) -> RoomDeleteResDto:
+        res = RoomDeleteResDto(room=room)
+        try:
+            await rocket_request(
+                rocket.call_api_post,
+                "rooms.delete",
+                **rocket_query_args(roomId=room)
+            )
+        except Exception as e:
+            res.error = extract_exception_message(e)
+        else:
+            res.success = True
+        return res
+    
+    rooms = await batch_execute(
+        _process,
+        [(room,) for room in body.rooms],
+        settings.app.batch_delay
+    )
+
+    return rooms
 
 @router.get("/{room_id}")
 async def get_room_information(room_id: str, space=Depends(get_space)) -> RoomInfoDto:

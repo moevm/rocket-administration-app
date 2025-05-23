@@ -247,3 +247,11 @@ class UsersAndTeamResDto(BaseModel):
 class TeamsDeleteDto(BaseModel):
     teams: List[str]
     delete_linked_rooms: bool = True
+
+class RoomsDeleteDto(BaseModel):
+    rooms: List[str]
+
+class RoomDeleteResDto(BaseModel):
+    room: str
+    success: bool = False
+    error: Optional[str] = None
