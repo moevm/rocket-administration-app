@@ -226,9 +226,13 @@ class UsersAndRoomsDto(BaseModel):
     users: List[str]
     rooms: List[str]
 
+class DeleteTeamDto(BaseModel):
+    id: str
+    rid: str
+
 class UsersAndTeamsDto(BaseModel):
     users: List[str]
-    teams: List[str]
+    teams: List[DeleteTeamDto]
     ban_in_rooms: bool = True
 
 
