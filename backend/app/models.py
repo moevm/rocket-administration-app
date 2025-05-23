@@ -220,9 +220,20 @@ class UsersAndRoomsDto(BaseModel):
     users: List[str]
     rooms: List[str]
 
+class UsersAndTeamsDto(BaseModel):
+    users: List[str]
+    teams: List[str]
+    ban_in_rooms: bool = True
 
-class UsersAndRoomsResDto(BaseModel):
+
+class UsersAndRoomResDto(BaseModel):
     success: bool = True
     error: Optional[str] = None
     user_list: List[str]
     room: str
+
+class UsersAndTeamResDto(BaseModel):
+    success: bool = True
+    error: Optional[str] = None
+    user_list: List[str]
+    team: str
