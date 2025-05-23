@@ -8,7 +8,7 @@ import {useAtomValue} from "jotai";
 import {
     $selectedRoom,
     $selectedSpaceId,
-    $selectedRoomId, $roomInfo, $selectedRoomsData
+    $selectedRoomId, $roomInfo, $selectedRoomsData, $teams
 } from "@/store/global-store.ts";
 import {NavLink, useParams} from "react-router";
 import {Label} from "@/components/ui/label.tsx";
@@ -25,7 +25,7 @@ import {showAddRoomsToUsersDialogAtom} from "@/components/app/dialogs/room-page-
 import {
     showDeleteUsersOutOfRoomDialogAtom
 } from "@/components/app/dialogs/room-page-dialogs/DeleteUsersOutOfRoomsDialog.tsx";
-import {showAddTeamsToRoomsDialogAtom} from "@/components/app/dialogs/room-page-dialogs/AddTeamsToRoomsDialog.tsx";
+import {showAddRoomsToTeamsDialogAtom} from "@/components/app/dialogs/room-page-dialogs/AddTeamsToRoomsDialog.tsx";
 import {
     showDeleteTeamsOutOfRoomsDialogAtom
 } from "@/components/app/dialogs/room-page-dialogs/DeleteTeamsOutOfRoomsDialog.tsx";
@@ -44,11 +44,14 @@ function RoomPageContent() {
     const room = loaded(useAtomValue($selectedRoom)).data
     const selectedSpaceId = useAtomValue($selectedSpaceId)!
     const {team, members} = loaded(useAtomValue($roomInfo)).data
+    console.info("CURRENT ROOM", room)
+
     const teams = team ? team : []
+    console.info(teams)
 
     const setAddRoomToUsersDialogOpen = useSetAtom(showAddRoomsToUsersDialogAtom)
     const setDeleteUsersOutOfRoomDialogOpen = useSetAtom(showDeleteUsersOutOfRoomDialogAtom)
-    const setAddTeamsToRoomsDialogOpen = useSetAtom(showAddTeamsToRoomsDialogAtom)
+    const setAddTeamsToRoomsDialogOpen = useSetAtom(showAddRoomsToTeamsDialogAtom)
     const setDeleteTeamsOutOfRoomDialogOpen = useSetAtom(showDeleteTeamsOutOfRoomsDialogAtom)
     const setHideRoomDialogOpen = useSetAtom(showHideRoomDialogAtom)
     const setDeleteRoomDialogOpen = useSetAtom(showDeleteRoomDialogAtom)
@@ -104,10 +107,10 @@ function RoomPageContent() {
                             Удалить участников
                         </Button>
                         <Button variant="outline" onClick={() => {setAddTeamsToRoomsDialogOpen(true)}}>
-                            Добавить команды
+                            Добавить в команды
                         </Button>
                         <Button variant="outline" onClick={() => {setDeleteTeamsOutOfRoomDialogOpen(true)}}>
-                            Удалить команды
+                            Удалить из команды
                         </Button>
                         <Button variant="outline" onClick={() => {setHideRoomDialogOpen(true)}}>
                             Скрыть комнату
@@ -126,7 +129,7 @@ function RoomPageContent() {
 
             <div className={"pt-8"}>
                 <Label className={"text-3xl"}>Команды</Label>
-                <ShortTeamTableView data={teams}/>
+                <ShortTeamTableView data={[teams]}/>
             </div>
         </div>
     )

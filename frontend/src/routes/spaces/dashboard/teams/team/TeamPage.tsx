@@ -27,9 +27,9 @@ import {showAddUsersToTeamDialogAtom} from "@/components/app/dialogs/team-page-d
 import {
     showDeleteUsersOutOfTeamDialogAtom
 } from "@/components/app/dialogs/team-page-dialogs/DeleteUsersOutOfTeamDialog.tsx";
-import {showAddTeamIntoRoomDialogAtom} from "@/components/app/dialogs/team-page-dialogs/AddTeamIntoRoomDialog.tsx";
+import {showAddRoomsIntoTeamDialogAtom} from "@/components/app/dialogs/team-page-dialogs/AddTeamIntoRoomDialog.tsx";
 import {
-    showDeleteTeamFromRoomDialogAtom
+    showDeleteRoomFromTeamDialogAtom
 } from "@/components/app/dialogs/team-page-dialogs/DeleteTeamFromRoomDialog.tsx";
 import {showDeleteTeamDialogAtom} from "@/components/app/dialogs/team-page-dialogs/DeleteTeamDialog.tsx";
 
@@ -46,8 +46,8 @@ function TeamPageContent() {
 
     const setAddUsersToTeamDialogOpen = useSetAtom(showAddUsersToTeamDialogAtom)
     const setDeleteUsersOutOfTeamDialogOpen = useSetAtom(showDeleteUsersOutOfTeamDialogAtom)
-    const setAddTeamIntoRoomDialogOpen = useSetAtom(showAddTeamIntoRoomDialogAtom)
-    const setDeleteTeamFromRoomDialogOpen = useSetAtom(showDeleteTeamFromRoomDialogAtom)
+    const setAddTeamIntoRoomDialogOpen = useSetAtom(showAddRoomsIntoTeamDialogAtom)
+    const setDeleteTeamFromRoomDialogOpen = useSetAtom(showDeleteRoomFromTeamDialogAtom)
     const setDeleteTeamDialogOpen = useSetAtom(showDeleteTeamDialogAtom)
 
     const setSelectedTeamsData = useSetAtom($selectedTeamsData)
@@ -97,10 +97,10 @@ function TeamPageContent() {
                             Удалить участников
                         </Button>
                         <Button variant="outline" onClick={() => {setAddTeamIntoRoomDialogOpen(true)}}>
-                            Добавить в комнату
+                            Привязать комнаты
                         </Button>
                         <Button variant="outline" onClick={() => {setDeleteTeamFromRoomDialogOpen(true)}}>
-                            Удалить из комнаты
+                            Отвязать комнаты
                         </Button>
                         <Button variant="outline" onClick={() => {setDeleteTeamDialogOpen(true)}}>
                             Удалить команду
@@ -111,7 +111,7 @@ function TeamPageContent() {
 
             <div className={"pt-8"}>
                 <Label className={"text-3xl"}>Комнаты</Label>
-                <RoomsTableView data={rooms}/>
+                <RoomsTableView data={[rooms]}/>
             </div>
 
             <div className={"pt-8"}>
