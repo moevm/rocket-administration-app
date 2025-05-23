@@ -39,9 +39,17 @@ async def get_user_information(user_id: str, space=Depends(get_space)) -> UserIn
         rocket_request(rocket.users_info, **rocket_query_args(user_id=user_id, includeUserRooms='true'))
     )
 
+    room_filter = (await rocket_request(
+            rocket.rooms_admin_rooms,
+            **rocket_query_args(types=['c', 'p'], count=0)
+        ))['rooms']
+
+    print([room for room in user_info_raw['user']['rooms']
+                  if room["rid"] in set(i['_id'] for i in room_filter)])
     return UserInfoDto.model_validate({
         'teams': teams_info_raw['teams'],
-        'rooms': user_info_raw['user']['rooms']
+        'rooms': [room for room in user_info_raw['user']['rooms']
+                  if room["rid"] in set(i['_id'] for i in room_filter)]
     })
 
 
