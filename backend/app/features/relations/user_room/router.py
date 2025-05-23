@@ -3,7 +3,7 @@ from typing import List
 import uuid
 from fastapi import APIRouter, Depends
 
-from app.models import UsersAndRoomsDto, UsersAndRoomResDto, UsersAndTeamsDto, UsersAndTeamResDto, TeamRoomsDto
+from app.models import UsersAndRoomsDto, UsersAndRoomResDto, UsersAndTeamsDto, UsersAndTeamResDto
 
 from app.features.spaces.utils import get_space
 from app.services.db import get_db
@@ -45,7 +45,7 @@ async def add_users_to_rooms(body: UsersAndRoomsDto, space=Depends(get_space)) -
             settings.app.batch_delay
     )
 
-@router.post("/remove/group")
+@router.delete("/group")
 async def remove_users_from_room(body: UsersAndRoomsDto, space=Depends(get_space)) -> List[UsersAndRoomResDto]:
     rocket = await obtain_rocket_instance(key_for_space(space))
 
@@ -68,18 +68,23 @@ async def remove_users_from_room(body: UsersAndRoomsDto, space=Depends(get_space
             settings.app.batch_delay
     )
 
-@router.post("/remove/team")
+@router.delete("/team")
 async def remove_users_from_team(body: UsersAndTeamsDto, space=Depends(get_space)) -> List[UsersAndTeamResDto]:
     rocket = await obtain_rocket_instance(key_for_space(space))
 
-    async def _process(user: str, team: TeamRoomsDto) -> UsersAndTeamResDto:
+    async def _process(user: str, team: str) -> UsersAndTeamResDto:
         result = UsersAndTeamResDto(success=False, user_list=[user], team=team)
         try:
+            rooms = []
+            if body.ban_in_rooms:
+                rooms_list = await rocket_request(
+                    rocket.teams_list_rooms, **rocket_query_args(team_id=team)
+                )
+                rooms = [ i["_id"] for i in rooms_list["rooms"]]
             tmp = await rocket_request(
-                rocket.teams_remove_member, **rocket_query_args(team_id=team.team_id, user_id=user, rooms=team.rooms)
+                rocket.teams_remove_member, **rocket_query_args(team_id=team, user_id=user, rooms=rooms)
             )
         except Exception as e:
-            print(e)
             result.error = extract_exception_message(e)
         else:
             result.success = True
