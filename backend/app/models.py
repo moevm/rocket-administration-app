@@ -220,9 +220,23 @@ class UsersAndRoomsDto(BaseModel):
     users: List[str]
     rooms: List[str]
 
+class TeamRoomsDto(BaseModel):
+    team_id: str
+    rooms: List[str]
 
-class UsersAndRoomsResDto(BaseModel):
+class UsersAndTeamsDto(BaseModel):
+    users: List[str]
+    teams: List[TeamRoomsDto]
+
+
+class UsersAndRoomResDto(BaseModel):
     success: bool = True
     error: Optional[str] = None
     user_list: List[str]
     room: str
+
+class UsersAndTeamResDto(BaseModel):
+    success: bool = True
+    error: Optional[str] = None
+    user_list: List[str]
+    team: TeamRoomsDto
