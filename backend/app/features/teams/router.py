@@ -83,8 +83,8 @@ async def create_teams(
 
     return results
 
-@router.delete("/{team_id}/{rooms}")
-async def remove_users_from_team(body: TeamsDeleteDto, space=Depends(get_space)) -> List[TeamDeletedDto]:
+@router.delete("/")
+async def remove_teams(body: TeamsDeleteDto, space=Depends(get_space)) -> List[TeamDeletedDto]:
     rocket = await obtain_rocket_instance(key_for_space(space))
     
     async def _process(team: str):
