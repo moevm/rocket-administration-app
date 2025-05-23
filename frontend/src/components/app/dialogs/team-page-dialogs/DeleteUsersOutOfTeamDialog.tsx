@@ -99,7 +99,8 @@ function DeleteUsersOutOfTeamContent(props: {
                         </div>
 
                         <DialogFooter className="sm:justify-start">
-                            <Button type="button" variant="default" onClick={handleSubmit}>
+                            <Button type="button" variant="default" onClick={handleSubmit}
+                                    disabled={isPending || selectedRoomIds.length === 0}>
                                 Удалить
                             </Button>
                         </DialogFooter>
