@@ -44,10 +44,10 @@ function RoomPageContent() {
     const room = loaded(useAtomValue($selectedRoom)).data
     const selectedSpaceId = useAtomValue($selectedSpaceId)!
     const {team, members} = loaded(useAtomValue($roomInfo)).data
-    const allTeams = useAtomValue($teams);
     console.info("CURRENT ROOM", room)
-    console.info("TEAMS: ", allTeams);
+
     const teams = team ? team : []
+    console.info(teams)
 
     const setAddRoomToUsersDialogOpen = useSetAtom(showAddRoomsToUsersDialogAtom)
     const setDeleteUsersOutOfRoomDialogOpen = useSetAtom(showDeleteUsersOutOfRoomDialogAtom)
@@ -129,7 +129,7 @@ function RoomPageContent() {
 
             <div className={"pt-8"}>
                 <Label className={"text-3xl"}>Команды</Label>
-                <ShortTeamTableView data={teams}/>
+                <ShortTeamTableView data={[teams]}/>
             </div>
         </div>
     )

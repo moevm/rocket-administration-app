@@ -111,7 +111,7 @@ function TeamPageContent() {
 
             <div className={"pt-8"}>
                 <Label className={"text-3xl"}>Комнаты</Label>
-                <RoomsTableView data={rooms}/>
+                <RoomsTableView data={[rooms]}/>
             </div>
 
             <div className={"pt-8"}>
