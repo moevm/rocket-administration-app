@@ -18,7 +18,7 @@ import {showAddRoomsToUsersDialogAtom} from "@/components/app/dialogs/room-page-
 import {
     showDeleteUsersOutOfRoomDialogAtom
 } from "@/components/app/dialogs/room-page-dialogs/DeleteUsersOutOfRoomsDialog.tsx";
-import {showAddTeamsToRoomsDialogAtom} from "@/components/app/dialogs/room-page-dialogs/AddTeamsToRoomsDialog.tsx";
+import {showAddRoomsToTeamsDialogAtom} from "@/components/app/dialogs/room-page-dialogs/AddTeamsToRoomsDialog.tsx";
 import {
     showDeleteTeamsOutOfRoomsDialogAtom
 } from "@/components/app/dialogs/room-page-dialogs/DeleteTeamsOutOfRoomsDialog.tsx";
@@ -39,7 +39,7 @@ const RoomContextMenuItems = ({rows}: { rows: Row<{ _id: string }>[] }) => {
 
     const setAddRoomToUsersDialogOpen = useSetAtom(showAddRoomsToUsersDialogAtom)
     const setDeleteUsersOutOfRoomDialogOpen = useSetAtom(showDeleteUsersOutOfRoomDialogAtom)
-    const setAddTeamsToRoomsDialogOpen = useSetAtom(showAddTeamsToRoomsDialogAtom)
+    const setAddRoomsToTeamsDialogOpen = useSetAtom(showAddRoomsToTeamsDialogAtom)
     const setDeleteTeamsOutOfRoomsDialogOpen = useSetAtom(showDeleteTeamsOutOfRoomsDialogAtom)
     const setHideRoomsDialogOpen = useSetAtom(showHideRoomDialogAtom)
     const setDeleteRoomsDialogOpen = useSetAtom(showDeleteRoomDialogAtom)
@@ -65,14 +65,14 @@ const RoomContextMenuItems = ({rows}: { rows: Row<{ _id: string }>[] }) => {
             }}>Удалить участников</ContextMenuItem>
             <ContextMenuItem onClick={() => {
                 setSelectedRoomsData(data)
-                setAddTeamsToRoomsDialogOpen(true)
+                setAddRoomsToTeamsDialogOpen(true)
                 setContextMenuOpen(false)
-            }}>Добавить команды</ContextMenuItem>
+            }}>Добавить в команды</ContextMenuItem>
             <ContextMenuItem onClick={() => {
                 setSelectedRoomsData(data)
                 setDeleteTeamsOutOfRoomsDialogOpen(true)
                 setContextMenuOpen(false)
-            }}>Удалить команды</ContextMenuItem>
+            }}>Удалить из команды</ContextMenuItem>
             <ContextMenuItem onClick={() => {
                 setSelectedRoomsData(data)
                 setHideRoomsDialogOpen(true)

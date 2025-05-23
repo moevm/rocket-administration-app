@@ -25,7 +25,7 @@ import {showAddRoomsToUsersDialogAtom} from "@/components/app/dialogs/room-page-
 import {
     showDeleteUsersOutOfRoomDialogAtom
 } from "@/components/app/dialogs/room-page-dialogs/DeleteUsersOutOfRoomsDialog.tsx";
-import {showAddTeamsToRoomsDialogAtom} from "@/components/app/dialogs/room-page-dialogs/AddTeamsToRoomsDialog.tsx";
+import {showAddRoomsToTeamsDialogAtom} from "@/components/app/dialogs/room-page-dialogs/AddTeamsToRoomsDialog.tsx";
 import {
     showDeleteTeamsOutOfRoomsDialogAtom
 } from "@/components/app/dialogs/room-page-dialogs/DeleteTeamsOutOfRoomsDialog.tsx";
@@ -48,7 +48,7 @@ function RoomPageContent() {
 
     const setAddRoomToUsersDialogOpen = useSetAtom(showAddRoomsToUsersDialogAtom)
     const setDeleteUsersOutOfRoomDialogOpen = useSetAtom(showDeleteUsersOutOfRoomDialogAtom)
-    const setAddTeamsToRoomsDialogOpen = useSetAtom(showAddTeamsToRoomsDialogAtom)
+    const setAddTeamsToRoomsDialogOpen = useSetAtom(showAddRoomsToTeamsDialogAtom)
     const setDeleteTeamsOutOfRoomDialogOpen = useSetAtom(showDeleteTeamsOutOfRoomsDialogAtom)
     const setHideRoomDialogOpen = useSetAtom(showHideRoomDialogAtom)
     const setDeleteRoomDialogOpen = useSetAtom(showDeleteRoomDialogAtom)

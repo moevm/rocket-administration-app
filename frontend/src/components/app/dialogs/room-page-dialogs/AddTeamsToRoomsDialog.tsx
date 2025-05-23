@@ -1,5 +1,5 @@
 import {atom, useAtom, useAtomValue} from "jotai/index";
-import {$selectedRoomsData, $teams} from "@/store/global-store.ts";
+import {$selectedRoomsData, $selectedSpaceId, $selectedUsersData, $teams} from "@/store/global-store.ts";
 import {BatchLoader} from "@/components/app/DataLoader.tsx";
 import {
     Dialog,
@@ -10,59 +10,119 @@ import {
     DialogTitle
 } from "@/components/ui/dialog.tsx";
 import {Button} from "@/components/ui/button.tsx";
+import {useEffect, useState} from "react";
+import {
+    showDeleteUserFromTeamDialogAtom
+} from "@/components/app/dialogs/user-page-dialogs/DeleteUserFromTeamDialog.tsx";
+import {$api, createMutationOptions, loaded} from "@/api";
+import TeamSmallTableView from "@/components/app/table/TeamSmallTableView.tsx";
+import ExportCard from "@/components/app/dialogs/ExportCard.tsx";
 
-export const showAddTeamsToRoomsDialogAtom = atom(false)
+export const showAddRoomsToTeamsDialogAtom = atom(false)
 
-function AddTeamsToRoomsContent() {
-    const [open, setOpen] = useAtom(showAddTeamsToRoomsDialogAtom)
-    // const selectedSpaceId = useAtomValue($selectedSpaceId)!
+function AddTeamsToRoomsContent(props: {
+    teams: any,
+    smallTeams: { _id: string, name: string, roomId: string, type: number }[]
+}) {
+    const [open, setOpen] = useAtom(showAddRoomsToTeamsDialogAtom)
     const selectedRoomsData = useAtomValue($selectedRoomsData)
-    // const [selectedRoomIds, setSelectedRoomIds] = useState<string[]>([]);
+    const [dialogStep, setDialogStep] = useState(1);
+    const selectedSpaceId = useAtomValue($selectedSpaceId)!
+    const [selectedTeamIds, setSelectedTeamIds] = useState<string[]>([]);
+    const [results, setResults] = useState<object[]>([]);
 
-    // const {
-    //     mutate,
-    //     isPending
-    // } = $api.useMutation('post', '/spaces/{space_id}/user_room/', createMutationOptions({
-    //     onSuccess: async (data) => {
-    //         console.log(data)
-    //     }
-    // }))
+    const allTeams = props.teams.data;
+    console.log(allTeams);
 
-    const handleAddClick = () => {
-        // mutate({
-        //     body: {
-        //         users: selectedUsersData.map(it => it.username),
-        //         rooms: selectedRoomIds
-        //     },
-        //     params: {
-        //         path: {
-        //             space_id: selectedSpaceId!
-        //         },
-        //     }
-        // })
+    const [selectedTeamsIds, setSelectedTeamsIds] = useState<string[]>([]);
+
+
+    console.log(selectedSpaceId)
+    useEffect(() => {
+        if (!open) {
+            setDialogStep(1)
+            setResults([])
+        }
+    }, [open]);
+
+    useEffect(() => {
+        if (!selectedTeamIds.length) return;
+
+        const selectedFullTeams = allTeams.filter(team =>
+            selectedTeamIds.includes(team.roomId)
+        );
+
+        const teamIds = selectedFullTeams.map(team => team._id);
+        setSelectedTeamsIds(teamIds);
+
+        console.log(teamIds);
+    }, [selectedTeamIds]);
+
+
+    const {
+        mutate,
+        isPending
+    } = $api.useMutation('post', '/spaces/{space_id}/team_room/', createMutationOptions({
+        onSuccess: async (data) => {
+            setDialogStep(0)
+            setResults(data)
+            console.log(data)
+        }
+    }))
+
+
+    const handleSubmit = () => {
+        mutate({
+            body: {
+                teams: selectedTeamsIds,
+                rooms: selectedRoomsData.map(it => it._id)
+            },
+            params: {
+                path: {
+                    space_id: selectedSpaceId!
+                },
+            }
+        })
     };
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogContent className="max-w-2xl">
-                <DialogHeader>
-                    <DialogTitle>Добавить команды</DialogTitle>
-                    <DialogDescription>
-                        Выбрано комнат: {selectedRoomsData.length}
-                    </DialogDescription>
-                </DialogHeader>
+                {dialogStep === 1 ? (
+                    <>
+                        <DialogHeader>
+                            <DialogTitle>Добавить комнаты в команды</DialogTitle>
+                            <DialogDescription>
+                                Выбрано команд: {selectedTeamIds.length}
+                            </DialogDescription>
+                        </DialogHeader>
 
-                {/*<div className="max-h-[60vh] overflow-y-auto">*/}
-                {/*    <RoomSmallTableView data={props.smallRooms} onSelectionUpdated={data =>*/}
-                {/*        setSelectedRoomIds(data.map(it => it.getValue('_id')))*/}
-                {/*    }/>*/}
-                {/*</div>*/}
+                        <div className="max-h-[60vh] overflow-y-auto">
+                            <TeamSmallTableView data={props.smallTeams} onSelectionUpdated={data =>
+                            {
+                                console.log(data.map(it => it.getValue('roomId')))
+                                setSelectedTeamIds(data.map(it => it.getValue('roomId')));
+                            }
+                            }/>
+                        </div>
 
-                <DialogFooter className="sm:justify-start">
-                    <Button type="button" variant="default">
-                        Добавить
-                    </Button>
-                </DialogFooter>
+                        <DialogFooter className="sm:justify-start">
+                            <Button type="button" variant="default" onClick={handleSubmit}>
+                                Добавить
+                            </Button>
+                        </DialogFooter>
+                    </>
+                ) : (
+                    <>
+                        <DialogHeader>
+                            <DialogTitle>Добавление комнаты в команды</DialogTitle>
+                        </DialogHeader>
+                        <ExportCard data={results} showData={true} countedValues={[
+                            {key: 'success', display: 'Успешно добавлено'},
+                            {key: 'error', display: 'Ошибок'},
+                        ]} />
+                    </>
+                )}
             </DialogContent>
         </Dialog>
     )
@@ -75,7 +135,7 @@ function AddTeamsToRoomsDialog() {
         <BatchLoader
             states={[teams]}
             loadingMessage='Загрузка команд'
-            display={() => <AddTeamsToRoomsContent/>}
+            display={() => <AddTeamsToRoomsContent teams={teams} smallTeams={loaded(teams).data.map(({_id, name, type, roomId}) => ({_id, name, type, roomId}))}/>}
         />
     )
 }
