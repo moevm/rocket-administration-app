@@ -72,17 +72,18 @@ async def remove_users_from_room(body: UsersAndRoomsDto, space=Depends(get_space
 async def remove_users_from_team(body: UsersAndTeamsDto, space=Depends(get_space)) -> List[UsersAndTeamResDto]:
     rocket = await obtain_rocket_instance(key_for_space(space))
 
-    async def _process(user: str, team: str) -> UsersAndTeamResDto:
-        result = UsersAndTeamResDto(success=False, user_list=[user], team=team)
+    async def _process(user: str, team_id: str, team_rid: str) -> UsersAndTeamResDto:
+        result = UsersAndTeamResDto(success=False, user_list=[user], team=team_id)
         try:
-            rooms = []
+            rooms = [team_rid]
             if body.ban_in_rooms:
                 rooms_list = await rocket_request(
-                    rocket.teams_list_rooms, **rocket_query_args(team_id=team)
+                    rocket.teams_list_rooms, **rocket_query_args(team_id=team_id)
                 )
-                rooms = [ i["_id"] for i in rooms_list["rooms"]]
-            tmp = await rocket_request(
-                rocket.teams_remove_member, **rocket_query_args(team_id=team, user_id=user, rooms=rooms)
+                rooms += [ i["_id"] for i in rooms_list["rooms"]]
+            
+            await rocket_request(
+                rocket.teams_remove_member, **rocket_query_args(team_id=team_id, user_id=user, rooms=rooms)
             )
         except Exception as e:
             result.error = extract_exception_message(e)
@@ -92,6 +93,6 @@ async def remove_users_from_team(body: UsersAndTeamsDto, space=Depends(get_space
     
     return await batch_execute(
             _process,
-            [(user, team) for team in body.teams for user in body.users],
+            [(user, team.id, team.rid) for team in body.teams for user in body.users],
             settings.app.batch_delay
     )

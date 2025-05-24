@@ -87,22 +87,25 @@ async def create_teams(
 async def remove_teams(body: TeamsDeleteDto, space=Depends(get_space)) -> List[TeamDeletedDto]:
     rocket = await obtain_rocket_instance(key_for_space(space))
     
-    async def _process(team: str):
-        res = TeamDeletedDto(team=team, success=False)
+    async def _process(team_id: str):
+        res = TeamDeletedDto(team=team_id, success=False)
         try:
             rooms = []
             if body.delete_linked_rooms:
                 rooms_list = await rocket_request(
-                    rocket.teams_list_rooms, **rocket_query_args(team_id=team)
+                    rocket.teams_list_rooms, **rocket_query_args(team_id=team_id)
                 )
-                rooms = [ i["_id"] for i in rooms_list["rooms"]]
+                rooms += [ i["_id"] for i in rooms_list["rooms"]]
         except Exception as e:
             res.error = extract_exception_message(e)
             return res
 
         res.rooms = rooms        
         try:
-            await rocket_request(rocket.teams_delete, **rocket_query_args(team_id=team, roomsToRemove=rooms))
+            if len(rooms):
+                await rocket_request(rocket.teams_delete, **rocket_query_args(team_id=team_id, roomsToRemove=rooms))
+            else:
+                await rocket_request(rocket.teams_delete, **rocket_query_args(team_id=team_id))
         except Exception as e:
             res.error = extract_exception_message(e)
         else:
