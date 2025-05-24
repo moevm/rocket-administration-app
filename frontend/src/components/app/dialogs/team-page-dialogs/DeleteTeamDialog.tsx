@@ -37,7 +37,8 @@ function DeleteTeamContent(props: { teams: any }) {
     console.log(correctTeamsIds)
     useEffect(() => {
         if (!open && dialogStep === 0) {
-            navigate(`/spaces/${selectedSpaceId}/dashboard/teams`)
+            navigate(`/spaces/${selectedSpaceId}/dashboard/teams`);
+            window.location.reload();
         }
         if (!open) {
             setDialogStep(1)
