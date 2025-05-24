@@ -17,13 +17,7 @@ import {Loader2} from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query"
 import {$spacesQueryOptions,} from "@/store/global-store.ts";
 import {useNavigate} from "react-router";
-
-const formSchema = z.object({
-    name: z.string().min(2),
-    url: z.string().url(),
-    user_id: z.string(),
-    token: z.string()
-})
+import {registerSchema} from "@/lib/form.ts";
 
 function RegisterSpace() {
     const navigate = useNavigate()
@@ -37,14 +31,14 @@ function RegisterSpace() {
         }
     }))
 
-    const form = useForm<z.infer<typeof formSchema>>({
+    const form = useForm<z.infer<typeof registerSchema>>({
         reValidateMode: "onChange",
         mode: "all",
-        resolver: zodResolver(formSchema),
+        resolver: zodResolver(registerSchema),
         disabled: isPending
     })
 
-    function onSubmit(values: z.infer<typeof formSchema>) {
+    function onSubmit(values: z.infer<typeof registerSchema>) {
         mutate({
             body: {
                 url: values.url,

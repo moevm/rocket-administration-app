@@ -22,7 +22,7 @@ import UserSmallTableView from "@/components/app/table/UserSmallTableView.tsx";
 export const showDeleteUsersOutOfRoomDialogAtom = atom(false)
 
 function DeleteUsersOutOfRoomContent(props: {
-    smallUsers: { _id: string, username: string, name: string, status: string }[]
+    smallUsers: { _id: string, username: string, name: string }[]
 }) {
     const [open, setOpen] = useAtom(showDeleteUsersOutOfRoomDialogAtom)
     const [dialogStep, setDialogStep] = useState(1);
@@ -41,7 +41,7 @@ function DeleteUsersOutOfRoomContent(props: {
     const {
         mutate,
         isPending
-    } = $api.useMutation('post', '/spaces/{space_id}/user_room/remove', createMutationOptions({
+    } = $api.useMutation('delete', '/spaces/{space_id}/user_room/group', createMutationOptions({
         onSuccess: async (data) => {
             setDialogStep(0)
             setResults(data)
@@ -91,12 +91,12 @@ function DeleteUsersOutOfRoomContent(props: {
                 ) : (
                     <>
                         <DialogHeader>
-                            <DialogTitle>Удаление пользователя из комнаты</DialogTitle>
+                            <DialogTitle>Удалить участников</DialogTitle>
                         </DialogHeader>
                         <ExportCard data={results} showData={true} countedValues={[
                             {key: 'success', display: 'Успешно удалено'},
                             {key: 'error', display: 'Ошибок'},
-                        ]} />
+                        ]}/>
                     </>
                 )}
 
@@ -112,7 +112,8 @@ function DeleteUsersOutOfRoomDialog() {
         <BatchLoader
             states={[users]}
             loadingMessage='Загрузка пользователей'
-            display={() => <DeleteUsersOutOfRoomContent smallUsers={loaded(users).data.map(({_id, name, username, status}) => ({_id, name, username, status}))}/>}
+            display={() => <DeleteUsersOutOfRoomContent
+                smallUsers={loaded(users).data.map(({_id, name, username}) => ({_id, name, username}))}/>}
         />
     )
 }

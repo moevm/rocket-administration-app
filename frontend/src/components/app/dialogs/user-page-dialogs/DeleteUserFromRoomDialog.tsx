@@ -19,7 +19,7 @@ import ExportCard from "@/components/app/dialogs/ExportCard.tsx";
 export const showDeleteUserFromRoomDialogAtom = atom(false)
 
 function DeleteUserFromRoomContent(props: {
-    smallRooms: { _id: string, name: string | null | undefined }[]
+    smallRooms: { _id: string, name: string | null | undefined, t: string }[]
 }) {
     const [open, setOpen] = useAtom(showDeleteUserFromRoomDialogAtom)
     const [dialogStep, setDialogStep] = useState(1);
@@ -39,7 +39,7 @@ function DeleteUserFromRoomContent(props: {
     const {
         mutate,
         isPending
-    } = $api.useMutation('post', '/spaces/{space_id}/user_room/remove', createMutationOptions({
+    } = $api.useMutation('delete', '/spaces/{space_id}/user_room/group', createMutationOptions({
         onSuccess: async (data) => {
             setDialogStep(0)
             setResults(data)
@@ -80,7 +80,8 @@ function DeleteUserFromRoomContent(props: {
                         </div>
 
                         <DialogFooter className="sm:justify-start">
-                            <Button type="button" variant="default" onClick={handleSubmit}>
+                            <Button type="button" variant="default" onClick={handleSubmit}
+                                    disabled={isPending || selectedRoomIds.length === 0}>
                                 Удалить
                             </Button>
                         </DialogFooter>
@@ -104,15 +105,13 @@ function DeleteUserFromRoomContent(props: {
 
 function DeleteUserFromRoomDialog() {
     const rooms = useAtomValue($rooms)
-    const selectedUsersData = useAtomValue($selectedUsersData)
-
 
     return (
         <>
             <BatchLoader
                 states={[rooms]}
                 loadingMessage='Загрузка комнат'
-                display={() => <DeleteUserFromRoomContent smallRooms={loaded(rooms).data.map(({_id, name}) => ({_id, name}))}/>}
+                display={() => <DeleteUserFromRoomContent smallRooms={loaded(rooms).data.map(({_id, name, t}) => ({_id, name, t}))}/>}
             />
         </>
     )

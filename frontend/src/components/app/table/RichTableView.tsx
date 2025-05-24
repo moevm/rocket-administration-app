@@ -317,6 +317,7 @@ function RichTableView<TData, TValue>({
             />
             <FileDialog
                 open={showDialogSelectFromFile}
+                dialogStep={1}
                 onOpenChange={setShowDialogSelectFromFile}
                 title={"Выделить из файла"}
                 description={"Будут выделены все строки с совпадениями основных полей"}
@@ -332,7 +333,7 @@ function RichTableView<TData, TValue>({
                         )
 
                     let count = 0
-                    table.getRowModel().rows.forEach(row => {
+                    table.getPrePaginationRowModel().rows.forEach(row => {
                         if (cols.some(it => matches.has(String(row.getValue(it.id)).toLowerCase()))) {
                             row.toggleSelected(true)
                             count++
