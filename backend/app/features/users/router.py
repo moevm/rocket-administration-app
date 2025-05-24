@@ -4,7 +4,8 @@ from fastapi import APIRouter, Depends
 
 from app.lib.cache import key_for_space
 from app.models import UserDto, TeamDto, UserInfoDto, UsersToChangePasswordDto,\
-    ChangedPasswordDto, UsersImportRequestDto, ImportedUserResultDto, UserCreateDto
+    ChangedPasswordDto, UsersImportRequestDto, ImportedUserResultDto, UserCreateDto, \
+    UsersDeleteDto, UserDeleteResDto
 from typing import Optional, List
 from app.features.spaces.utils import get_space
 from app.lib.rocket import obtain_rocket_instance, rocket_request, rocket_query_args
@@ -28,6 +29,7 @@ async def get_users(space=Depends(get_space)) -> List[UserDto]:
         ))['users']
     ]
     return users
+
 
 
 @router.get("/{user_id}")
@@ -163,3 +165,29 @@ async def create_users(
     )
 
     return results
+
+@router.delete("/")
+async def delete_users(
+    body: UsersDeleteDto,
+      space=Depends(get_space)
+) -> List[UserDeleteResDto]:
+    rocket = await obtain_rocket_instance(key_for_space(space))
+
+    async def _process(user: str):
+        res = UserDeleteResDto(user=user, force_delete=body.force_delete)
+        try:
+            await rocket_request(
+                rocket.users_delete,
+                **rocket_query_args(user_id=user, confirmRelinquish=body.force_delete)
+            )
+        except Exception as e:
+            res.error = extract_exception_message(e)
+        else:
+            res.success = True
+        return res
+    
+    return await batch_execute(
+        _process,
+        [(user,) for user in body.users],
+        settings.app.batch_delay
+    )

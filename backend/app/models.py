@@ -259,3 +259,13 @@ class RoomDeleteResDto(BaseModel):
     room: str
     success: bool = False
     error: Optional[str] = None
+
+class UsersDeleteDto(BaseModel):
+    users: List[str]
+    force_delete: bool = True
+
+class UserDeleteResDto(BaseModel):
+    user: str
+    force_delete: bool
+    success: bool = False
+    error: Optional[str] = None
