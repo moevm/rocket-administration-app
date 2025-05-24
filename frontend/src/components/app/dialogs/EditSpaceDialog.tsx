@@ -1,5 +1,5 @@
-import {useAtom} from "jotai/index";
-import {$showEditSpaceDialog} from "@/store/global-store.ts";
+import {useAtom, useAtomValue} from "jotai/index";
+import {$selectedSpaceId, $showEditSpaceDialog, $spacesQueryOptions} from "@/store/global-store.ts";
 import {Dialog, DialogContent, DialogHeader, DialogTitle} from "@/components/ui/dialog.tsx";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
@@ -16,19 +16,41 @@ import {
 } from "@/components/ui/form.tsx";
 import {Input} from "@/components/ui/input.tsx";
 import {Button} from "@/components/ui/button.tsx";
+import {$api, createMutationOptions, queryClient} from "@/api";
 
 function EditSpaceContent() {
     const [open, setOpen] = useAtom($showEditSpaceDialog)
+    const selectedSpaceId = useAtomValue($selectedSpaceId)!
+
+    const {mutate, isPending} = $api.useMutation('patch', '/spaces/{space_id}', createMutationOptions({
+        onSuccess: async (data: any) => {
+            await queryClient.invalidateQueries({
+                queryKey: $spacesQueryOptions().queryKey
+            })
+        }
+    }))
 
     const form = useForm<z.infer<typeof registerSchema>>({
         reValidateMode: "onChange",
         mode: "all",
         resolver: zodResolver(registerSchema),
-        // disabled: isPending
+        disabled: isPending
     })
 
     function onSubmit(values: z.infer<typeof registerSchema>) {
-        console.log(values)
+        mutate({
+            body: {
+                url: values.url,
+                user_id: values.user_id,
+                token: values.token,
+                name: values.name
+            },
+            params: {
+                path: {
+                    space_id: selectedSpaceId!
+                },
+            }
+        });
     }
 
     return (
