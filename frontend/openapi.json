@@ -113,6 +113,57 @@
             }
           }
         }
+      },
+      "delete": {
+        "summary": "Remove Teams",
+        "operationId": "remove_teams_spaces__space_id__teams__delete",
+        "parameters": [
+          {
+            "name": "space_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Space Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TeamsDeleteDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TeamDeletedDto"
+                  },
+                  "title": "Response Remove Teams Spaces  Space Id  Teams  Delete"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/spaces/{space_id}/teams/{team_id}": {
@@ -163,59 +214,6 @@
         }
       }
     },
-    "/spaces/{space_id}/teams/{team_id}/{rooms}": {
-      "delete": {
-        "summary": "Remove Users From Team",
-        "operationId": "remove_users_from_team_spaces__space_id__teams__team_id___rooms__delete",
-        "parameters": [
-          {
-            "name": "space_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Space Id"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/TeamsDeleteDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/TeamDeletedDto"
-                  },
-                  "title": "Response Remove Users From Team Spaces  Space Id  Teams  Team Id   Rooms  Delete"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/spaces/{space_id}/rooms/": {
       "get": {
         "summary": "Get Rooms",
@@ -242,6 +240,57 @@
                     "$ref": "#/components/schemas/RoomDto"
                   },
                   "title": "Response Get Rooms Spaces  Space Id  Rooms  Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete Rooms",
+        "operationId": "delete_rooms_spaces__space_id__rooms__delete",
+        "parameters": [
+          {
+            "name": "space_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Space Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoomsDeleteDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RoomDeleteResDto"
+                  },
+                  "title": "Response Delete Rooms Spaces  Space Id  Rooms  Delete"
                 }
               }
             }
@@ -446,6 +495,55 @@
             }
           },
           "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpaceDto"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spaces/{space_id}": {
+      "patch": {
+        "summary": "Update Space",
+        "operationId": "update_space_spaces__space_id__patch",
+        "parameters": [
+          {
+            "name": "space_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Space Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSpaceRequest"
+              }
+            }
+          }
         },
         "responses": {
           "200": {
@@ -1178,6 +1276,24 @@
         ],
         "title": "CreateSpaceRequest"
       },
+      "DeleteTeamDto": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "rid": {
+            "type": "string",
+            "title": "Rid"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "rid"
+        ],
+        "title": "DeleteTeamDto"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -1386,6 +1502,35 @@
         ],
         "title": "RoomCreateDto"
       },
+      "RoomDeleteResDto": {
+        "properties": {
+          "room": {
+            "type": "string",
+            "title": "Room"
+          },
+          "success": {
+            "type": "boolean",
+            "title": "Success",
+            "default": false
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "room"
+        ],
+        "title": "RoomDeleteResDto"
+      },
       "RoomDto": {
         "properties": {
           "_id": {
@@ -1562,6 +1707,22 @@
           "status"
         ],
         "title": "RoomUserDto"
+      },
+      "RoomsDeleteDto": {
+        "properties": {
+          "rooms": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Rooms"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rooms"
+        ],
+        "title": "RoomsDeleteDto"
       },
       "RoomsImportRequestDto": {
         "properties": {
@@ -2264,7 +2425,7 @@
           },
           "teams": {
             "items": {
-              "type": "string"
+              "$ref": "#/components/schemas/DeleteTeamDto"
             },
             "type": "array",
             "title": "Teams"

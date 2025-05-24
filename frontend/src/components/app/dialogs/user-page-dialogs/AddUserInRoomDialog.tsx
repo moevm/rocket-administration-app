@@ -9,7 +9,6 @@ import {atom} from "jotai";
 import {Button} from "@/components/ui/button.tsx";
 import {$api, createMutationOptions, loaded} from "@/api";
 import {$rooms, $selectedSpaceId, $selectedUsersData} from "@/store/global-store.ts";
-import {Plus} from "lucide-react";
 import {BatchLoader} from "@/components/app/DataLoader.tsx";
 import {useCallback, useEffect, useState} from "react";
 import RoomSmallTableView from "@/components/app/table/RoomSmallTableView.tsx";
@@ -18,7 +17,7 @@ import ExportCard from "@/components/app/dialogs/ExportCard.tsx";
 export const showAddUserInRoomDialogAtom = atom(false)
 
 function AddUserInRoomContent(props: {
-    smallRooms: { _id: string, name: string | null | undefined }[]
+    smallRooms: { _id: string, name: string | null | undefined, t: string}[]
 }) {
     const [open, setOpen] = useAtom(showAddUserInRoomDialogAtom)
     const [dialogStep, setDialogStep] = useState(1);
@@ -74,10 +73,6 @@ function AddUserInRoomContent(props: {
                                 setSelectedRoomIds(data.map(it => it.getValue('_id')))
                             }/>
                         </div>
-                        <Button variant="ghost" className="mt-2">
-                            <Plus className="size-4 border"/>
-                            <div>Создать новую комнату</div>
-                        </Button>
                         <DialogFooter className="sm:justify-start">
                             <Button type="button" variant="default" onClick={handleAddClick}
                                     disabled={isPending || selectedRoomIds.length === 0}>
@@ -110,8 +105,7 @@ const AddUserInRoomDialog = () => {
             loadingMessage='Загрузка комнат'
             display={() => <AddUserInRoomContent smallRooms={
                 loaded(rooms).data
-                    .filter(room => room.t === "c")
-                    .map(({ _id, name }) => ({ _id, name }))
+                    .map(({ _id, name, t }) => ({ _id, name, t }))
             }/>}
         />
     )

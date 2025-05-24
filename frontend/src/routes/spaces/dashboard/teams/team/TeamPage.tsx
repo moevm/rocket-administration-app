@@ -53,7 +53,8 @@ function TeamPageContent() {
     const setSelectedTeamsData = useSetAtom($selectedTeamsData)
     const data = [
         {
-            _id: team._id as string
+            _id: team._id as string,
+            roomId: team.roomId as string
         }
     ]
     setSelectedTeamsData(data)

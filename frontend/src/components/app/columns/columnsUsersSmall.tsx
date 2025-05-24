@@ -4,11 +4,6 @@ import {ApiRoomUserModel} from "@/store/global-store.ts";
 import { MonoRenderer, OptRenderer} from "@/components/app/ValueRenderers.tsx";
 import {customSortingFn, TypedColumnDef} from "@/lib/table.ts";
 
-const typesUserType = {
-    'bot': "Бот",
-    'user': "Пользователь"
-}
-
 export const columnsUsersSmall = [
     {
         id: "select",
@@ -52,21 +47,6 @@ export const columnsUsersSmall = [
         cell: ({cell}) => <MonoRenderer value={cell.getValue()} />
     },
     {
-        accessorKey: "username",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Никнейм"/>
-            )
-        },
-        meta: {
-            title: "Никнейм",
-            type: 'string',
-            selectFromFile: true,
-        },
-        sortingFn: customSortingFn,
-        cell: ({cell}) => <OptRenderer value={cell.getValue()} />
-    },
-    {
         accessorKey: 'name',
         header: ({column}) => {
             return (
@@ -82,15 +62,16 @@ export const columnsUsersSmall = [
         cell: ({cell}) => <OptRenderer value={cell.getValue()} />
     },
     {
-        accessorKey: "status",
+        accessorKey: "username",
         header: ({column}) => {
             return (
-                <DataTableColumnHeader column={column} title="Статус"/>
+                <DataTableColumnHeader column={column} title="Логин"/>
             )
         },
         meta: {
-            title: "Статус",
-            type: 'list'
+            title: "Логин",
+            type: 'string',
+            selectFromFile: true,
         },
         sortingFn: customSortingFn,
         cell: ({cell}) => <OptRenderer value={cell.getValue()} />

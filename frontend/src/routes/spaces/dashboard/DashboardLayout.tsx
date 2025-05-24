@@ -23,6 +23,7 @@ import DeleteTeamFromRoomDialog from "@/components/app/dialogs/team-page-dialogs
 import DeleteTeamDialog from "@/components/app/dialogs/team-page-dialogs/DeleteTeamDialog.tsx";
 import AddNewUserDialog from "@/components/app/dialogs/AddNewUserDialog.tsx";
 import AddNewRoomDialog from "@/components/app/dialogs/AddNewRoomDialog.tsx";
+import EditSpaceDialog from "@/components/app/dialogs/EditSpaceDialog.tsx";
 
 function DashboardLayout() {
     const context = useOutletContext<{
@@ -54,6 +55,8 @@ function DashboardLayout() {
             <AddNewTeamDialog/>
             <AddNewUserDialog/>
             <AddNewRoomDialog/>
+
+            <EditSpaceDialog/>
 
             <div>
                 <SidebarProvider>
