@@ -43,6 +43,7 @@ function TeamPageContent() {
     const team = loaded(useAtomValue($selectedTeam)).data
     const selectedSpaceId = useAtomValue($selectedSpaceId)!
     const {users, rooms} = loaded(useAtomValue($teamInfo)).data
+    console.log(users, rooms)
 
     const setAddUsersToTeamDialogOpen = useSetAtom(showAddUsersToTeamDialogAtom)
     const setDeleteUsersOutOfTeamDialogOpen = useSetAtom(showDeleteUsersOutOfTeamDialogAtom)
@@ -112,7 +113,7 @@ function TeamPageContent() {
 
             <div className={"pt-8"}>
                 <Label className={"text-3xl"}>Комнаты</Label>
-                <RoomsTableView data={[rooms]}/>
+                <RoomsTableView data={rooms}/>
             </div>
 
             <div className={"pt-8"}>
