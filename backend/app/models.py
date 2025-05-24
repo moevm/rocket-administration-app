@@ -207,6 +207,7 @@ class SmtpSettingsResponseDto(BaseModel):
 class UsersToChangePasswordDto(BaseModel):
     users: List[str]
     sendEmail: bool
+    password: Optional[str] = None
 
 
 class Result[T](BaseModel):
