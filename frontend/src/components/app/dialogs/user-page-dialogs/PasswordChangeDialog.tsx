@@ -20,6 +20,7 @@ import {MultiSelect} from "@/components/ui/multi-select.tsx";
 import * as React from "react";
 import {DialogBase} from "@/components/app/dialogs/DialogBase.tsx";
 import ExportCard from "@/components/app/dialogs/ExportCard.tsx";
+import {Input} from "@/components/ui/input.tsx";
 
 export const showPasswordChangeDialogAtom = atom(false)
 
@@ -30,6 +31,7 @@ const PasswordChangeDialog = () => {
     const selectedSpaceId = useAtomValue($selectedSpaceId)!
     const selectedUsersData = useAtomValue($selectedUsersData)
     const [changedPasswordsData, setChangedPasswordsData] = useState<object[]>([])
+    const [newPassword, setNewPassword] = useState<string>("")
 
     useEffect(() => {
         if (!open) {
@@ -50,17 +52,21 @@ const PasswordChangeDialog = () => {
     }))
 
     const handleNextClick = () => {
+        const body: any = {
+            users: selectedUsersData.map(it => it._id),
+            sendEmail: isSendingEmailChecked,
+        };
+        if (newPassword) {
+            body.password = newPassword;
+        }
         mutate({
-            body: {
-                users: selectedUsersData.map(it => it._id),
-                sendEmail: isSendingEmailChecked
-            },
+            body,
             params: {
                 path: {
                     space_id: selectedSpaceId!
                 },
             }
-        })
+        });
     };
 
     return (
@@ -80,15 +86,29 @@ const PasswordChangeDialog = () => {
             }
         >
             {dialogStep === 1 ? (
-                    <div className="flex items-center space-x-2">
-                        <Checkbox
-                            id="sendingEmail" checked={isSendingEmailChecked}
-                            onCheckedChange={setIsSendingEmailChecked}/>
-                        <label
-                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                            Отправить новый пароль на email?
-                        </label>
+                    <div className={"flex flex-col justify-center gap-4"}>
+                        <div className={"flex flex-col justify-center gap-4"}>
+                            <Label>
+                                Новый пароль.
+                            </Label>
+                            <Label>
+                                Оставьте поле пустым, если хотите, чтобы пароли сгенерировались автоматически.
+                            </Label>
+                            <Input placeholder={"Введите новый пароль"} onChange={(e) => setNewPassword(e.target.value)}>
+                            </Input>
+
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <Checkbox
+                                id="sendingEmail" checked={isSendingEmailChecked}
+                                onCheckedChange={setIsSendingEmailChecked}/>
+                            <Label
+                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                Отправить новый пароль на email?
+                            </Label>
+                        </div>
                     </div>
+
                 )
                 : (
                     <ExportCard data={changedPasswordsData} showData={true} countedValues={[
