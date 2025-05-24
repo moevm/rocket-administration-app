@@ -92,7 +92,7 @@ function AddNewRoomContent() {
                     {
                         name: values.name,
                         readOnly: values.readOnly,
-                        excludeSelf: values.excludeSelf
+                        excludeSelf: false
                     },
                 ],
             },
@@ -113,7 +113,7 @@ function AddNewRoomContent() {
                     {
                         name: values.name,
                         readOnly: values.readOnly,
-                        excludeSelf: values.excludeSelf
+                        excludeSelf: false
                     },
                 ],
             },
@@ -156,9 +156,9 @@ function AddNewRoomContent() {
                 <div>
                     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                         <TabsList className="grid w-full grid-cols-3">
-                            <TabsTrigger value="channel" className="rounded-t-xl data-[state=active]:bg-muted data-[state=active]:text-primary">Канал</TabsTrigger>
+                            <TabsTrigger value="channel" className="rounded-t-xl rounded-l-xl data-[state=active]:bg-muted data-[state=active]:text-primary">Канал</TabsTrigger>
                             <TabsTrigger value="group" className="rounded-t-xl data-[state=active]:bg-muted data-[state=active]:text-primary">Группа</TabsTrigger>
-                            <TabsTrigger value="team" className="rounded-t-xl data-[state=active]:bg-muted data-[state=active]:text-primary">Команда</TabsTrigger>
+                            <TabsTrigger value="team" className="rounded-t-xl rounded-r-xl data-[state=active]:bg-muted data-[state=active]:text-primary">Команда</TabsTrigger>
                         </TabsList>
 
                         <TabsContent value="channel">
@@ -171,7 +171,7 @@ function AddNewRoomContent() {
                                 <Form {...channelGroupForm}>
                                     <form onSubmit={channelGroupForm.handleSubmit(handleChannelCreate)}>
 
-                                        <CardContent className="space-y-2">
+                                        <CardContent className="space-y-4">
                                             <FormField
                                                 control={channelGroupForm.control}
                                                 name="name"
@@ -190,29 +190,32 @@ function AddNewRoomContent() {
                                                 control={channelGroupForm.control}
                                                 name="readOnly"
                                                 render={({field}) => (
-                                                    <FormItem className={"flex justify-start items-center gap-2"}>
-                                                        <FormControl>
-                                                            <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                                                        </FormControl>
-                                                        <FormLabel>Только для чтения</FormLabel>
+                                                    <FormItem>
+                                                        <div className={"flex justify-items-center items-center gap-2"}>
+                                                            <FormControl>
+                                                                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                                                            </FormControl>
+                                                            <FormLabel>Только для чтения</FormLabel>
+                                                        </div>
+
                                                         <FormMessage/>
                                                     </FormItem>
                                                 )}
                                             />
 
-                                            <FormField
-                                                control={channelGroupForm.control}
-                                                name="excludeSelf"
-                                                render={({field}) => (
-                                                    <FormItem className={"flex justify-start items-center gap-2"}>
-                                                        <FormControl>
-                                                            <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                                                        </FormControl>
-                                                        <FormLabel>Не включать себя в новую комнату</FormLabel>
-                                                        <FormMessage/>
-                                                    </FormItem>
-                                                )}
-                                            />
+                                            {/*<FormField*/}
+                                            {/*    control={channelGroupForm.control}*/}
+                                            {/*    name="excludeSelf"*/}
+                                            {/*    render={({field}) => (*/}
+                                            {/*        <FormItem className={"flex justify-start items-center gap-2"}>*/}
+                                            {/*            <FormControl>*/}
+                                            {/*                <Checkbox checked={field.value} onCheckedChange={field.onChange} />*/}
+                                            {/*            </FormControl>*/}
+                                            {/*            <FormLabel>Не включать себя в новую комнату</FormLabel>*/}
+                                            {/*            <FormMessage/>*/}
+                                            {/*        </FormItem>*/}
+                                            {/*    )}*/}
+                                            {/*/>*/}
 
                                         </CardContent>
                                         <CardFooter>
@@ -235,7 +238,7 @@ function AddNewRoomContent() {
                                 <Form {...channelGroupForm}>
                                     <form onSubmit={channelGroupForm.handleSubmit(handleGroupCreate)}>
 
-                                        <CardContent className="space-y-2">
+                                        <CardContent className="space-y-4">
                                             <FormField
                                                 control={channelGroupForm.control}
                                                 name="name"
@@ -254,29 +257,32 @@ function AddNewRoomContent() {
                                                 control={channelGroupForm.control}
                                                 name="readOnly"
                                                 render={({field}) => (
-                                                    <FormItem className={"flex justify-start items-center gap-2"}>
-                                                        <FormControl>
-                                                            <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                                                        </FormControl>
-                                                        <FormLabel>Только для чтения</FormLabel>
+                                                    <FormItem>
+                                                        <div className={"flex justify-items-center items-center gap-2"}>
+                                                            <FormControl>
+                                                                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                                                            </FormControl>
+                                                            <FormLabel>Только для чтения</FormLabel>
+                                                        </div>
+
                                                         <FormMessage/>
                                                     </FormItem>
                                                 )}
                                             />
 
-                                            <FormField
-                                                control={channelGroupForm.control}
-                                                name="excludeSelf"
-                                                render={({field}) => (
-                                                    <FormItem className={"flex justify-start items-center gap-2"}>
-                                                        <FormControl>
-                                                            <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                                                        </FormControl>
-                                                        <FormLabel>Не включать себя в новую комнату</FormLabel>
-                                                        <FormMessage/>
-                                                    </FormItem>
-                                                )}
-                                            />
+                                            {/*<FormField*/}
+                                            {/*    control={channelGroupForm.control}*/}
+                                            {/*    name="excludeSelf"*/}
+                                            {/*    render={({field}) => (*/}
+                                            {/*        <FormItem className={"flex justify-start items-center gap-2"}>*/}
+                                            {/*            <FormControl>*/}
+                                            {/*                <Checkbox checked={field.value} onCheckedChange={field.onChange} />*/}
+                                            {/*            </FormControl>*/}
+                                            {/*            <FormLabel>Не включать себя в новую комнату</FormLabel>*/}
+                                            {/*            <FormMessage/>*/}
+                                            {/*        </FormItem>*/}
+                                            {/*    )}*/}
+                                            {/*/>*/}
 
                                         </CardContent>
                                         <CardFooter>
