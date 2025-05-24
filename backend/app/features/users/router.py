@@ -60,16 +60,16 @@ async def change_user_passwords(body: UsersToChangePasswordDto, space=Depends(ge
     rocket = await obtain_rocket_instance(key_for_space(space))
 
     if body.sendEmail:
-        smtp_settings = await require_smtp_settings(db, space.id);
+        smtp_settings = await require_smtp_settings(db, space.id)
 
-    async def _process(user: str, password: str): 
+    async def _process(user: str, password_to_set: str):
         result = ChangedPasswordDto(user=user)        
-        try:  
-            await rocket_request(rocket.users_update, **rocket_query_args(user_id=user, password=password))
+        try:
+            await rocket_request(rocket.users_update, **rocket_query_args(user_id=user, password=password_to_set))
         except Exception as e:
             result.password_error = extract_exception_message(e)
         else:
-            result.password = password
+            result.password = password_to_set
 
         if not body.sendEmail:
             return result
@@ -83,7 +83,7 @@ async def change_user_passwords(body: UsersToChangePasswordDto, space=Depends(ge
                 smtp_settings,
                 user_info["user"]['emails'][0]["address"],
                 "Пароль изменен",
-                f"Ваш новый пароль в пространстве {space.url}: {password}"
+                f"Ваш новый пароль в пространстве {space.url}: {password_to_set}"
             )
         except Exception as e:
             result.email_send_error = extract_exception_message(e)
@@ -91,9 +91,14 @@ async def change_user_passwords(body: UsersToChangePasswordDto, space=Depends(ge
             result.email_sent = True
         return result
 
+    args_for_batch = []
+    for user_login in body.users:
+        password_for_user = body.password if body.password is not None else generate_password(16)
+        args_for_batch.append((user_login, password_for_user))
+
     results = await batch_execute(
-        _process, 
-        [(user, generate_password(16)) for user in body.users], 
+        _process,
+        args_for_batch,
         settings.app.batch_delay
     )
 
