@@ -11,6 +11,7 @@ import {$selectedSpaceId, $usersQueryOptions} from "@/store/global-store.ts";
 import React, {useEffect, useState} from "react";
 import {BatchResult} from "@/components/app/BatchResult.tsx";
 import ExportCard from "@/components/app/dialogs/ExportCard.tsx";
+import {useInvalidateEntities, useInvalidateUsers} from "@/api/invalidate.ts";
 
 interface UserImportDialogProps {
     open: boolean
@@ -34,6 +35,8 @@ export const UserImportDialog = ({
     const [successData, setSuccessData] = React.useState<any>(null)
     const [dialogStep, setDialogStep] = useState(1);
 
+    const invalidate = useInvalidateUsers()
+
     const {
         mutate,
         isPending
@@ -42,9 +45,7 @@ export const UserImportDialog = ({
             setSuccess(true)
             setSuccessData(data)
             setDialogStep(0)
-            await queryClient.invalidateQueries({
-                queryKey: $usersQueryOptions(selectedSpaceId!, true).queryKey
-            })
+            invalidate()
         }
     }))
 

@@ -15,6 +15,7 @@ import ExportCard from "@/components/app/dialogs/ExportCard.tsx";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
 import {Label} from "@/components/ui/label.tsx";
 import {useNavigate} from "react-router";
+import {useInvalidateUsers} from "@/api/invalidate.ts";
 
 export const showDeleteUserDialogAtom = atom(false)
 
@@ -27,10 +28,11 @@ function DeleteUserContent() {
     const [forceDelete, setForceDelete] = useState<boolean>(false);
     const navigate = useNavigate();
 
+    const invalidate = useInvalidateUsers()
+
     useEffect(() => {
         if (!open && dialogStep === 0) {
             navigate(`/spaces/${selectedSpaceId}/dashboard/users`);
-            window.location.reload();
         }
         if (!open) {
             setDialogStep(1)
@@ -45,7 +47,9 @@ function DeleteUserContent() {
     } = $api.useMutation('delete', '/spaces/{space_id}/users/', createMutationOptions({
         onSuccess: async (data) => {
             setDialogStep(0)
-            setResults(data)}
+            setResults(data)
+            invalidate()
+        }
     }))
 
     const handleSubmit = () => {

@@ -18,10 +18,13 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form.tsx";
 import {toast} from "sonner";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
+import {useInvalidateTeams} from "@/api/invalidate.ts";
 
 function AddNewTeamContent() {
     const [open, setOpen] = useAtom(showAddNewTeamDialogAtom)
     const selectedSpaceId = useAtomValue($selectedSpaceId)!
+
+    const invalidate = useInvalidateTeams()
 
     const {
         mutate,
@@ -30,9 +33,7 @@ function AddNewTeamContent() {
         onSuccess: async (data) => {
             toast.success("Команда успешно создана");
             setOpen(false);
-            await queryClient.invalidateQueries({
-                queryKey: $teamsQueryOptions(selectedSpaceId!, true).queryKey
-            })
+            invalidate()
         },
         onError: async (error) => {
             console.log(error);

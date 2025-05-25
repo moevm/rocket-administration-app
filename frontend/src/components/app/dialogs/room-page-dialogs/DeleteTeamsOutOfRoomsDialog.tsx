@@ -19,6 +19,7 @@ import {useEffect, useState} from "react";
 import {$api, createMutationOptions, loaded, queryClient} from "@/api";
 import TeamSmallTableView from "@/components/app/table/TeamSmallTableView.tsx";
 import ExportCard from "@/components/app/dialogs/ExportCard.tsx";
+import {useInvalidateEntities} from "@/api/invalidate.ts";
 
 export const showDeleteTeamsOutOfRoomsDialogAtom = atom(false)
 
@@ -55,6 +56,7 @@ function DeleteTeamsOutOfRoomsContent(props: {
         setSelectedTeamsIds(teamIds);
     }, [selectedTeamIds]);
 
+    const invalidate = useInvalidateEntities()
 
     const {
         mutate,
@@ -63,9 +65,7 @@ function DeleteTeamsOutOfRoomsContent(props: {
         onSuccess: async (data) => {
             setDialogStep(0)
             setResults(data)
-            await queryClient.invalidateQueries({
-                queryKey: $roomsQueryOptions(selectedSpaceId!, true).queryKey
-            })
+            invalidate()
         }
     }))
 

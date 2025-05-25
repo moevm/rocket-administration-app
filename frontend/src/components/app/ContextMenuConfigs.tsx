@@ -73,11 +73,11 @@ const RoomContextMenuItems = ({rows}: { rows: Row<{ _id: string }>[] }) => {
                 setDeleteTeamsOutOfRoomsDialogOpen(true)
                 setContextMenuOpen(false)
             }}>Удалить из команды</ContextMenuItem>
-            <ContextMenuItem onClick={() => {
-                setSelectedRoomsData(data)
-                setHideRoomsDialogOpen(true)
-                setContextMenuOpen(false)
-            }}>Скрыть комнату</ContextMenuItem>
+            {/*<ContextMenuItem onClick={() => {*/}
+            {/*    setSelectedRoomsData(data)*/}
+            {/*    setHideRoomsDialogOpen(true)*/}
+            {/*    setContextMenuOpen(false)*/}
+            {/*}}>Скрыть комнату</ContextMenuItem>*/}
             <ContextMenuItem onClick={() => {
                 setSelectedRoomsData(data)
                 setDeleteRoomsDialogOpen(true)

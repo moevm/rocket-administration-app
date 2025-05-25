@@ -31,6 +31,7 @@ def generate_password(length: int) -> str:
 
 
 def extract_exception_message(exception: Exception) -> str:
+    print('Request exception', exception)
     if isinstance(exception, HTTPException):
         return exception.detail
     else:

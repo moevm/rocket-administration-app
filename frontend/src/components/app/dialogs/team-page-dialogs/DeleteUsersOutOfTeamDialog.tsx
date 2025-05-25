@@ -20,6 +20,7 @@ import {$api, createMutationOptions, loaded, queryClient} from "@/api";
 import UserSmallTableView from "@/components/app/table/UserSmallTableView.tsx";
 import ExportCard from "@/components/app/dialogs/ExportCard.tsx";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
+import {useInvalidateEntities} from "@/api/invalidate.ts";
 
 export const showDeleteUsersOutOfTeamDialogAtom = atom(false)
 
@@ -41,6 +42,8 @@ function DeleteUsersOutOfTeamContent(props: {
         }
     }, [open]);
 
+    const invalidate = useInvalidateEntities()
+
     const {
         mutate,
         isPending
@@ -48,9 +51,7 @@ function DeleteUsersOutOfTeamContent(props: {
         onSuccess: async (data) => {
             setResults(data)
             setDialogStep(0)
-            await queryClient.invalidateQueries({
-                queryKey: $teamsQueryOptions(selectedSpaceId!, true).queryKey
-            })
+            invalidate()
         }
     }))
 

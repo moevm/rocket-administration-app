@@ -17,6 +17,7 @@ import {Checkbox} from "@/components/ui/checkbox.tsx";
 import {Label} from "@/components/ui/label.tsx";
 import {useNavigate} from "react-router";
 import {BatchLoader} from "@/components/app/DataLoader.tsx";
+import {useInvalidateTeams} from "@/api/invalidate.ts";
 
 export const showDeleteTeamDialogAtom = atom(false)
 
@@ -34,9 +35,10 @@ function DeleteTeamContent(props: { teams: any }) {
     const selectedIds = selectedTeamsData.map(i => i._id);
     const correctTeamsIds = allTeams.filter(team => selectedIds.includes(team._id));
 
+    const invalidate = useInvalidateTeams()
+
     useEffect(() => {
         if (!open && dialogStep === 0) {
-            navigate(`/spaces/${selectedSpaceId}/dashboard/teams`);
             window.location.reload();
         }
         if (!open) {
@@ -52,6 +54,7 @@ function DeleteTeamContent(props: { teams: any }) {
         onSuccess: async (data) => {
             setDialogStep(0)
             setResults(data)
+            invalidate()
         }
     }))
 

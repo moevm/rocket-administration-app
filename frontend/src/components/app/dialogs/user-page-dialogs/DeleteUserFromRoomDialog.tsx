@@ -15,6 +15,7 @@ import {showAddUserInRoomDialogAtom} from "@/components/app/dialogs/user-page-di
 import RoomSmallTableView from "@/components/app/table/RoomSmallTableView.tsx";
 import {$api, createMutationOptions, loaded, queryClient} from "@/api";
 import ExportCard from "@/components/app/dialogs/ExportCard.tsx";
+import {useInvalidateEntities, useInvalidateRooms} from "@/api/invalidate.ts";
 
 export const showDeleteUserFromRoomDialogAtom = atom(false)
 
@@ -36,6 +37,8 @@ function DeleteUserFromRoomContent(props: {
         }
     }, [open]);
 
+    const invalidate = useInvalidateEntities()
+
     const {
         mutate,
         isPending
@@ -43,9 +46,7 @@ function DeleteUserFromRoomContent(props: {
         onSuccess: async (data) => {
             setDialogStep(0)
             setResults(data)
-            await queryClient.invalidateQueries({
-                queryKey: $usersQueryOptions(selectedSpaceId!, true).queryKey
-            })
+            invalidate()
         }
     }))
 
