@@ -11,7 +11,6 @@ import {
 import {Button} from "@/components/ui/button.tsx";
 import {useEffect, useState} from "react";
 import {$api, createMutationOptions} from "@/api";
-import RoomSmallTableView from "@/components/app/table/RoomSmallTableView.tsx";
 import ExportCard from "@/components/app/dialogs/ExportCard.tsx";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
 import {Label} from "@/components/ui/label.tsx";

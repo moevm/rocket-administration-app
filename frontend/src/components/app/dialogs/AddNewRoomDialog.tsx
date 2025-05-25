@@ -1,8 +1,8 @@
 import {useAtom, useAtomValue} from "jotai/index";
 import {useEffect, useState} from "react";
 import {
-    $selectedSpaceId,
-    showAddNewRoomDialogAtom
+    $roomsQueryOptions,
+    $selectedSpaceId, $teamsQueryOptions, showAddNewRoomDialogAtom
 } from "@/store/global-store.ts";
 import {Dialog, DialogContent, DialogHeader, DialogTitle} from "@/components/ui/dialog.tsx";
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card.tsx";
@@ -15,17 +15,17 @@ import {z} from "zod";
 import {useForm} from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form.tsx";
-import {$api, createMutationOptions} from "@/api";
+import {$api, createMutationOptions, queryClient} from "@/api";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 
 const channelGroupSchema = z.object({
-    name: z.string().min(3, {message: "Минимум 3 символа"}),
+    name: z.string().min(1, {message: "Обязательное поле"}),
     readOnly: z.boolean(),
     excludeSelf: z.boolean(),
 });
 
 const groupSchema = z.object({
-    login: z.string().min(3, {message: "Минимум 3 символа"}),
+    login: z.string().min(1, {message: "Обязательное поле"}),
     email: z.string().email("Неверный email"),
     password: z.string().min(5, {message: "Минимум 5 символов"}),
 });
@@ -37,18 +37,18 @@ function AddNewRoomContent() {
     const {
         mutate: mutateChannels,
         isPending: isPendingChannels
-    } = $api.useMutation('post', '/spaces/{space_id}/rooms/channels/', createMutationOptions())
+    } = $api.useMutation('post', '/spaces/{space_id}/rooms/channels/', createMutationOptions({}))
 
     const {
         mutate: mutateGroups,
         isPending: isPendingGroups
-    } = $api.useMutation('post', '/spaces/{space_id}/rooms/groups/', createMutationOptions())
+    } = $api.useMutation('post', '/spaces/{space_id}/rooms/groups/', createMutationOptions({}))
 
 
     const {
         mutate: mutateTeams,
         isPending: isPendingTeams
-    } = $api.useMutation('post', '/spaces/{space_id}/teams/', createMutationOptions())
+    } = $api.useMutation('post', '/spaces/{space_id}/teams/', createMutationOptions({}))
 
     const channelGroupForm = useForm<z.infer<typeof channelGroupSchema>>({
         resolver: zodResolver(channelGroupSchema),
@@ -99,6 +99,13 @@ function AddNewRoomContent() {
                     space_id: selectedSpaceId!
                 },
             }
+        }, {
+            onSuccess: (data) => {
+                queryClient.invalidateQueries({
+                    queryKey: $roomsQueryOptions(selectedSpaceId!, true).queryKey
+                })
+                setOpen(false)
+            }
         })
     }
 
@@ -118,6 +125,13 @@ function AddNewRoomContent() {
                     space_id: selectedSpaceId!
                 },
             }
+        }, {
+            onSuccess: (data) => {
+                queryClient.invalidateQueries({
+                    queryKey: $roomsQueryOptions(selectedSpaceId!, true).queryKey
+                })
+                setOpen(false)
+            }
         })
     }
 
@@ -136,8 +150,14 @@ function AddNewRoomContent() {
                     space_id: selectedSpaceId!
                 },
             }
+        }, {
+            onSuccess: (data) => {
+                queryClient.invalidateQueries({
+                    queryKey: $teamsQueryOptions(selectedSpaceId!, true).queryKey
+                })
+                setOpen(false)
+            }
         })
-
     }
 
     return (

@@ -1,6 +1,6 @@
 import {atom, useAtom, useAtomValue} from "jotai/index";
 import {BatchLoader} from "@/components/app/DataLoader.tsx";
-import {$rooms, $selectedSpaceId, $selectedUsersData} from "@/store/global-store.ts";
+import {$rooms, $selectedSpaceId, $selectedUsersData, $usersQueryOptions} from "@/store/global-store.ts";
 import {
     Dialog,
     DialogContent,
@@ -13,7 +13,7 @@ import {Button} from "@/components/ui/button.tsx";
 import {useEffect, useState} from "react";
 import {showAddUserInRoomDialogAtom} from "@/components/app/dialogs/user-page-dialogs/AddUserInRoomDialog.tsx";
 import RoomSmallTableView from "@/components/app/table/RoomSmallTableView.tsx";
-import {$api, createMutationOptions, loaded} from "@/api";
+import {$api, createMutationOptions, loaded, queryClient} from "@/api";
 import ExportCard from "@/components/app/dialogs/ExportCard.tsx";
 
 export const showDeleteUserFromRoomDialogAtom = atom(false)
@@ -43,6 +43,9 @@ function DeleteUserFromRoomContent(props: {
         onSuccess: async (data) => {
             setDialogStep(0)
             setResults(data)
+            await queryClient.invalidateQueries({
+                queryKey: $usersQueryOptions(selectedSpaceId!, true).queryKey
+            })
         }
     }))
 

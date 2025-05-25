@@ -1,6 +1,6 @@
 import {useAtom, useAtomValue} from "jotai/index";
 import {
-    $selectedSpaceId,
+    $selectedSpaceId, $usersQueryOptions,
     showAddNewUserDialogAtom
 } from "@/store/global-store.ts";
 import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle} from "@/components/ui/dialog.tsx";
@@ -19,7 +19,7 @@ import {Loader2} from "lucide-react";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {$api, createMutationOptions} from "@/api";
+import {$api, createMutationOptions, queryClient} from "@/api";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
 import React, {useEffect, useState} from "react";
 import {Label} from "@/components/ui/label.tsx";
@@ -81,6 +81,9 @@ function AddNewUserContent() {
             }
         }, {
             onSuccess: (data) => {
+                queryClient.invalidateQueries({
+                    queryKey: $usersQueryOptions(selectedSpaceId!, true).queryKey
+                })
                 if (data[0]?.error) {
                     console.log((`Ошибка: ${data[0].error}`));
                     setError(data[0].error);

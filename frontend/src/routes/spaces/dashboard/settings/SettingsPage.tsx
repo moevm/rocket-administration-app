@@ -18,7 +18,7 @@ import {
     $smtpSettings,
     $selectedSpaceId,
     ApiSmtpSettingsModel,
-    $spacesQueryOptions, $spaces, $selectedSpace, ApiSpaceModel
+    $spacesQueryOptions, $spaces, $selectedSpace, ApiSpaceModel, $roomsQueryOptions, $smtpSettingsQueryOptions
 } from "@/store/global-store.ts";
 import {useAtomValue} from "jotai/index";
 import {BatchLoader} from "@/components/app/DataLoader.tsx";
@@ -185,7 +185,13 @@ function SMTPSettingsContent(props: {
     const {
         mutate,
         isPending
-    } = $api.useMutation('post', '/spaces/{space_id}/settings/smtp', createMutationOptions({}))
+    } = $api.useMutation('post', '/spaces/{space_id}/settings/smtp', createMutationOptions({
+        onSuccess: async (data: any) => {
+            await queryClient.invalidateQueries({
+                queryKey: $smtpSettingsQueryOptions().queryKey
+            })
+        }
+    }))
 
     function onSubmit(values: z.infer<typeof smtpSettingsSchema>) {
         const {login, password, host, port, path, sender} = values;

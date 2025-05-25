@@ -1,5 +1,5 @@
 import {atom, useAtom, useAtomValue} from "jotai/index";
-import {$selectedRoomsData, $selectedSpaceId, $users} from "@/store/global-store.ts";
+import {$roomsQueryOptions, $selectedRoomsData, $selectedSpaceId, $users} from "@/store/global-store.ts";
 import {BatchLoader} from "@/components/app/DataLoader.tsx";
 import {
     Dialog,
@@ -10,7 +10,7 @@ import {
     DialogTitle
 } from "@/components/ui/dialog.tsx";
 import {Button} from "@/components/ui/button.tsx";
-import {$api, createMutationOptions, loaded} from "@/api";
+import {$api, createMutationOptions, loaded, queryClient} from "@/api";
 import {useCallback, useEffect, useState} from "react";
 import UserSmallTableView from "@/components/app/table/UserSmallTableView.tsx";
 import ExportCard from "@/components/app/dialogs/ExportCard.tsx";
@@ -41,6 +41,9 @@ function AddRoomsToUsersContent(props: {
         onSuccess: async (data) => {
             setResults(data)
             setDialogStep(0)
+            await queryClient.invalidateQueries({
+                queryKey: $roomsQueryOptions(selectedSpaceId!, true).queryKey
+            })
         }
     }))
 

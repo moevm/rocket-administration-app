@@ -1,5 +1,12 @@
 import {atom, useAtom, useAtomValue} from "jotai/index";
-import {$selectedSpaceId, $selectedUsersData, $teams} from "@/store/global-store.ts";
+import {
+    $selectedSpaceId,
+    $selectedUser,
+    $selectedUsersData,
+    $teams,
+    $teamsQueryOptions,
+    $usersQueryOptions
+} from "@/store/global-store.ts";
 import {BatchLoader} from "@/components/app/DataLoader.tsx";
 import {
     Dialog,
@@ -14,7 +21,7 @@ import React, {useEffect, useState} from "react";
 import {
     showDeleteUserFromRoomDialogAtom
 } from "@/components/app/dialogs/user-page-dialogs/DeleteUserFromRoomDialog.tsx";
-import {$api, createMutationOptions, loaded} from "@/api";
+import {$api, createMutationOptions, loaded, queryClient} from "@/api";
 import RoomSmallTableView from "@/components/app/table/RoomSmallTableView.tsx";
 import ExportCard from "@/components/app/dialogs/ExportCard.tsx";
 import ShortTeamTableView from "@/components/app/table/ShortTeamTableView.tsx";
@@ -54,6 +61,9 @@ function DeleteUserFromTeamContent(props: {
         onSuccess: async (data) => {
             setDialogStep(0)
             setResults(data)
+            await queryClient.invalidateQueries({
+                queryKey: $usersQueryOptions(selectedSpaceId!, true).queryKey
+            })
         }
     }))
 

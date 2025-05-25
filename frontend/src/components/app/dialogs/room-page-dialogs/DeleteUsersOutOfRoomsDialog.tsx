@@ -1,5 +1,10 @@
 import {atom, useAtom, useAtomValue} from "jotai/index";
-import {$selectedRoomsData, $selectedSpaceId, $selectedUsersData, $users} from "@/store/global-store.ts";
+import {
+    $roomsQueryOptions,
+    $selectedRoomsData,
+    $selectedSpaceId,
+    $users
+} from "@/store/global-store.ts";
 import {BatchLoader} from "@/components/app/DataLoader.tsx";
 import {
     Dialog,
@@ -11,11 +16,7 @@ import {
 } from "@/components/ui/dialog.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {useEffect, useState} from "react";
-import {
-    showDeleteUserFromRoomDialogAtom
-} from "@/components/app/dialogs/user-page-dialogs/DeleteUserFromRoomDialog.tsx";
-import {$api, createMutationOptions, loaded} from "@/api";
-import RoomSmallTableView from "@/components/app/table/RoomSmallTableView.tsx";
+import {$api, createMutationOptions, loaded, queryClient} from "@/api";
 import ExportCard from "@/components/app/dialogs/ExportCard.tsx";
 import UserSmallTableView from "@/components/app/table/UserSmallTableView.tsx";
 
@@ -45,6 +46,9 @@ function DeleteUsersOutOfRoomContent(props: {
         onSuccess: async (data) => {
             setDialogStep(0)
             setResults(data)
+            await queryClient.invalidateQueries({
+                queryKey: $roomsQueryOptions(selectedSpaceId!, true).queryKey
+            })
         }
     }))
 
@@ -52,7 +56,7 @@ function DeleteUsersOutOfRoomContent(props: {
         mutate({
             body: {
                 users: selectedUserIds,
-                rooms: selectedRoomsData.map(it => it._id)
+                rooms: selectedRoomsData.map(it => it.name)
             },
             params: {
                 path: {

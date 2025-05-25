@@ -24,7 +24,6 @@ function DeleteRoomContent() {
     const selectedRoomsData = useAtomValue($selectedRoomsData)
     const [dialogStep, setDialogStep] = useState(1);
     const [results, setResults] = useState<object[]>([]);
-    const [deleteLinkedRooms, setDeleteLinkedRooms] = useState<boolean>(false);
 
     const navigate = useNavigate();
 

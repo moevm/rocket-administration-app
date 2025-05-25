@@ -57,7 +57,8 @@ function RoomPageContent() {
     const setSelectedRoomsData = useSetAtom($selectedRoomsData)
     const data = [
         {
-            _id: room._id as string
+            _id: room._id as string,
+            name: room.name as string
         }
     ]
     setSelectedRoomsData(data)

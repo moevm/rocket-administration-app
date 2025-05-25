@@ -252,7 +252,7 @@ function RichTableView<TData, TValue>({
                                 )
                                 .map(it => ({
                                     label: it.columnDef.meta?.title || it.id,
-                                    value: it.id
+                                    value: it.columnDef.meta?.title || it.id
                                 }))}
                             defaultValue={searchColumns}
                             onValueChange={setSearchColumns}
