@@ -61,7 +61,6 @@ function DeleteUserFromTeamContent(props: {
         onSuccess: async (data) => {
             setDialogStep(0)
             setResults(data)
-            console.log(data)
             await queryClient.invalidateQueries({
                 queryKey: $usersQueryOptions(selectedSpaceId!, true).queryKey
             })
@@ -69,7 +68,6 @@ function DeleteUserFromTeamContent(props: {
     }))
 
     const handleSubmit = () => {
-        console.log(selectedTeamIds)
         mutate({
             body: {
                 users: selectedUsersData.map(it => it._id),

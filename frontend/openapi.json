@@ -698,6 +698,57 @@
             }
           }
         }
+      },
+      "delete": {
+        "summary": "Delete Users",
+        "operationId": "delete_users_spaces__space_id__users__delete",
+        "parameters": [
+          {
+            "name": "space_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Space Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UsersDeleteDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserDeleteResDto"
+                  },
+                  "title": "Response Delete Users Spaces  Space Id  Users  Delete"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/spaces/{space_id}/users/{user_id}": {
@@ -2144,6 +2195,40 @@
         ],
         "title": "UserCreateDto"
       },
+      "UserDeleteResDto": {
+        "properties": {
+          "user": {
+            "type": "string",
+            "title": "User"
+          },
+          "force_delete": {
+            "type": "boolean",
+            "title": "Force Delete"
+          },
+          "success": {
+            "type": "boolean",
+            "title": "Success",
+            "default": false
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user",
+          "force_delete"
+        ],
+        "title": "UserDeleteResDto"
+      },
       "UserDto": {
         "properties": {
           "_id": {
@@ -2443,6 +2528,27 @@
         ],
         "title": "UsersAndTeamsDto"
       },
+      "UsersDeleteDto": {
+        "properties": {
+          "users": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Users"
+          },
+          "force_delete": {
+            "type": "boolean",
+            "title": "Force Delete",
+            "default": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "users"
+        ],
+        "title": "UsersDeleteDto"
+      },
       "UsersImportRequestDto": {
         "properties": {
           "users": {
@@ -2491,6 +2597,17 @@
           "sendEmail": {
             "type": "boolean",
             "title": "Sendemail"
+          },
+          "password": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Password"
           }
         },
         "type": "object",

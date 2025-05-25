@@ -31,7 +31,6 @@ function DeleteTeamFromRoomContent(props: {
     const [selectedRoomsIds, setSelectedRoomsIds] = useState<string[]>([]);
     const [results, setResults] = useState<object[]>([]);
 
-
     useEffect(() => {
         if (!open) {
             setDialogStep(1)
@@ -47,7 +46,6 @@ function DeleteTeamFromRoomContent(props: {
         onSuccess: async (data) => {
             setDialogStep(0)
             setResults(data)
-            console.log(data)
             await queryClient.invalidateQueries({
                 queryKey: $teamsQueryOptions(selectedSpaceId!, true).queryKey
             })

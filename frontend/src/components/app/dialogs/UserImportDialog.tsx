@@ -40,9 +40,7 @@ export const UserImportDialog = ({
     } = $api.useMutation('post', '/spaces/{space_id}/users/', createMutationOptions({
         async onSuccess(data) {
             setSuccess(true)
-            console.info(data)
             setSuccessData(data)
-            console.log("successData", data)
             setDialogStep(0)
             await queryClient.invalidateQueries({
                 queryKey: $usersQueryOptions(selectedSpaceId!, true).queryKey

@@ -124,11 +124,9 @@ function FilterDialog<TData>(
                     setRelation(editingFilter.relation)
                 }, 0)
 
-                console.info('setting fields from editing filter', editingFilter.columnId, editingFilter.relation, editingFilter.values)
                 form.reset(editingFilter.values)
             } else {
                 setColumnId(availableColumns[0].id)
-                console.info('setting fields to none')
                 form.reset({}, {keepValues: false})
             }
         }

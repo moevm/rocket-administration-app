@@ -39,8 +39,6 @@ function AddTeamIntoRoomContent(props: {
     const [selectedRoomsIds, setSelectedRoomsIds] = useState<string[]>([]);
     const [results, setResults] = useState<object[]>([]);
 
-
-    console.log(selectedSpaceId)
     useEffect(() => {
         if (!open) {
             setDialogStep(1)

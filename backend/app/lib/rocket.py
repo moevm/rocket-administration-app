@@ -35,16 +35,26 @@ async def create_rocket_instance(key: SpaceCacheKey) -> RocketChat:
 async def rocket_request(func, /, *args, **kwargs):
     response = await rocket_interaction(func, *args, **kwargs)
 
-    if not (response.status_code == 200 and response.json()['success'] == True):
-        if 'error' in response.json():
-            raise HTTPException(status_code=400, detail="Ошибка запроса к RocketChat: " + str(response.json()['error']))
+    try:
+        response_json = response.json()
+    except:
+        raise HTTPException(status_code=502, detail="Ошибка запроса к RocketChat: сервер вернул неверный ответ")
+
+    if not (response.status_code == 200 and response_json['success'] == True):
+        if 'error' in response_json:
+            raise HTTPException(status_code=400, detail="Ошибка запроса к RocketChat: " + str(response_json['error']))
+        if 'status' in response_json and response_json['status'] == 'error' and 'message' in response_json:
+            if 'You must be logged in to do this.' in response_json['message']:
+                raise HTTPException(status_code=502,
+                                    detail="Ошибка запроса к RocketChat: " + str(response_json['message']))
+            else:
+                raise HTTPException(status_code=400, detail="Ошибка запроса к RocketChat: " + str(response_json['message']))
         else:
             raise HTTPException(status_code=400, detail="Ошибка запроса к RocketChat")
 
-    json = response.json()
-    if 'success' in json:
-        del json['success']
-    return json
+    if 'success' in response_json:
+        del response_json['success']
+    return response_json
 
 
 async def rocket_interaction(func, /, *args, **kwargs):

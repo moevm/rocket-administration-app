@@ -35,11 +35,7 @@ export const columnsRoomUser = [
     },
     {
         accessorKey: "_id",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="id"/>
-            )
-        },
+        header: DataTableColumnHeader,
         meta: {
             title: "id",
             type: 'string',
@@ -50,11 +46,7 @@ export const columnsRoomUser = [
     },
     {
         accessorKey: "name",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Имя"/>
-            )
-        },
+        header: DataTableColumnHeader,
         meta: {
             title: "Имя",
             type: 'string',
@@ -65,11 +57,7 @@ export const columnsRoomUser = [
     },
     {
         accessorKey: "username",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Логин"/>
-            )
-        },
+        header: DataTableColumnHeader,
         meta: {
             title: "Логин",
             type: 'string',
@@ -80,11 +68,7 @@ export const columnsRoomUser = [
     },
     {
         accessorKey: "status",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Статус"/>
-            )
-        },
+        header: DataTableColumnHeader,
         meta: {
             title: "Статус",
             type: 'string'

@@ -50,7 +50,6 @@ function AddUserInTeamContent(props: {
     }))
 
     const handleSubmit = () => {
-        console.log(selectedUsersData.map(it => it._id), selectedTeamIds)
         mutate({
             body: {
                 users: selectedUsersData.map(it => it.username),

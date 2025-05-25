@@ -45,11 +45,7 @@ export const columnsUser = [
     },
     {
         accessorKey: "_id",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="id"/>
-            )
-        },
+        header: DataTableColumnHeader,
         meta: {
             title: "id",
             type: 'string',
@@ -60,11 +56,7 @@ export const columnsUser = [
     },
     {
         accessorKey: "username",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Никнейм"/>
-            )
-        },
+        header: DataTableColumnHeader,
         meta: {
             title: "Никнейм",
             type: 'string',
@@ -75,11 +67,7 @@ export const columnsUser = [
     },
     {
         accessorKey: 'name',
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Имя"/>
-            )
-        },
+        header: DataTableColumnHeader,
         meta: {
             title: "Имя",
             type: 'string',
@@ -96,11 +84,7 @@ export const columnsUser = [
             }
             return "–";
         },
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Email"/>
-            );
-        },
+        header: DataTableColumnHeader,
         meta: {
             title: "Email",
             type: 'list',
@@ -109,11 +93,7 @@ export const columnsUser = [
     },
     {
         accessorKey: "status",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Статус"/>
-            )
-        },
+        header: DataTableColumnHeader,
         meta: {
             title: "Статус",
             type: 'list'
@@ -123,11 +103,7 @@ export const columnsUser = [
     },
     {
         accessorKey: "roles",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Роли"/>
-            )
-        },
+        header: DataTableColumnHeader,
         meta: {
             title: "Роли",
             type: 'list'
@@ -137,11 +113,7 @@ export const columnsUser = [
     },
     {
         accessorKey: "active",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Активен"/>
-            )
-        },
+        header: DataTableColumnHeader,
         meta: {
             title: "Активен",
             type: 'boolean'
@@ -150,11 +122,7 @@ export const columnsUser = [
     },
     {
         id: "type",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Тип"/>
-            )
-        },
+        header: DataTableColumnHeader,
         accessorFn: (row) => {
             return typesUserType[row.type] ?? row.type
         },
@@ -165,11 +133,7 @@ export const columnsUser = [
     },
     {
         id: "lastLogin",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Последний логин"/>
-            )
-        },
+        header: DataTableColumnHeader,
         accessorFn: (row) => {
             return dayjs(row.lastLogin);
         },

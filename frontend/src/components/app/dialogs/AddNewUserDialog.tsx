@@ -62,7 +62,6 @@ function AddNewUserContent() {
     })
 
     function onSubmit(values: z.infer<typeof formSchema>) {
-        console.log(values)
         mutate({
             body: {
                 users: [{
@@ -82,7 +81,6 @@ function AddNewUserContent() {
             }
         }, {
             onSuccess: (data) => {
-                console.log(data)
                 queryClient.invalidateQueries({
                     queryKey: $usersQueryOptions(selectedSpaceId!, true).queryKey
                 })
