@@ -7,7 +7,7 @@ import {
     VisibilityState
 } from "@tanstack/react-table";
 import {Point} from "@/components/custom-radix/context-menu.tsx";
-import {useCallback, useEffect} from "react";
+import {useCallback, useEffect, useMemo} from "react";
 import {ContextMenuLabel} from "@/components/ui/context-menu.tsx";
 import {Input} from "@/components/ui/input.tsx";
 import {MultiSelect} from "@/components/ui/multi-select.tsx";
@@ -26,7 +26,8 @@ import TableFilters from "@/components/app/table/TableFilters.tsx";
 import {FilterConfig, performFilter} from "@/lib/filters.ts";
 import {FilterMeta} from "@tanstack/table-core/src/types.ts";
 import {useAtom} from "jotai/index";
-import {showContextMenuAtom} from "@/store/global-store.ts";
+import {$hideColumnsAtomFamily, $searchColumnsAtomFamily, showContextMenuAtom} from "@/store/global-store.ts";
+import {useAtomValue} from "jotai";
 
 export interface ContextMenuConfig<TData> {
     getLabel?: (rows: Row<TData>[]) => string;
@@ -62,9 +63,6 @@ function RichTableView<TData, TValue>({
                                           onSelectionUpdated,
                                           buttonsSlot
                                       }: RichTableViewProps<TData, TValue>) {
-    console.info({
-        entries: entries
-    })
     const data = entries;
 
     const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -72,7 +70,7 @@ function RichTableView<TData, TValue>({
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
     const [filterString, setFilterString] = React.useState<string>();
-    const [searchColumns, setSearchColumns] = React.useState<string[]>([]);
+    const [searchColumns, setSearchColumns] = useAtom($searchColumnsAtomFamily(tableId))
 
     const contextMenuPosition = React.useRef<Point>({x: 0, y: 0});
     const [contextMenuOpen, setContextMenuOpen] = useAtom(showContextMenuAtom)
@@ -150,6 +148,43 @@ function RichTableView<TData, TValue>({
         }
     });
 
+    const [hiddenColumns, setHiddenColumns] = useAtom($hideColumnsAtomFamily(tableId))
+
+    const allTableColumns = useMemo(() => {
+        return table.getAllColumns()
+            .filter(
+                (column) =>
+                    typeof column.accessorFn !== "undefined" && column.getCanHide()
+            )
+    }, [table])
+
+    const visibleColumns = useMemo(() => {
+        return allTableColumns.filter(it => !hiddenColumns.includes(it.id)).map(it => it.id)
+    }, [allTableColumns, hiddenColumns])
+
+    const setVisibleColumns = useCallback((newVisibleColumns: string[]) => {
+        setHiddenColumns(
+            allTableColumns
+                .filter(it => !newVisibleColumns.includes(it.id))
+                .map(it => it.id)
+        )
+
+    }, [allTableColumns, setHiddenColumns])
+
+    // const hideColumn = useCallback((id: string) => {
+    //     console.log('hiding column', id)
+    //     console.log('prev hidden: ', hiddenColumns)
+    //     const newHidden = [...hiddenColumns, id]
+    //     console.log('new hidden', newHidden)
+    //     setHiddenColumns(newHidden)
+    // }, [setHiddenColumns, hiddenColumns])
+
+    useEffect(() => {
+        for (const col of allTableColumns) {
+            col.toggleVisibility(visibleColumns.includes(col.id))
+        }
+    }, [allTableColumns, visibleColumns]);
+
     useEffect(() => {
         table.setGlobalFilter(filterString)
     }, [filterString, table, searchColumns]);
@@ -217,8 +252,9 @@ function RichTableView<TData, TValue>({
                                 )
                                 .map(it => ({
                                     label: it.columnDef.meta?.title || it.id,
-                                    value: it.id
+                                    value: it.columnDef.meta?.title || it.id
                                 }))}
+                            defaultValue={searchColumns}
                             onValueChange={setSearchColumns}
                         >
                             <Button variant={"outline"}>
@@ -246,7 +282,7 @@ function RichTableView<TData, TValue>({
                             </Button>}
                         {buttonsSlot && buttonsSlot()}
                     </div>
-                    {settings?.enableColumnVisibilityToggle && <DataTableViewOptions table={table} tableId={tableId}/>}
+                    {settings?.enableColumnVisibilityToggle && <DataTableViewOptions allTableColumns={allTableColumns} visibleColumns={visibleColumns} setVisibleColumns={setVisibleColumns}/>}
                 </div>
             </div>
 
@@ -259,7 +295,7 @@ function RichTableView<TData, TValue>({
                                     <TableHead key={header.id}>
                                         {header.isPlaceholder
                                             ? null
-                                            : flexRender(header.column.columnDef.header, header.getContext())}
+                                            : flexRender(header.column.columnDef.header, {...header.getContext() })}
                                     </TableHead>
                                 ))}
                             </TableRow>
@@ -317,13 +353,13 @@ function RichTableView<TData, TValue>({
             />
             <FileDialog
                 open={showDialogSelectFromFile}
+                dialogStep={1}
                 onOpenChange={setShowDialogSelectFromFile}
                 title={"Выделить из файла"}
                 description={"Будут выделены все строки с совпадениями основных полей"}
                 buttonText={"Выделить из файла"}
                 onSubmit={(data) => {
                     const matches = new Set(data.flatMap(it => Object.values(it).map(it => String(it).toLowerCase())))
-                    console.info(matches)
 
                     const cols = table.getAllColumns()
                         .filter(
@@ -332,7 +368,7 @@ function RichTableView<TData, TValue>({
                         )
 
                     let count = 0
-                    table.getRowModel().rows.forEach(row => {
+                    table.getPrePaginationRowModel().rows.forEach(row => {
                         if (cols.some(it => matches.has(String(row.getValue(it.id)).toLowerCase()))) {
                             row.toggleSelected(true)
                             count++

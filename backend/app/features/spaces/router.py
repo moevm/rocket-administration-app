@@ -40,21 +40,3 @@ async def get_spaces(db=Depends(get_db)) -> List[SpaceDto]:
     async for doc in db.spaces.find():
         result.append(convert_to(SpaceDto, SpaceModel.model_validate(doc)))
     return result
-
-@router.get("/{space_id}/status")
-async def get_user_status(space=Depends(get_space)):
-
-    try:
-        rocket = await obtain_rocket_instance(key_for_space(space))
-
-        await rocket_request(
-            rocket.me,
-            **rocket_query_args()
-        )
-        return {"status": "ok"}
-
-    except Exception as e:
-        if "You must be logged in to do this." in str(e):
-            return {"status": "unauthorized"}
-        else:
-            return {"status": "unknown-error"}

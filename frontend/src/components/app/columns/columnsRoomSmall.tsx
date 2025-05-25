@@ -3,6 +3,13 @@ import {Checkbox} from "@/components/ui/checkbox.tsx";
 import {MonoRenderer, OptRenderer} from "@/components/app/ValueRenderers.tsx";
 import {customSortingFn, TypedColumnDef} from "@/lib/table.ts";
 
+const typesName = {
+    d: "Личные сообщения",
+    c: "Публичный канал",
+    p: "Приватный канал",
+    l: "Лайвчат",
+    v: "Omnichannel VoIP rooms"
+}
 
 export const columnsRoomSmall = [
     {
@@ -33,11 +40,7 @@ export const columnsRoomSmall = [
     },
     {
         accessorKey: "_id",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="id"/>
-            )
-        },
+        header: DataTableColumnHeader,
         meta: {
             title: "id",
             type: 'string',
@@ -48,11 +51,7 @@ export const columnsRoomSmall = [
     },
     {
         accessorKey: "name",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Имя"/>
-            )
-        },
+        header: DataTableColumnHeader,
         meta: {
             title: "Имя",
             type: 'string',
@@ -61,4 +60,16 @@ export const columnsRoomSmall = [
         sortingFn: customSortingFn,
         cell: ({cell}) => <OptRenderer value={cell.getValue()}/>
     },
-] as TypedColumnDef<{ _id: string, name: string | null | undefined }>[]
+    {
+        id: "t",
+        header: DataTableColumnHeader,
+        accessorFn: (row) => {
+            return typesName[row.t] ?? row.t
+        },
+        meta: {
+            title: "Tип",
+            type: 'string'
+        },
+        sortingFn: customSortingFn,
+    },
+] as TypedColumnDef<{ _id: string, name: string | null | undefined, t: string }>[]

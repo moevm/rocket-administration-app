@@ -53,7 +53,8 @@ function TeamPageContent() {
     const setSelectedTeamsData = useSetAtom($selectedTeamsData)
     const data = [
         {
-            _id: team._id as string
+            _id: team._id as string,
+            roomId: team.roomId as string
         }
     ]
     setSelectedTeamsData(data)
@@ -84,8 +85,6 @@ function TeamPageContent() {
                         ['Создатель', <MonoRenderer value={team.createdBy._id} />],
                         ['Обновлено в', <OptRenderer value={team.updatedAt} />],
                         ['Id комнаты', <MonoRenderer value={team.roomId} />],
-                        ['Комнаты', <OptRenderer value={team.rooms} />],
-                        ['Количество пользователей', <OptRenderer value={team.numberOfUsers} />],
                     ]}
                 />
                 <div className={"flex justify-between gap-6"}>
@@ -111,7 +110,7 @@ function TeamPageContent() {
 
             <div className={"pt-8"}>
                 <Label className={"text-3xl"}>Комнаты</Label>
-                <RoomsTableView data={[rooms]}/>
+                <RoomsTableView data={rooms}/>
             </div>
 
             <div className={"pt-8"}>

@@ -28,6 +28,21 @@ export const HydrateAtoms = ({children}: { children: ReactNode }) => {
 
 const fetchClient = createFetchClient<paths>({
     baseUrl: import.meta.env.VITE_BACKEND_URL ?? "http://localhost:8000",
+    async fetch(request) {
+        const originalResponse = await globalThis.fetch(request);
+
+        if (originalResponse.status === 502) {
+            toast.error(
+                'Не удалось авторизоваться в RocketChat. Проверьте валидность токена или измените его в настройках',
+                {
+                    id: 'cannot-auth',
+                    duration: Infinity,
+                }
+            )
+        }
+
+        return originalResponse;
+    }
 });
 export const $api = createClient(fetchClient);
 

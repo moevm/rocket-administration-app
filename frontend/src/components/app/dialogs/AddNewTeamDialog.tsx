@@ -8,7 +8,7 @@ import {Button} from "@/components/ui/button.tsx";
 import {$api, createMutationOptions, queryClient} from "@/api";
 import {
     $roomsQueryOptions,
-    $selectedSpaceId, showAddNewTeamDialogAtom
+    $selectedSpaceId, $teamsQueryOptions, showAddNewTeamDialogAtom
 } from "@/store/global-store.ts";
 import {Loader2} from "lucide-react";
 import {Input} from "@/components/ui/input.tsx";
@@ -28,11 +28,10 @@ function AddNewTeamContent() {
         isPending
     } = $api.useMutation('post', '/spaces/{space_id}/teams/', createMutationOptions({
         onSuccess: async (data) => {
-            console.log(data)
             toast.success("Команда успешно создана");
             setOpen(false);
             await queryClient.invalidateQueries({
-                queryKey: $roomsQueryOptions(selectedSpaceId!, true).queryKey
+                queryKey: $teamsQueryOptions(selectedSpaceId!, true).queryKey
             })
         },
         onError: async (error) => {
@@ -58,7 +57,6 @@ function AddNewTeamContent() {
     })
 
     function onSubmit(values: z.infer<typeof formSchema>) {
-        console.log(values)
         mutate({
             body: {
                 teams: [

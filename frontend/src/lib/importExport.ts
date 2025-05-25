@@ -93,7 +93,6 @@ export function exportData(format: Format, exportFile: string) {
         try {
             switch (format) {
                 case "JSON":
-                    console.log(exportFile);
                     blob = new Blob([exportFile], {type: `application/${format.toLowerCase()}`});
                     break;
                 case "CSV":

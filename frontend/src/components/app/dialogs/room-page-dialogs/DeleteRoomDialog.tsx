@@ -1,5 +1,5 @@
 import {atom, useAtom, useAtomValue} from "jotai/index";
-import {$selectedRoomsData} from "@/store/global-store.ts";
+import {$selectedRoomsData, $selectedSpaceId} from "@/store/global-store.ts";
 import {
     Dialog,
     DialogContent,
@@ -9,59 +9,89 @@ import {
     DialogTitle
 } from "@/components/ui/dialog.tsx";
 import {Button} from "@/components/ui/button.tsx";
+import {useEffect, useState} from "react";
+import {useNavigate} from "react-router";
+import {$api, createMutationOptions} from "@/api";
+import {Checkbox} from "@/components/ui/checkbox.tsx";
+import {Label} from "@/components/ui/label.tsx";
+import ExportCard from "@/components/app/dialogs/ExportCard.tsx";
 
 export const showDeleteRoomDialogAtom = atom(false)
 
 function DeleteRoomContent() {
     const [open, setOpen] = useAtom(showDeleteRoomDialogAtom)
-    // const selectedSpaceId = useAtomValue($selectedSpaceId)!
+    const selectedSpaceId = useAtomValue($selectedSpaceId)!
     const selectedRoomsData = useAtomValue($selectedRoomsData)
-    // const [selectedRoomIds, setSelectedRoomIds] = useState<string[]>([]);
+    const [dialogStep, setDialogStep] = useState(1);
+    const [results, setResults] = useState<object[]>([]);
 
-    // const {
-    //     mutate,
-    //     isPending
-    // } = $api.useMutation('post', '/spaces/{space_id}/user_room/', createMutationOptions({
-    //     onSuccess: async (data) => {
-    //         console.log(data)
-    //     }
-    // }))
+    const navigate = useNavigate();
 
-    const handleAddClick = () => {
-        // mutate({
-        //     body: {
-        //         users: selectedUsersData.map(it => it.username),
-        //         rooms: selectedRoomIds
-        //     },
-        //     params: {
-        //         path: {
-        //             space_id: selectedSpaceId!
-        //         },
-        //     }
-        // })
+    useEffect(() => {
+        if (!open && dialogStep === 0) {
+            navigate(`/spaces/${selectedSpaceId}/dashboard/rooms`);
+            window.location.reload();
+        }
+        if (!open) {
+            setDialogStep(1)
+            setResults([])
+        }
+    }, [open]);
+
+    const {
+        mutate,
+        isPending
+    } = $api.useMutation('delete', '/spaces/{space_id}/rooms/', createMutationOptions({
+        onSuccess: async (data) => {
+            setDialogStep(0)
+            setResults(data)
+        }
+    }))
+
+    const handleSubmit = () => {
+        mutate({
+            body: {
+                rooms: selectedRoomsData.map(team => team._id),
+            },
+            params: {
+                path: {
+                    space_id: selectedSpaceId!
+                },
+            }
+        })
     };
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogContent className="max-w-2xl">
-                <DialogHeader>
-                    <DialogTitle>Удалить комнату</DialogTitle>
-                    <DialogDescription>
-                        Выбрано комнат: {selectedRoomsData.length}
-                    </DialogDescription>
-                </DialogHeader>
+                    {dialogStep === 1 ? (
+                        <>
+                            <DialogHeader>
+                                <DialogTitle>Удаление комнат</DialogTitle>
+                                <DialogDescription className={"flex flex-col gap-2"}>
+                                    <Label> Выбрано комнат: {selectedRoomsData.length}.</Label>
+                                    <Label> Вы уверены, что хотите удалить комнаты?</Label>
+                                </DialogDescription>
+                            </DialogHeader>
 
-                {/*<div className="max-h-[60vh] overflow-y-auto">*/}
-                {/*    <RoomSmallTableView data={props.smallRooms} onSelectionUpdated={data =>*/}
-                {/*        setSelectedRoomIds(data.map(it => it.getValue('_id')))*/}
-                {/*    }/>*/}
-                {/*</div>*/}
-
-                <DialogFooter className="sm:justify-start">
-                    <Button type="button" variant="default">
-                        Удалить
-                    </Button>
-                </DialogFooter>
+                            <DialogFooter className="sm:justify-start">
+                                <Button type="button" variant="default" onClick={handleSubmit}
+                                        disabled={isPending}>
+                                    Удалить
+                                </Button>
+                            </DialogFooter>
+                        </>
+                    ) : (
+                        <>
+                            <DialogHeader>
+                                <DialogTitle>Удаление команд</DialogTitle>
+                            </DialogHeader>
+                            <ExportCard data={results} showData={true} countedValues={[
+                                {key: 'success', display: 'Успешно удалено'},
+                                {key: 'error', display: 'Ошибок'},
+                            ]} />
+                        </>
+                    )}
             </DialogContent>
         </Dialog>
     )

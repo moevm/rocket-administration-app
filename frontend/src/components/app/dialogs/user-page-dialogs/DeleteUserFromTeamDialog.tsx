@@ -1,5 +1,12 @@
 import {atom, useAtom, useAtomValue} from "jotai/index";
-import {$selectedSpaceId, $selectedUsersData, $teams} from "@/store/global-store.ts";
+import {
+    $selectedSpaceId,
+    $selectedUser,
+    $selectedUsersData,
+    $teams,
+    $teamsQueryOptions,
+    $usersQueryOptions
+} from "@/store/global-store.ts";
 import {BatchLoader} from "@/components/app/DataLoader.tsx";
 import {
     Dialog,
@@ -10,17 +17,24 @@ import {
     DialogTitle
 } from "@/components/ui/dialog.tsx";
 import {Button} from "@/components/ui/button.tsx";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {
     showDeleteUserFromRoomDialogAtom
 } from "@/components/app/dialogs/user-page-dialogs/DeleteUserFromRoomDialog.tsx";
-import {$api, createMutationOptions, loaded} from "@/api";
+import {$api, createMutationOptions, loaded, queryClient} from "@/api";
 import RoomSmallTableView from "@/components/app/table/RoomSmallTableView.tsx";
 import ExportCard from "@/components/app/dialogs/ExportCard.tsx";
 import ShortTeamTableView from "@/components/app/table/ShortTeamTableView.tsx";
 import TeamSmallTableView from "@/components/app/table/TeamSmallTableView.tsx";
+import {Checkbox} from "@/components/ui/checkbox.tsx";
+import {FormLabel} from "@/components/ui/form.tsx";
 
 export const showDeleteUserFromTeamDialogAtom = atom(false)
+
+interface TeamData {
+    _id: string;
+    roomId: string;
+}
 
 function DeleteUserFromTeamContent(props: {
     smallTeams: { _id: string, name: string, roomId: string, type: number }[]
@@ -29,8 +43,9 @@ function DeleteUserFromTeamContent(props: {
     const [dialogStep, setDialogStep] = useState(1);
     const selectedSpaceId = useAtomValue($selectedSpaceId)!
     const selectedUsersData = useAtomValue($selectedUsersData)
-    const [selectedTeamIds, setSelectedTeamIds] = useState<string[]>([]);
+    const [selectedTeamIds, setSelectedTeamIds] = useState<TeamData[]>([]);
     const [results, setResults] = useState<object[]>([]);
+    const [linkedRooms, setLinkedRooms] = useState(false)
 
     useEffect(() => {
         if (!open) {
@@ -42,20 +57,25 @@ function DeleteUserFromTeamContent(props: {
     const {
         mutate,
         isPending
-    } = $api.useMutation('post', '/spaces/{space_id}/user_room/remove', createMutationOptions({
+    } = $api.useMutation('delete', '/spaces/{space_id}/user_room/team', createMutationOptions({
         onSuccess: async (data) => {
             setDialogStep(0)
             setResults(data)
-            console.log(data)
+            await queryClient.invalidateQueries({
+                queryKey: $usersQueryOptions(selectedSpaceId!, true).queryKey
+            })
         }
     }))
 
     const handleSubmit = () => {
-        console.log(selectedUsersData.map(it => it._id), selectedTeamIds)
         mutate({
             body: {
                 users: selectedUsersData.map(it => it._id),
-                rooms: selectedTeamIds
+                teams: selectedTeamIds.map(team => ({
+                    id: team._id,
+                    rid: team.roomId
+                })),
+                ban_in_rooms: linkedRooms
             },
             params: {
                 path: {
@@ -78,16 +98,28 @@ function DeleteUserFromTeamContent(props: {
                         </DialogHeader>
 
                         <div className="max-h-[60vh] overflow-y-auto">
-                            <TeamSmallTableView data={props.smallTeams} onSelectionUpdated={data =>
-                            {
-                                console.log(data.map(it => it.getValue('roomId')))
-                                setSelectedTeamIds(data.map(it => it.getValue('roomId')));
-                                }
-                            }/>
+                            <TeamSmallTableView data={props.smallTeams} onSelectionUpdated={data => {
+                                setSelectedTeamIds(data.map(it => ({
+                                    _id: it.getValue('_id'),
+                                    roomId: it.getValue('roomId')
+                                })));
+
+                            }}/>
                         </div>
 
+                        <div className="max-h-[60vh] overflow-y-auto">
+                            <Checkbox
+                                checked={linkedRooms}
+                                onCheckedChange={setLinkedRooms}
+                                className="mr-3"
+                            />
+                            Удалить из привязанных комнат
+                        </div>
+
+
                         <DialogFooter className="sm:justify-start">
-                            <Button type="button" variant="default" onClick={handleSubmit}>
+                            <Button type="button" variant="default" onClick={handleSubmit}
+                                    disabled={isPending || selectedTeamIds.length === 0}>
                                 Удалить
                             </Button>
                         </DialogFooter>
@@ -95,12 +127,12 @@ function DeleteUserFromTeamContent(props: {
                 ) : (
                     <>
                         <DialogHeader>
-                            <DialogTitle>Удаление пользователя из комнаты</DialogTitle>
+                            <DialogTitle>Удаление пользователя из команды</DialogTitle>
                         </DialogHeader>
                         <ExportCard data={results} showData={true} countedValues={[
                             {key: 'success', display: 'Успешно удалено'},
                             {key: 'error', display: 'Ошибок'},
-                        ]} />
+                        ]}/>
                     </>
                 )}
 
@@ -111,13 +143,13 @@ function DeleteUserFromTeamContent(props: {
 
 function DeleteUserFromTeamDialog() {
     const teams = useAtomValue($teams)
-    console.log(teams)
 
     return (
         <BatchLoader
             states={[teams]}
             loadingMessage='Загрузка команд'
-            display={() => <DeleteUserFromTeamContent smallTeams={loaded(teams).data.map(({_id, name, type, roomId}) => ({_id, name, type, roomId}))}/>}
+            display={() => <DeleteUserFromTeamContent
+                smallTeams={loaded(teams).data.map(({_id, name, type, roomId}) => ({_id, name, type, roomId}))}/>}
         />
     )
 }

@@ -1,5 +1,10 @@
 import {atom, useAtom, useAtomValue} from "jotai/index";
-import {$selectedRoomsData, $selectedSpaceId, $teams} from "@/store/global-store.ts";
+import {
+    $roomsQueryOptions,
+    $selectedRoomsData,
+    $selectedSpaceId,
+    $teams
+} from "@/store/global-store.ts";
 import {BatchLoader} from "@/components/app/DataLoader.tsx";
 import {
     Dialog,
@@ -11,8 +16,7 @@ import {
 } from "@/components/ui/dialog.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {useEffect, useState} from "react";
-import {$api, createMutationOptions, loaded} from "@/api";
-import {showAddRoomsToTeamsDialogAtom} from "@/components/app/dialogs/room-page-dialogs/AddTeamsToRoomsDialog.tsx";
+import {$api, createMutationOptions, loaded, queryClient} from "@/api";
 import TeamSmallTableView from "@/components/app/table/TeamSmallTableView.tsx";
 import ExportCard from "@/components/app/dialogs/ExportCard.tsx";
 
@@ -30,12 +34,9 @@ function DeleteTeamsOutOfRoomsContent(props: {
     const [results, setResults] = useState<object[]>([]);
 
     const allTeams = props.teams.data;
-    console.log(allTeams);
 
     const [selectedTeamsIds, setSelectedTeamsIds] = useState<string[]>([]);
 
-
-    console.log(selectedSpaceId)
     useEffect(() => {
         if (!open) {
             setDialogStep(1)
@@ -52,8 +53,6 @@ function DeleteTeamsOutOfRoomsContent(props: {
 
         const teamIds = selectedFullTeams.map(team => team._id);
         setSelectedTeamsIds(teamIds);
-
-        console.log(teamIds);
     }, [selectedTeamIds]);
 
 
@@ -64,7 +63,9 @@ function DeleteTeamsOutOfRoomsContent(props: {
         onSuccess: async (data) => {
             setDialogStep(0)
             setResults(data)
-            console.log(data)
+            await queryClient.invalidateQueries({
+                queryKey: $roomsQueryOptions(selectedSpaceId!, true).queryKey
+            })
         }
     }))
 
@@ -97,7 +98,6 @@ function DeleteTeamsOutOfRoomsContent(props: {
                         <div className="max-h-[60vh] overflow-y-auto">
                             <TeamSmallTableView data={props.smallTeams} onSelectionUpdated={data =>
                             {
-                                console.log(data.map(it => it.getValue('roomId')))
                                 setSelectedTeamIds(data.map(it => it.getValue('roomId')));
                             }
                             }/>

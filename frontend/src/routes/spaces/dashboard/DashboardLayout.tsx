@@ -58,7 +58,7 @@ function DashboardLayout() {
             <div>
                 <SidebarProvider>
                     <AppSidebar spaces={context.spaces} selectedSpace={context.selectedSpace}/>
-                    <main className="min-w-0">
+                    <main className="min-w-0 flex-grow">
                         <Outlet context={context}/>
                     </main>
                 </SidebarProvider>

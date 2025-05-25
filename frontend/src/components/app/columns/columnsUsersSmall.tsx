@@ -4,11 +4,6 @@ import {ApiRoomUserModel} from "@/store/global-store.ts";
 import { MonoRenderer, OptRenderer} from "@/components/app/ValueRenderers.tsx";
 import {customSortingFn, TypedColumnDef} from "@/lib/table.ts";
 
-const typesUserType = {
-    'bot': "Бот",
-    'user': "Пользователь"
-}
-
 export const columnsUsersSmall = [
     {
         id: "select",
@@ -38,11 +33,7 @@ export const columnsUsersSmall = [
     },
     {
         accessorKey: "_id",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="id"/>
-            )
-        },
+        header: DataTableColumnHeader,
         meta: {
             title: "id",
             type: 'string',
@@ -52,27 +43,8 @@ export const columnsUsersSmall = [
         cell: ({cell}) => <MonoRenderer value={cell.getValue()} />
     },
     {
-        accessorKey: "username",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Никнейм"/>
-            )
-        },
-        meta: {
-            title: "Никнейм",
-            type: 'string',
-            selectFromFile: true,
-        },
-        sortingFn: customSortingFn,
-        cell: ({cell}) => <OptRenderer value={cell.getValue()} />
-    },
-    {
         accessorKey: 'name',
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Имя"/>
-            )
-        },
+        header: DataTableColumnHeader,
         meta: {
             title: "Имя",
             type: 'string',
@@ -82,15 +54,12 @@ export const columnsUsersSmall = [
         cell: ({cell}) => <OptRenderer value={cell.getValue()} />
     },
     {
-        accessorKey: "status",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Статус"/>
-            )
-        },
+        accessorKey: "username",
+        header: DataTableColumnHeader,
         meta: {
-            title: "Статус",
-            type: 'list'
+            title: "Логин",
+            type: 'string',
+            selectFromFile: true,
         },
         sortingFn: customSortingFn,
         cell: ({cell}) => <OptRenderer value={cell.getValue()} />

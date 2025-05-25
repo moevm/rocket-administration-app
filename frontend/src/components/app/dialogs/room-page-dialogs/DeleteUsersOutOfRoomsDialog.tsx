@@ -1,5 +1,10 @@
 import {atom, useAtom, useAtomValue} from "jotai/index";
-import {$selectedRoomsData, $selectedSpaceId, $selectedUsersData, $users} from "@/store/global-store.ts";
+import {
+    $roomsQueryOptions,
+    $selectedRoomsData,
+    $selectedSpaceId,
+    $users
+} from "@/store/global-store.ts";
 import {BatchLoader} from "@/components/app/DataLoader.tsx";
 import {
     Dialog,
@@ -11,18 +16,14 @@ import {
 } from "@/components/ui/dialog.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {useEffect, useState} from "react";
-import {
-    showDeleteUserFromRoomDialogAtom
-} from "@/components/app/dialogs/user-page-dialogs/DeleteUserFromRoomDialog.tsx";
-import {$api, createMutationOptions, loaded} from "@/api";
-import RoomSmallTableView from "@/components/app/table/RoomSmallTableView.tsx";
+import {$api, createMutationOptions, loaded, queryClient} from "@/api";
 import ExportCard from "@/components/app/dialogs/ExportCard.tsx";
 import UserSmallTableView from "@/components/app/table/UserSmallTableView.tsx";
 
 export const showDeleteUsersOutOfRoomDialogAtom = atom(false)
 
 function DeleteUsersOutOfRoomContent(props: {
-    smallUsers: { _id: string, username: string, name: string, status: string }[]
+    smallUsers: { _id: string, username: string, name: string }[]
 }) {
     const [open, setOpen] = useAtom(showDeleteUsersOutOfRoomDialogAtom)
     const [dialogStep, setDialogStep] = useState(1);
@@ -41,11 +42,13 @@ function DeleteUsersOutOfRoomContent(props: {
     const {
         mutate,
         isPending
-    } = $api.useMutation('post', '/spaces/{space_id}/user_room/remove', createMutationOptions({
+    } = $api.useMutation('delete', '/spaces/{space_id}/user_room/group', createMutationOptions({
         onSuccess: async (data) => {
             setDialogStep(0)
             setResults(data)
-            console.log(data)
+            await queryClient.invalidateQueries({
+                queryKey: $roomsQueryOptions(selectedSpaceId!, true).queryKey
+            })
         }
     }))
 
@@ -53,7 +56,7 @@ function DeleteUsersOutOfRoomContent(props: {
         mutate({
             body: {
                 users: selectedUserIds,
-                rooms: selectedRoomsData.map(it => it._id)
+                rooms: selectedRoomsData.map(it => it.name)
             },
             params: {
                 path: {
@@ -91,12 +94,12 @@ function DeleteUsersOutOfRoomContent(props: {
                 ) : (
                     <>
                         <DialogHeader>
-                            <DialogTitle>Удаление пользователя из комнаты</DialogTitle>
+                            <DialogTitle>Удалить участников</DialogTitle>
                         </DialogHeader>
                         <ExportCard data={results} showData={true} countedValues={[
                             {key: 'success', display: 'Успешно удалено'},
                             {key: 'error', display: 'Ошибок'},
-                        ]} />
+                        ]}/>
                     </>
                 )}
 
@@ -112,7 +115,8 @@ function DeleteUsersOutOfRoomDialog() {
         <BatchLoader
             states={[users]}
             loadingMessage='Загрузка пользователей'
-            display={() => <DeleteUsersOutOfRoomContent smallUsers={loaded(users).data.map(({_id, name, username, status}) => ({_id, name, username, status}))}/>}
+            display={() => <DeleteUsersOutOfRoomContent
+                smallUsers={loaded(users).data.map(({_id, name, username}) => ({_id, name, username}))}/>}
         />
     )
 }

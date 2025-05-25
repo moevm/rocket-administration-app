@@ -1,5 +1,5 @@
 import {atom, useAtom, useAtomValue} from "jotai/index";
-import {$rooms, $selectedSpaceId, $selectedTeamsData, $teams} from "@/store/global-store.ts";
+import {$rooms, $selectedSpaceId, $selectedTeamsData, $teams, $teamsQueryOptions} from "@/store/global-store.ts";
 import {BatchLoader} from "@/components/app/DataLoader.tsx";
 import {
     Dialog,
@@ -10,7 +10,7 @@ import {
     DialogTitle
 } from "@/components/ui/dialog.tsx";
 import {Button} from "@/components/ui/button.tsx";
-import {$api, createMutationOptions, loaded} from "@/api";
+import {$api, createMutationOptions, loaded, queryClient} from "@/api";
 import {useEffect, useState} from "react";
 import {showAddRoomsIntoTeamDialogAtom} from "@/components/app/dialogs/team-page-dialogs/AddTeamIntoRoomDialog.tsx";
 import TeamSmallTableView from "@/components/app/table/TeamSmallTableView.tsx";
@@ -22,7 +22,7 @@ export const showDeleteRoomFromTeamDialogAtom = atom(false)
 
 function DeleteTeamFromRoomContent(props: {
     teams: any,
-    smallRooms: { _id: string, name: string | null | undefined }[]
+    smallRooms: { _id: string, name: string | null | undefined, t: string }[]
 }) {
     const selectedTeamsData = useAtomValue($selectedTeamsData)
     const [open, setOpen] = useAtom(showDeleteRoomFromTeamDialogAtom)
@@ -31,8 +31,6 @@ function DeleteTeamFromRoomContent(props: {
     const [selectedRoomsIds, setSelectedRoomsIds] = useState<string[]>([]);
     const [results, setResults] = useState<object[]>([]);
 
-
-    console.log(selectedSpaceId)
     useEffect(() => {
         if (!open) {
             setDialogStep(1)
@@ -48,7 +46,9 @@ function DeleteTeamFromRoomContent(props: {
         onSuccess: async (data) => {
             setDialogStep(0)
             setResults(data)
-            console.log(data)
+            await queryClient.invalidateQueries({
+                queryKey: $teamsQueryOptions(selectedSpaceId!, true).queryKey
+            })
         }
     }))
 
@@ -116,7 +116,7 @@ function DeleteTeamFromRoomDialog() {
         <BatchLoader
             states={[rooms, teams]}
             loadingMessage='Загрузка комнат'
-            display={() => <DeleteTeamFromRoomContent teams={teams} smallRooms={loaded(rooms).data.map(({_id, name}) => ({_id, name}))}/>}
+            display={() => <DeleteTeamFromRoomContent teams={teams} smallRooms={loaded(rooms).data.map(({_id, name, t}) => ({_id, name, t}))}/>}
         />
     )
 }
