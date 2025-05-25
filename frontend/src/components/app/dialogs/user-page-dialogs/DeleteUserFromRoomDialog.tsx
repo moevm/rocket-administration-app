@@ -43,7 +43,6 @@ function DeleteUserFromRoomContent(props: {
         onSuccess: async (data) => {
             setDialogStep(0)
             setResults(data)
-            console.log(data)
         }
     }))
 

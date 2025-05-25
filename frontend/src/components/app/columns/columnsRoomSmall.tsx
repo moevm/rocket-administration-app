@@ -40,11 +40,7 @@ export const columnsRoomSmall = [
     },
     {
         accessorKey: "_id",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="id"/>
-            )
-        },
+        header: DataTableColumnHeader,
         meta: {
             title: "id",
             type: 'string',
@@ -55,11 +51,7 @@ export const columnsRoomSmall = [
     },
     {
         accessorKey: "name",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Имя"/>
-            )
-        },
+        header: DataTableColumnHeader,
         meta: {
             title: "Имя",
             type: 'string',
@@ -70,11 +62,7 @@ export const columnsRoomSmall = [
     },
     {
         id: "t",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Тип"/>
-            )
-        },
+        header: DataTableColumnHeader,
         accessorFn: (row) => {
             return typesName[row.t] ?? row.t
         },

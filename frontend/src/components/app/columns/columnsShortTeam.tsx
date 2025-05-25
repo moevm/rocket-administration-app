@@ -38,11 +38,7 @@ export const columnsShortTeam = [
     },
     {
         accessorKey: "_id",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="id"/>
-            )
-        },
+        header: DataTableColumnHeader,
         meta: {
             title: "id",
             type: 'string',
@@ -53,11 +49,7 @@ export const columnsShortTeam = [
     },
     {
         accessorKey: "name",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Имя"/>
-            )
-        },
+        header: DataTableColumnHeader,
         meta: {
             title: "Имя",
             type: 'string',
@@ -67,11 +59,7 @@ export const columnsShortTeam = [
     },
     {
         id: "type",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Тип"/>
-            )
-        },
+        header: DataTableColumnHeader,
         accessorFn: (row) => {
             return typesType[row.type]
         },
@@ -82,11 +70,7 @@ export const columnsShortTeam = [
     },
     {
         accessorKey: "roomId",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Id комнаты"/>
-            )
-        },
+        header: DataTableColumnHeader,
         meta: {
             title: "Id комнаты",
             type: 'string'

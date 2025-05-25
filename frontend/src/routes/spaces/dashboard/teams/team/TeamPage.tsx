@@ -43,7 +43,6 @@ function TeamPageContent() {
     const team = loaded(useAtomValue($selectedTeam)).data
     const selectedSpaceId = useAtomValue($selectedSpaceId)!
     const {users, rooms} = loaded(useAtomValue($teamInfo)).data
-    console.log(users, rooms)
 
     const setAddUsersToTeamDialogOpen = useSetAtom(showAddUsersToTeamDialogAtom)
     const setDeleteUsersOutOfTeamDialogOpen = useSetAtom(showDeleteUsersOutOfTeamDialogAtom)

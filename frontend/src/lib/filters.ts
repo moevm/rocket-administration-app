@@ -112,7 +112,6 @@ export function performFilter(filter: FilterConfig, value: any) {
         value !== undefined && value !== null && value !== '' &&
         (!isDayjs(value) || dayjs(value, 'DD.MM.YYYY HH:mm').isValid());
 
-    console.log(valueExists, value);
     //console.log( value.toDate().toString(), dayjs(value, 'DD.MM.YYYY HH:mm').isValid())
 
     switch (filter.relation) {

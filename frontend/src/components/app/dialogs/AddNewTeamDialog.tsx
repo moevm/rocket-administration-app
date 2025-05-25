@@ -28,7 +28,6 @@ function AddNewTeamContent() {
         isPending
     } = $api.useMutation('post', '/spaces/{space_id}/teams/', createMutationOptions({
         onSuccess: async (data) => {
-            console.log(data)
             toast.success("Команда успешно создана");
             setOpen(false);
             await queryClient.invalidateQueries({
@@ -58,7 +57,6 @@ function AddNewTeamContent() {
     })
 
     function onSubmit(values: z.infer<typeof formSchema>) {
-        console.log(values)
         mutate({
             body: {
                 teams: [

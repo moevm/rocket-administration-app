@@ -1,8 +1,8 @@
-import { Column } from "@tanstack/react-table"
-import { ArrowDown, ArrowUp, ChevronsUpDown, EyeOff } from "lucide-react"
+import {Column} from "@tanstack/react-table"
+import {ArrowDown, ArrowUp, ChevronsUpDown, EyeOff} from "lucide-react"
 
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import {cn} from "@/lib/utils"
+import {Button} from "@/components/ui/button"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -10,18 +10,21 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {useMemo} from "react";
 
 interface DataTableColumnHeaderProps<TData, TValue>
     extends React.HTMLAttributes<HTMLDivElement> {
     column: Column<TData, TValue>
-    title: string
+    title: string,
+    hide: () => void
 }
 
 function DataTableColumnHeader<TData, TValue>({
-                                                         column,
-                                                         title,
-                                                         className,
-                                                     }: DataTableColumnHeaderProps<TData, TValue>) {
+                                                  column,
+                                                  className,
+                                              }: DataTableColumnHeaderProps<TData, TValue>) {
+    const title = useMemo(() => column.columnDef.meta?.title ?? column.id, [column])
+
     if (!column.getCanSort()) {
         return <div className={cn(className)}>{title}</div>
     }
@@ -37,28 +40,28 @@ function DataTableColumnHeader<TData, TValue>({
                     >
                         <span>{title}</span>
                         {column.getIsSorted() === "desc" ? (
-                            <ArrowDown />
+                            <ArrowDown/>
                         ) : column.getIsSorted() === "asc" ? (
-                            <ArrowUp />
+                            <ArrowUp/>
                         ) : (
-                            <ChevronsUpDown />
+                            <ChevronsUpDown/>
                         )}
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start">
                     <DropdownMenuItem onClick={() => column.toggleSorting(false)}>
-                        <ArrowUp className="h-3.5 w-3.5 text-muted-foreground/70" />
+                        <ArrowUp className="h-3.5 w-3.5 text-muted-foreground/70"/>
                         По возрастанию
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => column.toggleSorting(true)}>
-                        <ArrowDown className="h-3.5 w-3.5 text-muted-foreground/70" />
+                        <ArrowDown className="h-3.5 w-3.5 text-muted-foreground/70"/>
                         По убыванию
                     </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => column.toggleVisibility(false)}>
-                        <EyeOff className="h-3.5 w-3.5 text-muted-foreground/70" />
-                        Спрятать
-                    </DropdownMenuItem>
+                    {/*<DropdownMenuSeparator/>*/}
+                    {/*<DropdownMenuItem onClick={() => hide()}>*/}
+                    {/*    <EyeOff className="h-3.5 w-3.5 text-muted-foreground/70"/>*/}
+                    {/*    Спрятать*/}
+                    {/*</DropdownMenuItem>*/}
                 </DropdownMenuContent>
             </DropdownMenu>
         </div>

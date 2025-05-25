@@ -33,8 +33,7 @@ function DeleteTeamContent(props: { teams: any }) {
 
     const selectedIds = selectedTeamsData.map(i => i._id);
     const correctTeamsIds = allTeams.filter(team => selectedIds.includes(team._id));
-    console.log(selectedSpaceId)
-    console.log(correctTeamsIds)
+
     useEffect(() => {
         if (!open && dialogStep === 0) {
             navigate(`/spaces/${selectedSpaceId}/dashboard/teams`);
@@ -53,7 +52,6 @@ function DeleteTeamContent(props: { teams: any }) {
         onSuccess: async (data) => {
             setDialogStep(0)
             setResults(data)
-            console.log(data)
         }
     }))
 

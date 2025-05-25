@@ -33,11 +33,7 @@ export const columnsUsersSmall = [
     },
     {
         accessorKey: "_id",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="id"/>
-            )
-        },
+        header: DataTableColumnHeader,
         meta: {
             title: "id",
             type: 'string',
@@ -48,11 +44,7 @@ export const columnsUsersSmall = [
     },
     {
         accessorKey: 'name',
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Имя"/>
-            )
-        },
+        header: DataTableColumnHeader,
         meta: {
             title: "Имя",
             type: 'string',
@@ -63,11 +55,7 @@ export const columnsUsersSmall = [
     },
     {
         accessorKey: "username",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Логин"/>
-            )
-        },
+        header: DataTableColumnHeader,
         meta: {
             title: "Логин",
             type: 'string',

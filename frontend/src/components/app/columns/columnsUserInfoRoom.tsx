@@ -42,11 +42,7 @@ export const columnsUserInfoRoom = [
     },
     {
         accessorKey: "_id",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="id"/>
-            )
-        },
+        header: DataTableColumnHeader,
         meta: {
             title: "id",
             type: 'string',
@@ -57,11 +53,7 @@ export const columnsUserInfoRoom = [
     },
     {
         accessorKey: "name",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Имя"/>
-            )
-        },
+        header: DataTableColumnHeader,
         meta: {
             title: "Имя",
             type: 'string',
@@ -72,11 +64,7 @@ export const columnsUserInfoRoom = [
     },
     {
         id: "t",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Тип"/>
-            )
-        },
+        header: DataTableColumnHeader,
         accessorFn: (row) => {
             return typesName[row.t] ?? row.t
         },
@@ -88,11 +76,7 @@ export const columnsUserInfoRoom = [
     },
     {
         accessorKey: "rid",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="rid"/>
-            )
-        },
+        header: DataTableColumnHeader,
         meta: {
             title: "rid",
             type: 'string',
@@ -103,11 +87,7 @@ export const columnsUserInfoRoom = [
     },
     {
         accessorKey: "roles",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Роли"/>
-            )
-        },
+        header: DataTableColumnHeader,
         meta: {
             title: "Роли",
             type: 'list'

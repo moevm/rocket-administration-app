@@ -1,8 +1,9 @@
-import {atom} from "jotai";
+import {atom, WritableAtom} from "jotai";
 import {$api, loadableQuery} from "@/api";
 import {atomWithQuery} from 'jotai-tanstack-query'
-import {loadable} from "jotai/utils";
+import {atomFamily, atomWithStorage, loadable} from "jotai/utils";
 import {components} from "@/schema";
+import {Atom} from "jotai/vanilla";
 
 export type ApiUserModel = components['schemas']['UserDto']
 export type ApiRoomModel = components['schemas']['RoomDto']
@@ -283,3 +284,10 @@ export const showAddNewTeamDialogAtom = atom(false)
 export const showAddNewUserDialogAtom = atom(false)
 export const showAddNewRoomDialogAtom = atom(false)
 export const showContextMenuAtom = atom(false)
+
+export const $searchColumnsAtomFamily = atomFamily<string, WritableAtom<string[], [string[]], void>>(
+    (id: string) => atomWithStorage(`${id}_search`, [] as string[], undefined, {getOnInit: true})
+)
+export const $hideColumnsAtomFamily = atomFamily<string, WritableAtom<string[], [string[]], void>>(
+    (id: string) => atomWithStorage(`${id}_hide`, [] as string[], undefined, {getOnInit: true})
+)

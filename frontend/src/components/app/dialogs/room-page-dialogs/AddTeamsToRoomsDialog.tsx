@@ -32,12 +32,9 @@ function AddTeamsToRoomsContent(props: {
     const [results, setResults] = useState<object[]>([]);
 
     const allTeams = props.teams.data;
-    console.log(allTeams);
 
     const [selectedTeamsIds, setSelectedTeamsIds] = useState<string[]>([]);
 
-
-    console.log(selectedSpaceId)
     useEffect(() => {
         if (!open) {
             setDialogStep(1)
@@ -54,8 +51,6 @@ function AddTeamsToRoomsContent(props: {
 
         const teamIds = selectedFullTeams.map(team => team._id);
         setSelectedTeamsIds(teamIds);
-
-        console.log(teamIds);
     }, [selectedTeamIds]);
 
 
@@ -66,7 +61,6 @@ function AddTeamsToRoomsContent(props: {
         onSuccess: async (data) => {
             setDialogStep(0)
             setResults(data)
-            console.log(data)
         }
     }))
 
@@ -100,7 +94,6 @@ function AddTeamsToRoomsContent(props: {
                         <div className="max-h-[60vh] overflow-y-auto">
                             <TeamSmallTableView data={props.smallTeams} onSelectionUpdated={data =>
                             {
-                                console.log(data.map(it => it.getValue('roomId')))
                                 setSelectedTeamIds(data.map(it => it.getValue('roomId')));
                             }
                             }/>

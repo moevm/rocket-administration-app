@@ -42,12 +42,10 @@ function AddUserInTeamContent(props: {
         onSuccess: async (data) => {
             setDialogStep(0)
             setResults(data)
-            console.log(data)
         }
     }))
 
     const handleSubmit = () => {
-        console.log(selectedUsersData.map(it => it._id), selectedTeamIds)
         mutate({
             body: {
                 users: selectedUsersData.map(it => it.username),

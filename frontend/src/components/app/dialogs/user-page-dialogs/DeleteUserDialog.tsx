@@ -28,7 +28,6 @@ function DeleteUserContent() {
     const [forceDelete, setForceDelete] = useState<boolean>(false);
     const navigate = useNavigate();
 
-    console.log(selectedSpaceId)
     useEffect(() => {
         if (!open && dialogStep === 0) {
             navigate(`/spaces/${selectedSpaceId}/dashboard/users`);
@@ -47,9 +46,7 @@ function DeleteUserContent() {
     } = $api.useMutation('delete', '/spaces/{space_id}/users/', createMutationOptions({
         onSuccess: async (data) => {
             setDialogStep(0)
-            setResults(data)
-            console.log(data)
-        }
+            setResults(data)}
     }))
 
     const handleSubmit = () => {

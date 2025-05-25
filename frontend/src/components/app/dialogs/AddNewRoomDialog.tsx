@@ -6,7 +6,7 @@ import {
 } from "@/store/global-store.ts";
 import {Dialog, DialogContent, DialogHeader, DialogTitle} from "@/components/ui/dialog.tsx";
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card.tsx";
-import {Tabs, TabsContent, TabsList, TabsTrigger} from "@radix-ui/react-tabs";
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs.tsx";
 import {Label} from "@/components/ui/label.tsx";
 import {Input} from "@/components/ui/input.tsx";
 import {Button} from "@/components/ui/button.tsx";
@@ -84,8 +84,6 @@ function AddNewRoomContent() {
     }, [activeTab]);
 
     function handleChannelCreate (values: z.infer<typeof channelGroupSchema>) {
-        console.log(values);
-
         mutateChannels({
             body: {
                 rooms: [
@@ -105,8 +103,6 @@ function AddNewRoomContent() {
     }
 
     function handleGroupCreate (values: z.infer<typeof channelGroupSchema>) {
-        console.log(values);
-
         mutateGroups({
             body: {
                 rooms: [
@@ -126,8 +122,6 @@ function AddNewRoomContent() {
     }
 
     function handleTeamCreate (values: z.infer<typeof teamSchema>) {
-        console.log(values);
-
         mutateTeams({
             body: {
                 teams: [
@@ -155,10 +149,10 @@ function AddNewRoomContent() {
 
                 <div>
                     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                        <TabsList className="grid w-full grid-cols-3">
-                            <TabsTrigger value="channel" className="rounded-t-xl rounded-l-xl data-[state=active]:bg-muted data-[state=active]:text-primary">Канал</TabsTrigger>
-                            <TabsTrigger value="group" className="rounded-t-xl data-[state=active]:bg-muted data-[state=active]:text-primary">Группа</TabsTrigger>
-                            <TabsTrigger value="team" className="rounded-t-xl rounded-r-xl data-[state=active]:bg-muted data-[state=active]:text-primary">Команда</TabsTrigger>
+                        <TabsList>
+                            <TabsTrigger value="channel">Канал</TabsTrigger>
+                            <TabsTrigger value="group">Группа</TabsTrigger>
+                            <TabsTrigger value="team">Команда</TabsTrigger>
                         </TabsList>
 
                         <TabsContent value="channel">
