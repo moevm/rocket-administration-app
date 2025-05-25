@@ -27,7 +27,7 @@ export const HydrateAtoms = ({children}: { children: ReactNode }) => {
 }
 
 const fetchClient = createFetchClient<paths>({
-    baseUrl: "http://localhost:8000",
+    baseUrl: import.meta.env.VITE_BACKEND_URL ?? "http://localhost:8000",
 });
 export const $api = createClient(fetchClient);
 
