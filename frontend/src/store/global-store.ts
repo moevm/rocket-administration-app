@@ -272,7 +272,8 @@ export const $selectedUsersData = atom<{
     username: string
 }[]>([])
 export const $selectedRoomsData = atom<{
-    _id: string
+    _id: string,
+    name: string
 }[]>([])
 export const $selectedTeamsData = atom<{
     _id: string,

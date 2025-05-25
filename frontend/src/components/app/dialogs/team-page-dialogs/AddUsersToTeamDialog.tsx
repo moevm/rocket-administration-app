@@ -1,5 +1,5 @@
 import {atom, useAtom, useAtomValue} from "jotai/index";
-import {$selectedSpaceId, $selectedTeamsData, $users} from "@/store/global-store.ts";
+import {$selectedSpaceId, $selectedTeamsData, $teamsQueryOptions, $users} from "@/store/global-store.ts";
 import {BatchLoader} from "@/components/app/DataLoader.tsx";
 import {
     Dialog,
@@ -10,7 +10,7 @@ import {
     DialogTitle
 } from "@/components/ui/dialog.tsx";
 import {Button} from "@/components/ui/button.tsx";
-import {$api, createMutationOptions, loaded} from "@/api";
+import {$api, createMutationOptions, loaded, queryClient} from "@/api";
 import {useCallback, useEffect, useState} from "react";
 import UserSmallTableView from "@/components/app/table/UserSmallTableView.tsx";
 import ExportCard from "@/components/app/dialogs/ExportCard.tsx";
@@ -41,6 +41,9 @@ function AddUsersToTeamContent(props: {
         onSuccess: async (data) => {
             setResults(data)
             setDialogStep(0)
+            await queryClient.invalidateQueries({
+                queryKey: $teamsQueryOptions(selectedSpaceId!, true).queryKey
+            })
         }
     }))
 
@@ -69,12 +72,6 @@ function AddUsersToTeamContent(props: {
                                 Выбрано команд: {selectedTeamsData.length}
                             </DialogDescription>
                         </DialogHeader>
-
-                        {/*<div className="max-h-[60vh] overflow-y-auto">*/}
-                        {/*    <RoomSmallTableView data={props.smallRooms} onSelectionUpdated={data =>*/}
-                        {/*        setSelectedRoomIds(data.map(it => it.getValue('_id')))*/}
-                        {/*    }/>*/}
-                        {/*</div>*/}
 
                         <div className="max-h-[60vh] overflow-y-auto">
                             <UserSmallTableView data={props.smallUsers} onSelectionUpdated={data =>

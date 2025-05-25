@@ -1,5 +1,12 @@
 import {atom, useAtom, useAtomValue} from "jotai/index";
-import {$rooms, $selectedRoomsData, $selectedSpaceId, $selectedTeamsData, $teams} from "@/store/global-store.ts";
+import {
+    $rooms,
+    $selectedRoomsData,
+    $selectedSpaceId,
+    $selectedTeamsData,
+    $teams,
+    $teamsQueryOptions
+} from "@/store/global-store.ts";
 import {BatchLoader} from "@/components/app/DataLoader.tsx";
 import {
     Dialog,
@@ -11,7 +18,7 @@ import {
 } from "@/components/ui/dialog.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {useEffect, useState} from "react";
-import {$api, createMutationOptions, loaded} from "@/api";
+import {$api, createMutationOptions, loaded, queryClient} from "@/api";
 import {
     showDeleteTeamsOutOfRoomsDialogAtom
 } from "@/components/app/dialogs/room-page-dialogs/DeleteTeamsOutOfRoomsDialog.tsx";
@@ -23,7 +30,7 @@ export const showAddRoomsIntoTeamDialogAtom = atom(false)
 
 function AddTeamIntoRoomContent(props: {
     teams: any,
-    smallRooms: { _id: string, name: string | null | undefined }[]
+    smallRooms: { _id: string, name: string | null | undefined, t: string }[]
 }) {
     const selectedTeamsData = useAtomValue($selectedTeamsData)
     const [open, setOpen] = useAtom(showAddRoomsIntoTeamDialogAtom)
@@ -49,7 +56,9 @@ function AddTeamIntoRoomContent(props: {
         onSuccess: async (data) => {
             setDialogStep(0)
             setResults(data)
-            console.log(data)
+            await queryClient.invalidateQueries({
+                queryKey: $teamsQueryOptions(selectedSpaceId!, true).queryKey
+            })
         }
     }))
 
@@ -116,7 +125,7 @@ function AddTeamIntoRoomDialog() {
         <BatchLoader
             states={[rooms, teams]}
             loadingMessage='Загрузка комнат'
-            display={() => <AddTeamIntoRoomContent teams={teams} smallRooms={loaded(rooms).data.map(({_id, name}) => ({_id, name}))}/>}
+            display={() => <AddTeamIntoRoomContent teams={teams} smallRooms={loaded(rooms).data.map(({_id, name, t}) => ({_id, name, t}))}/>}
         />
     )
 }

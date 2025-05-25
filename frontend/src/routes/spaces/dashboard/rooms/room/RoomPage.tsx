@@ -44,10 +44,8 @@ function RoomPageContent() {
     const room = loaded(useAtomValue($selectedRoom)).data
     const selectedSpaceId = useAtomValue($selectedSpaceId)!
     const {team, members} = loaded(useAtomValue($roomInfo)).data
-    console.info("CURRENT ROOM", room)
 
     const teams = team ? team : []
-    console.info(teams)
 
     const setAddRoomToUsersDialogOpen = useSetAtom(showAddRoomsToUsersDialogAtom)
     const setDeleteUsersOutOfRoomDialogOpen = useSetAtom(showDeleteUsersOutOfRoomDialogAtom)
@@ -59,7 +57,8 @@ function RoomPageContent() {
     const setSelectedRoomsData = useSetAtom($selectedRoomsData)
     const data = [
         {
-            _id: room._id as string
+            _id: room._id as string,
+            name: room.name as string
         }
     ]
     setSelectedRoomsData(data)
