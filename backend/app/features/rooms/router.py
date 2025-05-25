@@ -85,11 +85,10 @@ async def create_groups(
 
         try:
             response_data = await rocket_request(
-                rocket.channels_create,
+                rocket.groups_create,
                 **rocket_query_args(
                     name=group_data.name,
-                    readOnly=group_data.readOnly,
-                    teamId=group_data.teamId
+                    readOnly=group_data.readOnly
                 )
             )
 
