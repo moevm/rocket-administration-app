@@ -1,5 +1,10 @@
 import {atom, useAtom, useAtomValue} from "jotai/index";
-import {$selectedSpaceId, $selectedTeamsData, $users} from "@/store/global-store.ts";
+import {
+    $selectedSpaceId,
+    $selectedTeamsData,
+    $teamsQueryOptions,
+    $users
+} from "@/store/global-store.ts";
 import {BatchLoader} from "@/components/app/DataLoader.tsx";
 import {
     Dialog,
@@ -11,7 +16,7 @@ import {
 } from "@/components/ui/dialog.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import React, {useCallback, useEffect, useState} from "react";
-import {$api, createMutationOptions, loaded} from "@/api";
+import {$api, createMutationOptions, loaded, queryClient} from "@/api";
 import UserSmallTableView from "@/components/app/table/UserSmallTableView.tsx";
 import ExportCard from "@/components/app/dialogs/ExportCard.tsx";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
@@ -43,6 +48,9 @@ function DeleteUsersOutOfTeamContent(props: {
         onSuccess: async (data) => {
             setResults(data)
             setDialogStep(0)
+            await queryClient.invalidateQueries({
+                queryKey: $teamsQueryOptions(selectedSpaceId!, true).queryKey
+            })
         }
     }))
 

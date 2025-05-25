@@ -24,7 +24,6 @@ function DeleteRoomContent() {
     const selectedRoomsData = useAtomValue($selectedRoomsData)
     const [dialogStep, setDialogStep] = useState(1);
     const [results, setResults] = useState<object[]>([]);
-    const [deleteLinkedRooms, setDeleteLinkedRooms] = useState<boolean>(false);
 
     const navigate = useNavigate();
 
@@ -46,7 +45,6 @@ function DeleteRoomContent() {
         onSuccess: async (data) => {
             setDialogStep(0)
             setResults(data)
-            console.log(data)
         }
     }))
 

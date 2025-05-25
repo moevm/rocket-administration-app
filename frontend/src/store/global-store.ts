@@ -11,6 +11,7 @@ export type ApiSpaceModel = components['schemas']['SpaceDto']
 export type ApiUserInfoRoomModel = components['schemas']['UserInfoRoomDto']
 export type ApiRoomUserModel = components['schemas']["RoomUserDto"]
 export type ApiShortTeamModel = components['schemas']['ShortTeamDto']
+export type ApiSmtpSettingsModel = components['schemas']['SmtpSettingsDto']
 
 export const $spacesQueryOptions = () => $api.queryOptions('get', '/spaces/', {})
 export const $spacesQuery = atomWithQuery(() => $spacesQueryOptions())
@@ -271,7 +272,8 @@ export const $selectedUsersData = atom<{
     username: string
 }[]>([])
 export const $selectedRoomsData = atom<{
-    _id: string
+    _id: string,
+    name: string
 }[]>([])
 export const $selectedTeamsData = atom<{
     _id: string,
@@ -282,4 +284,3 @@ export const showAddNewTeamDialogAtom = atom(false)
 export const showAddNewUserDialogAtom = atom(false)
 export const showAddNewRoomDialogAtom = atom(false)
 export const showContextMenuAtom = atom(false)
-export const $showEditSpaceDialog = atom(false)
