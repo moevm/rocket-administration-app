@@ -57,7 +57,7 @@ function DeleteUsersOutOfRoomContent(props: {
         mutate({
             body: {
                 users: selectedUserIds,
-                rooms: selectedRoomsData.map(it => it.name)
+                rooms: selectedRoomsData.map(it => it._id)
             },
             params: {
                 path: {

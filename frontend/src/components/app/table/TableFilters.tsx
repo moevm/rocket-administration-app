@@ -203,7 +203,7 @@ function FilterDialog<TData>(
                                         <FormItem>
                                             <FormLabel>{label}</FormLabel>
                                             <FormControl>
-                                                <Input {...field}  />
+                                                <Input {...field} type={relation?.includes('datetime') && 'datetime-local' || undefined} />
                                             </FormControl>
                                             <FormMessage/>
                                         </FormItem>
