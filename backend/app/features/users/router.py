@@ -67,6 +67,7 @@ async def change_user_passwords(body: UsersToChangePasswordDto, space=Depends(ge
         try:
             await rocket_request(rocket.users_update, **rocket_query_args(user_id=user, password=password_to_set))
         except Exception as e:
+            print(e)
             result.password_error = extract_exception_message(e)
         else:
             result.password = password_to_set
