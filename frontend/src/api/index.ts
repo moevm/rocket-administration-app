@@ -27,7 +27,7 @@ export const HydrateAtoms = ({children}: { children: ReactNode }) => {
 }
 
 const fetchClient = createFetchClient<paths>({
-    baseUrl: "http://localhost:8000",
+    baseUrl: import.meta.env.VITE_BACKEND_URL ?? "http://localhost:8000",
     async fetch(request) {
         const originalResponse = await globalThis.fetch(request);
 
@@ -85,7 +85,7 @@ export function createMutationOptions<D, E, I>(options?: Omit<UseMutationOptions
             if (options?.onError) options.onError(error, variables, context)
         },
         onSuccess: (data, variables, context) => {
-            toast.success("Успех")
+            toast.success("Запрос выполнен")
             if (options?.onSuccess) options.onSuccess(data, variables, context)
         },
     }

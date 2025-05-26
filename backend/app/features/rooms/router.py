@@ -9,7 +9,7 @@ from app.features.spaces.utils import get_space
 from app.models import TeamDto
 from app.models import UserDto
 from app.lib.rocket import obtain_rocket_instance, rocket_request, rocket_query_args
-from app.lib.utils import batch_execute, generate_password, extract_exception_message
+from app.lib.utils import batch_execute, generate_password, extract_exception_message, hide_system_messages
 from app.config import settings
 
 from app.models import RoomsImportRequestDto, ImportedRoomResultDto, RoomCreateDto, RoomsDeleteDto, RoomDeleteResDto
@@ -84,15 +84,19 @@ async def create_groups(
         )
 
         try:
-            create_args = group_data.model_dump(exclude_unset=True)
-
             response_data = await rocket_request(
                 rocket.groups_create,
-                **rocket_query_args(**create_args)
+                **rocket_query_args(
+                    name=group_data.name,
+                    readOnly=group_data.readOnly
+                )
             )
 
             created_group = response_data['group']
             result.created_id = created_group['_id']
+            if group_data.disable_system_messages:
+                await hide_system_messages(rocket, result.created_id)
+
 
         except Exception as e:
             result.error = extract_exception_message(e)
@@ -121,15 +125,18 @@ async def create_channel(
         )
 
         try:
-            create_args = channel_data.model_dump(exclude_unset=True)
-
             response_data = await rocket_request(
                 rocket.channels_create,
-                **rocket_query_args(**create_args)
+                **rocket_query_args(
+                    name=channel_data.name,
+                    readOnly=channel_data.readOnly,
+                    teamId=channel_data.teamId
+                )
             )
-
             created_channel = response_data['channel']
             result.created_id = created_channel['_id']
+            if channel_data.disable_system_messages:
+                await hide_system_messages(rocket, result.created_id)
 
         except Exception as e:
             result.error = extract_exception_message(e)

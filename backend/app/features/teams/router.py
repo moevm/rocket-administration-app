@@ -11,7 +11,7 @@ from app.models import TeamDto
 from app.models import RoomUserDto
 from app.lib.rocket import obtain_rocket_instance, rocket_request, rocket_query_args
 from app.services.db import get_db
-from app.lib.utils import batch_execute, generate_password, extract_exception_message
+from app.lib.utils import batch_execute, generate_password, extract_exception_message, hide_system_messages
 from app.config import settings
 from app.models import TeamsImportRequestDto, ImportedTeamResultDto, TeamCreateDto, TeamsDeleteDto, TeamDeletedDto
 
@@ -63,12 +63,16 @@ async def create_teams(
 
             responce_data = await rocket_request(
                 rocket.teams_create,
-                **rocket_query_args(**create_args)
+                **rocket_query_args(
+                    name=team_data.name,
+                    team_type=team_data.team_type
+                )
             )
 
             create_team = responce_data['team']
             result.created_id = create_team['_id']
-
+            if team_data.disable_system_messages:
+                await hide_system_messages(rocket, result.created_id)
         except Exception as e:
             result.error = extract_exception_message(e)
 
@@ -93,7 +97,7 @@ async def remove_teams(body: TeamsDeleteDto, space=Depends(get_space)) -> List[T
             rooms = []
             if body.delete_linked_rooms:
                 rooms_list = await rocket_request(
-                    rocket.teams_list_rooms, **rocket_query_args(team_id=team_id)
+                    rocket.teams_list_rooms, **rocket_query_args(team_id=team_id, count=0)
                 )
                 rooms += [ i["_id"] for i in rooms_list["rooms"]]
         except Exception as e:

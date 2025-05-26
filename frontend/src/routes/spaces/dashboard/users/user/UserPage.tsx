@@ -80,7 +80,7 @@ function UserPageContent() {
                     ]}
                 />
                 <div className={"flex justify-between gap-6"}>
-                    <div className="flex justify-between gap-2">
+                    <div className="flex flex-wrap gap-2">
                         <Button variant="outline" onClick={() => {setAddUserInRoomOpen(true)}}>
                             Добавить в комнату
                         </Button>

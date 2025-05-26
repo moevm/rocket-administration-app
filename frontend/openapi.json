@@ -569,43 +569,6 @@
         }
       }
     },
-    "/spaces/{space_id}/status": {
-      "get": {
-        "summary": "Get User Status",
-        "operationId": "get_user_status_spaces__space_id__status_get",
-        "parameters": [
-          {
-            "name": "space_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Space Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/spaces/{space_id}/users/": {
       "get": {
         "summary": "Get Users",
@@ -1530,10 +1493,10 @@
             "title": "Readonly",
             "default": false
           },
-          "excludeSelf": {
+          "disable_system_messages": {
             "type": "boolean",
-            "title": "Excludeself",
-            "default": false
+            "title": "Disable System Messages",
+            "default": true
           },
           "teamId": {
             "anyOf": [
@@ -1622,7 +1585,14 @@
             "title": "Name"
           },
           "t": {
-            "type": "string",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "T"
           },
           "msgs": {
@@ -1721,10 +1691,17 @@
             ]
           },
           "members": {
-            "items": {
-              "$ref": "#/components/schemas/RoomUserDto"
-            },
-            "type": "array",
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/RoomUserDto"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Members"
           }
         },
@@ -1928,6 +1905,11 @@
           "team_type": {
             "type": "integer",
             "title": "Team Type"
+          },
+          "disable_system_messages": {
+            "type": "boolean",
+            "title": "Disable System Messages",
+            "default": true
           }
         },
         "type": "object",

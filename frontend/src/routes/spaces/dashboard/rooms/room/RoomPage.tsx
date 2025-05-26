@@ -98,7 +98,7 @@ function RoomPageContent() {
                     ]}
                 />
                 <div className={"flex justify-between gap-6"}>
-                    <div className="flex justify-between gap-2">
+                    <div className="flex flex-wrap gap-2">
                         <Button variant="outline" onClick={() => {setAddRoomToUsersDialogOpen(true)}}>
                             Добавить участников
                         </Button>
@@ -111,9 +111,9 @@ function RoomPageContent() {
                         <Button variant="outline" onClick={() => {setDeleteTeamsOutOfRoomDialogOpen(true)}}>
                             Удалить из команды
                         </Button>
-                        <Button variant="outline" onClick={() => {setHideRoomDialogOpen(true)}}>
-                            Скрыть комнату
-                        </Button>
+                        {/*<Button variant="outline" onClick={() => {setHideRoomDialogOpen(true)}}>*/}
+                        {/*    Скрыть комнату*/}
+                        {/*</Button>*/}
                         <Button variant="outline" onClick={() => {setDeleteRoomDialogOpen(true)}}>
                             Удалить комнату
                         </Button>

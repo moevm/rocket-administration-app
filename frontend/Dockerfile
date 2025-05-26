@@ -2,7 +2,11 @@ FROM oven/bun:1.2.3-debian AS builder
 WORKDIR /app
 
 COPY . /app/
-RUN bun install --frozen-lockfile
+RUN rm bun.lock package-lock.json
+RUN bun install
+
+ARG BACKEND_URL
+ENV VITE_BACKEND_URL=$BACKEND_URL
 
 ENV NODE_ENV=production
 RUN bun run build

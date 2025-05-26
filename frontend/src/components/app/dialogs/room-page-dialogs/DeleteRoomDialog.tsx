@@ -15,6 +15,7 @@ import {$api, createMutationOptions} from "@/api";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
 import {Label} from "@/components/ui/label.tsx";
 import ExportCard from "@/components/app/dialogs/ExportCard.tsx";
+import {useInvalidateRooms} from "@/api/invalidate.ts";
 
 export const showDeleteRoomDialogAtom = atom(false)
 
@@ -27,10 +28,11 @@ function DeleteRoomContent() {
 
     const navigate = useNavigate();
 
+    const invalidate = useInvalidateRooms()
+
     useEffect(() => {
         if (!open && dialogStep === 0) {
             navigate(`/spaces/${selectedSpaceId}/dashboard/rooms`);
-            window.location.reload();
         }
         if (!open) {
             setDialogStep(1)
@@ -45,6 +47,7 @@ function DeleteRoomContent() {
         onSuccess: async (data) => {
             setDialogStep(0)
             setResults(data)
+            invalidate()
         }
     }))
 
@@ -84,7 +87,7 @@ function DeleteRoomContent() {
                     ) : (
                         <>
                             <DialogHeader>
-                                <DialogTitle>Удаление команд</DialogTitle>
+                                <DialogTitle>Удаление комнат</DialogTitle>
                             </DialogHeader>
                             <ExportCard data={results} showData={true} countedValues={[
                                 {key: 'success', display: 'Успешно удалено'},

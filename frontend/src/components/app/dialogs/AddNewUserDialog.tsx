@@ -24,6 +24,7 @@ import {Checkbox} from "@/components/ui/checkbox.tsx";
 import React, {useEffect, useState} from "react";
 import {Label} from "@/components/ui/label.tsx";
 import {toast} from "sonner";
+import {useInvalidateUsers} from "@/api/invalidate.ts";
 
 const formSchema = z.object({
     username: z.string().min(1, "Обязательное поле"),
@@ -61,6 +62,8 @@ function AddNewUserContent() {
         disabled: isPending
     })
 
+    const invalidate = useInvalidateUsers()
+
     function onSubmit(values: z.infer<typeof formSchema>) {
         mutate({
             body: {
@@ -81,9 +84,7 @@ function AddNewUserContent() {
             }
         }, {
             onSuccess: (data) => {
-                queryClient.invalidateQueries({
-                    queryKey: $usersQueryOptions(selectedSpaceId!, true).queryKey
-                })
+                invalidate()
                 if (data[0]?.error) {
                     console.log((`Ошибка: ${data[0].error}`));
                     setError(data[0].error);

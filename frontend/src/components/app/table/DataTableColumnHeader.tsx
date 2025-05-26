@@ -1,5 +1,5 @@
 import {Column} from "@tanstack/react-table"
-import {ArrowDown, ArrowUp, ChevronsUpDown, EyeOff} from "lucide-react"
+import {ArrowDown, ArrowUp, ChevronsUpDown, EyeOff, X} from "lucide-react"
 
 import {cn} from "@/lib/utils"
 import {Button} from "@/components/ui/button"
@@ -57,11 +57,14 @@ function DataTableColumnHeader<TData, TValue>({
                         <ArrowDown className="h-3.5 w-3.5 text-muted-foreground/70"/>
                         По убыванию
                     </DropdownMenuItem>
-                    {/*<DropdownMenuSeparator/>*/}
-                    {/*<DropdownMenuItem onClick={() => hide()}>*/}
-                    {/*    <EyeOff className="h-3.5 w-3.5 text-muted-foreground/70"/>*/}
-                    {/*    Спрятать*/}
-                    {/*</DropdownMenuItem>*/}
+                    {column.getIsSorted() && <>
+                        <DropdownMenuSeparator/>
+                        <DropdownMenuItem onClick={() => column.clearSorting()}>
+                            <X className="h-3.5 w-3.5 text-muted-foreground/70"/>
+                            Не сортировать
+                        </DropdownMenuItem>
+                    </>
+                    }
                 </DropdownMenuContent>
             </DropdownMenu>
         </div>

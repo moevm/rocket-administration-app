@@ -25,6 +25,7 @@ import {
 import TeamSmallTableView from "@/components/app/table/TeamSmallTableView.tsx";
 import ExportCard from "@/components/app/dialogs/ExportCard.tsx";
 import RoomSmallTableView from "@/components/app/table/RoomSmallTableView.tsx";
+import {useInvalidateEntities} from "@/api/invalidate.ts";
 
 export const showAddRoomsIntoTeamDialogAtom = atom(false)
 
@@ -46,6 +47,7 @@ function AddTeamIntoRoomContent(props: {
         }
     }, [open]);
 
+    const invalidate = useInvalidateEntities()
 
     const {
         mutate,
@@ -54,9 +56,7 @@ function AddTeamIntoRoomContent(props: {
         onSuccess: async (data) => {
             setDialogStep(0)
             setResults(data)
-            await queryClient.invalidateQueries({
-                queryKey: $teamsQueryOptions(selectedSpaceId!, true).queryKey
-            })
+            invalidate()
         }
     }))
 

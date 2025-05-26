@@ -1,5 +1,5 @@
 import {useAtom, useAtomValue} from "jotai/index";
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import {
     $roomsQueryOptions,
     $selectedSpaceId, $teamsQueryOptions, showAddNewRoomDialogAtom
@@ -17,17 +17,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form.tsx";
 import {$api, createMutationOptions, queryClient} from "@/api";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
+import {toast} from "sonner";
+import {useInvalidateRooms, useInvalidateTeams} from "@/api/invalidate.ts";
 
 const channelGroupSchema = z.object({
     name: z.string().min(1, {message: "Обязательное поле"}),
     readOnly: z.boolean(),
     excludeSelf: z.boolean(),
-});
-
-const groupSchema = z.object({
-    login: z.string().min(1, {message: "Обязательное поле"}),
-    email: z.string().email("Неверный email"),
-    password: z.string().min(5, {message: "Минимум 5 символов"}),
+    disableSystemMessages: z.boolean()
 });
 
 function AddNewRoomContent() {
@@ -55,7 +52,8 @@ function AddNewRoomContent() {
         defaultValues: {
             name: "",
             readOnly: false,
-            excludeSelf: false
+            excludeSelf: false,
+            disableSystemMessages: true
         },
         disabled: isPendingChannels || isPendingGroups
     });
@@ -63,6 +61,7 @@ function AddNewRoomContent() {
     const teamSchema = z.object({
         name: z.string(),
         teamType: z.string(),
+        disableSystemMessages: z.boolean()
     })
 
     const teamForm = useForm<z.infer<typeof teamSchema>>({
@@ -71,7 +70,8 @@ function AddNewRoomContent() {
         resolver: zodResolver(teamSchema),
         defaultValues: {
             name: "",
-            teamType: "0"
+            teamType: "0",
+            disableSystemMessages: true
         },
         disabled: isPendingTeams
     })
@@ -83,6 +83,23 @@ function AddNewRoomContent() {
         teamForm.reset();
     }, [activeTab]);
 
+    const checkResponse = useCallback((response) => {
+        let error: string | null = null
+        if (!(Array.isArray(response) && response.length === 1)) {
+            error = 'Непредвиденная ошибка'
+        } else if (response[0].error) {
+            error = response[0].error
+        }
+        if (error) {
+            toast.error(error)
+        } else {
+            setOpen(false)
+        }
+    }, [setOpen])
+
+    const invalidateTeams = useInvalidateTeams()
+    const invalidateRooms = useInvalidateRooms()
+
     function handleChannelCreate (values: z.infer<typeof channelGroupSchema>) {
         mutateChannels({
             body: {
@@ -90,7 +107,7 @@ function AddNewRoomContent() {
                     {
                         name: values.name,
                         readOnly: values.readOnly,
-                        excludeSelf: false
+                        disable_system_messages: values.disableSystemMessages
                     },
                 ],
             },
@@ -101,10 +118,8 @@ function AddNewRoomContent() {
             }
         }, {
             onSuccess: (data) => {
-                queryClient.invalidateQueries({
-                    queryKey: $roomsQueryOptions(selectedSpaceId!, true).queryKey
-                })
-                setOpen(false)
+                invalidateRooms()
+                checkResponse(data)
             }
         })
     }
@@ -116,7 +131,7 @@ function AddNewRoomContent() {
                     {
                         name: values.name,
                         readOnly: values.readOnly,
-                        excludeSelf: false
+                        disable_system_messages: values.disableSystemMessages
                     },
                 ],
             },
@@ -127,10 +142,8 @@ function AddNewRoomContent() {
             }
         }, {
             onSuccess: (data) => {
-                queryClient.invalidateQueries({
-                    queryKey: $roomsQueryOptions(selectedSpaceId!, true).queryKey
-                })
-                setOpen(false)
+                invalidateRooms()
+                checkResponse(data)
             }
         })
     }
@@ -142,6 +155,7 @@ function AddNewRoomContent() {
                     {
                         name: values.name,
                         team_type: Number(values.teamType),
+                        disable_system_messages: values.disableSystemMessages
                     },
                 ],
             },
@@ -152,10 +166,8 @@ function AddNewRoomContent() {
             }
         }, {
             onSuccess: (data) => {
-                queryClient.invalidateQueries({
-                    queryKey: $teamsQueryOptions(selectedSpaceId!, true).queryKey
-                })
-                setOpen(false)
+                invalidateTeams()
+                checkResponse(data)
             }
         })
     }
@@ -217,19 +229,22 @@ function AddNewRoomContent() {
                                                 )}
                                             />
 
-                                            {/*<FormField*/}
-                                            {/*    control={channelGroupForm.control}*/}
-                                            {/*    name="excludeSelf"*/}
-                                            {/*    render={({field}) => (*/}
-                                            {/*        <FormItem className={"flex justify-start items-center gap-2"}>*/}
-                                            {/*            <FormControl>*/}
-                                            {/*                <Checkbox checked={field.value} onCheckedChange={field.onChange} />*/}
-                                            {/*            </FormControl>*/}
-                                            {/*            <FormLabel>Не включать себя в новую комнату</FormLabel>*/}
-                                            {/*            <FormMessage/>*/}
-                                            {/*        </FormItem>*/}
-                                            {/*    )}*/}
-                                            {/*/>*/}
+                                            <FormField
+                                                control={channelGroupForm.control}
+                                                name="disableSystemMessages"
+                                                render={({field}) => (
+                                                    <FormItem>
+                                                        <div className={"flex justify-items-center items-center gap-2"}>
+                                                            <FormControl>
+                                                                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                                                            </FormControl>
+                                                            <FormLabel>Отключить системные сообщения</FormLabel>
+                                                        </div>
+
+                                                        <FormMessage/>
+                                                    </FormItem>
+                                                )}
+                                            />
 
                                         </CardContent>
                                         <CardFooter>
@@ -277,6 +292,23 @@ function AddNewRoomContent() {
                                                                 <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                                                             </FormControl>
                                                             <FormLabel>Только для чтения</FormLabel>
+                                                        </div>
+
+                                                        <FormMessage/>
+                                                    </FormItem>
+                                                )}
+                                            />
+
+                                            <FormField
+                                                control={channelGroupForm.control}
+                                                name="disableSystemMessages"
+                                                render={({field}) => (
+                                                    <FormItem>
+                                                        <div className={"flex justify-items-center items-center gap-2"}>
+                                                            <FormControl>
+                                                                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                                                            </FormControl>
+                                                            <FormLabel>Отключить системные сообщения</FormLabel>
                                                         </div>
 
                                                         <FormMessage/>
@@ -350,6 +382,22 @@ function AddNewRoomContent() {
                                                                 <SelectItem value="1">Закрытая</SelectItem>
                                                             </SelectContent>
                                                         </Select>
+                                                        <FormMessage/>
+                                                    </FormItem>
+                                                )}
+                                            />
+                                            <FormField
+                                                control={channelGroupForm.control}
+                                                name="disableSystemMessages"
+                                                render={({field}) => (
+                                                    <FormItem>
+                                                        <div className={"flex justify-items-center items-center gap-2"}>
+                                                            <FormControl>
+                                                                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                                                            </FormControl>
+                                                            <FormLabel>Отключить системные сообщения</FormLabel>
+                                                        </div>
+
                                                         <FormMessage/>
                                                     </FormItem>
                                                 )}

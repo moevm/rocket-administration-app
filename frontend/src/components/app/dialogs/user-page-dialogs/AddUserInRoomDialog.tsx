@@ -13,6 +13,7 @@ import {BatchLoader} from "@/components/app/DataLoader.tsx";
 import {useCallback, useEffect, useState} from "react";
 import RoomSmallTableView from "@/components/app/table/RoomSmallTableView.tsx";
 import ExportCard from "@/components/app/dialogs/ExportCard.tsx";
+import {useInvalidateEntities} from "@/api/invalidate.ts";
 
 export const showAddUserInRoomDialogAtom = atom(false)
 
@@ -33,6 +34,8 @@ function AddUserInRoomContent(props: {
         }
     }, [open]);
 
+    const invalidate = useInvalidateEntities()
+
     const {
         mutate,
         isPending
@@ -40,9 +43,7 @@ function AddUserInRoomContent(props: {
         onSuccess: async (data) => {
             setResults(data)
             setDialogStep(0)
-            await queryClient.invalidateQueries({
-                queryKey: $usersQueryOptions(selectedSpaceId!, true).queryKey
-            })
+            invalidate()
         }
     }))
 

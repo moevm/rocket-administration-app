@@ -26,7 +26,7 @@ class RoomDto(BaseModel):
     description: Optional[str] = None
     broadcast: Optional[bool] = None
     name: Optional[str] = None
-    t: str = None
+    t: Optional[str] = None
     msgs: Optional[int] = None
     usersCount: Optional[int] = None
     u: Optional[ShortUserDto] = None
@@ -72,7 +72,7 @@ class ImportedUserResultDto(BaseModel):
 class RoomCreateDto(BaseModel):
     name: str
     readOnly: bool = False
-    excludeSelf: bool = False
+    disable_system_messages: bool = True
     teamId: Optional[str] = None
 
 
@@ -89,6 +89,7 @@ class ImportedRoomResultDto(BaseModel):
 class TeamCreateDto(BaseModel):
     name: str
     team_type: int
+    disable_system_messages: bool = True
 
 
 class TeamsImportRequestDto(BaseModel):
@@ -153,7 +154,7 @@ class RoomUserDto(BaseModel):
 
 class RoomInfoDto(BaseModel):
     team: Optional[ShortTeamDto] = None
-    members: List[RoomUserDto] = None
+    members: Optional[List[RoomUserDto]] = None
 
 
 class CreateSpaceRequest(BaseModel):

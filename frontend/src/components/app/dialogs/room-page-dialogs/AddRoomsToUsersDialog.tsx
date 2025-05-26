@@ -14,6 +14,7 @@ import {$api, createMutationOptions, loaded, queryClient} from "@/api";
 import {useCallback, useEffect, useState} from "react";
 import UserSmallTableView from "@/components/app/table/UserSmallTableView.tsx";
 import ExportCard from "@/components/app/dialogs/ExportCard.tsx";
+import {useInvalidateEntities} from "@/api/invalidate.ts";
 
 export const showAddRoomsToUsersDialogAtom = atom(false)
 
@@ -34,6 +35,8 @@ function AddRoomsToUsersContent(props: {
         }
     }, [open]);
 
+    const invalidate = useInvalidateEntities()
+
     const {
         mutate,
         isPending
@@ -41,9 +44,7 @@ function AddRoomsToUsersContent(props: {
         onSuccess: async (data) => {
             setResults(data)
             setDialogStep(0)
-            await queryClient.invalidateQueries({
-                queryKey: $roomsQueryOptions(selectedSpaceId!, true).queryKey
-            })
+            invalidate()
         }
     }))
 

@@ -83,6 +83,6 @@
   @apply bg-primary/20 text-primary hover:bg-primary/30 hover:text-primary !important;
 }
 
-a.active {
+div[data-sidebar="group"] > a.active {
   @apply menu-item--active
 }

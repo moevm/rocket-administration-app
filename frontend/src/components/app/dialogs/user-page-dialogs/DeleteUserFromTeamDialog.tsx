@@ -28,6 +28,7 @@ import ShortTeamTableView from "@/components/app/table/ShortTeamTableView.tsx";
 import TeamSmallTableView from "@/components/app/table/TeamSmallTableView.tsx";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
 import {FormLabel} from "@/components/ui/form.tsx";
+import {useInvalidateEntities} from "@/api/invalidate.ts";
 
 export const showDeleteUserFromTeamDialogAtom = atom(false)
 
@@ -54,6 +55,8 @@ function DeleteUserFromTeamContent(props: {
         }
     }, [open]);
 
+    const invalidate = useInvalidateEntities()
+
     const {
         mutate,
         isPending
@@ -61,9 +64,7 @@ function DeleteUserFromTeamContent(props: {
         onSuccess: async (data) => {
             setDialogStep(0)
             setResults(data)
-            await queryClient.invalidateQueries({
-                queryKey: $usersQueryOptions(selectedSpaceId!, true).queryKey
-            })
+            invalidate()
         }
     }))
 

@@ -46,8 +46,6 @@ async def get_user_information(user_id: str, space=Depends(get_space)) -> UserIn
             **rocket_query_args(types=['c', 'p'], count=0)
         ))['rooms']
 
-    print([room for room in user_info_raw['user']['rooms']
-                  if room["rid"] in set(i['_id'] for i in room_filter)])
     return UserInfoDto.model_validate({
         'teams': teams_info_raw['teams'],
         'rooms': [room for room in user_info_raw['user']['rooms']
@@ -67,6 +65,7 @@ async def change_user_passwords(body: UsersToChangePasswordDto, space=Depends(ge
         try:
             await rocket_request(rocket.users_update, **rocket_query_args(user_id=user, password=password_to_set))
         except Exception as e:
+            print(e)
             result.password_error = extract_exception_message(e)
         else:
             result.password = password_to_set

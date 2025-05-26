@@ -19,6 +19,7 @@ import {useEffect, useState} from "react";
 import {$api, createMutationOptions, loaded, queryClient} from "@/api";
 import ExportCard from "@/components/app/dialogs/ExportCard.tsx";
 import UserSmallTableView from "@/components/app/table/UserSmallTableView.tsx";
+import {useInvalidateEntities} from "@/api/invalidate.ts";
 
 export const showDeleteUsersOutOfRoomDialogAtom = atom(false)
 
@@ -39,6 +40,8 @@ function DeleteUsersOutOfRoomContent(props: {
         }
     }, [open]);
 
+    const invalidate = useInvalidateEntities()
+
     const {
         mutate,
         isPending
@@ -46,9 +49,7 @@ function DeleteUsersOutOfRoomContent(props: {
         onSuccess: async (data) => {
             setDialogStep(0)
             setResults(data)
-            await queryClient.invalidateQueries({
-                queryKey: $roomsQueryOptions(selectedSpaceId!, true).queryKey
-            })
+            invalidate()
         }
     }))
 
@@ -56,7 +57,7 @@ function DeleteUsersOutOfRoomContent(props: {
         mutate({
             body: {
                 users: selectedUserIds,
-                rooms: selectedRoomsData.map(it => it.name)
+                rooms: selectedRoomsData.map(it => it._id)
             },
             params: {
                 path: {

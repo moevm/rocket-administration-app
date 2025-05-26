@@ -24,6 +24,7 @@ import {useAtomValue} from "jotai/index";
 import {BatchLoader} from "@/components/app/DataLoader.tsx";
 import {Loader2} from "lucide-react";
 import {registerSchema} from "@/lib/form.ts";
+import {useInvalidateSpace} from "@/api/invalidate.ts";
 
 
 const smtpSettingsSchema = z.object({
@@ -52,12 +53,11 @@ function EditSpaceContent(props: {
     space: ApiSpaceModel
 }) {
     const selectedSpaceId = useAtomValue($selectedSpaceId)!
+    const invalidate = useInvalidateSpace()
 
     const {mutate, isPending} = $api.useMutation('patch', '/spaces/{space_id}', createMutationOptions({
         onSuccess: async (data: any) => {
-            await queryClient.invalidateQueries({
-                queryKey: $spacesQueryOptions().queryKey
-            })
+            invalidate()
         }
     }))
 
@@ -187,8 +187,8 @@ function SMTPSettingsContent(props: {
         isPending
     } = $api.useMutation('post', '/spaces/{space_id}/settings/smtp', createMutationOptions({
         onSuccess: async (data: any) => {
-            await queryClient.invalidateQueries({
-                queryKey: $smtpSettingsQueryOptions().queryKey
+            queryClient.invalidateQueries({
+                queryKey: $smtpSettingsQueryOptions(selectedSpaceId, true).queryKey
             })
         }
     }))

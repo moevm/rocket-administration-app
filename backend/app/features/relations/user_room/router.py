@@ -1,7 +1,7 @@
 import json
 from typing import List
 import uuid
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 
 from app.models import UsersAndRoomsDto, UsersAndRoomResDto, UsersAndTeamsDto, UsersAndTeamResDto
 
@@ -52,11 +52,18 @@ async def remove_users_from_room(body: UsersAndRoomsDto, space=Depends(get_space
     async def _process(user: str, room: str) -> UsersAndRoomResDto:
         result = UsersAndRoomResDto(success=False, user_list=[user], room=room)
         try:
-            tmp = await rocket_request(
-                rocket.groups_kick, **rocket_query_args(room_id=room, user_id=user)
-            )
+            room_info = await rocket_request(rocket.rooms_info,**rocket_query_args(room_id=room))
+            if room_info['room']['t'] == 'p':
+                tmp = await rocket_request(
+                    rocket.groups_kick, **rocket_query_args(room_id=room, user_id=user)
+                )
+            elif room_info['room']['t'] == 'c':
+                tmp = await rocket_request(
+                    rocket.channels_kick, **rocket_query_args(room_id=room, user_id=user)
+                )
+            else:
+                raise HTTPException(status_code=403, detail="Trying to ban from not a room")
         except Exception as e:
-            print(e)
             result.error = extract_exception_message(e)
         else:
             result.success = True
@@ -78,7 +85,7 @@ async def remove_users_from_team(body: UsersAndTeamsDto, space=Depends(get_space
             rooms = [team_rid]
             if body.ban_in_rooms:
                 rooms_list = await rocket_request(
-                    rocket.teams_list_rooms, **rocket_query_args(team_id=team_id)
+                    rocket.teams_list_rooms, **rocket_query_args(team_id=team_id, count=0)
                 )
                 rooms += [ i["_id"] for i in rooms_list["rooms"]]
             

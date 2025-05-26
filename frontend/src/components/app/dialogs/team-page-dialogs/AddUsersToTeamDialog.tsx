@@ -14,6 +14,7 @@ import {$api, createMutationOptions, loaded, queryClient} from "@/api";
 import {useCallback, useEffect, useState} from "react";
 import UserSmallTableView from "@/components/app/table/UserSmallTableView.tsx";
 import ExportCard from "@/components/app/dialogs/ExportCard.tsx";
+import {useInvalidateEntities} from "@/api/invalidate.ts";
 
 export const showAddUsersToTeamDialogAtom = atom(false)
 
@@ -34,6 +35,8 @@ function AddUsersToTeamContent(props: {
         }
     }, [open]);
 
+    const invalidate = useInvalidateEntities()
+
     const {
         mutate,
         isPending
@@ -41,9 +44,7 @@ function AddUsersToTeamContent(props: {
         onSuccess: async (data) => {
             setResults(data)
             setDialogStep(0)
-            await queryClient.invalidateQueries({
-                queryKey: $teamsQueryOptions(selectedSpaceId!, true).queryKey
-            })
+            invalidate()
         }
     }))
 

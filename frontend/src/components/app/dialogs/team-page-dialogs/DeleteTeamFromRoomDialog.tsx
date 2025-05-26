@@ -16,6 +16,7 @@ import {showAddRoomsIntoTeamDialogAtom} from "@/components/app/dialogs/team-page
 import TeamSmallTableView from "@/components/app/table/TeamSmallTableView.tsx";
 import ExportCard from "@/components/app/dialogs/ExportCard.tsx";
 import RoomSmallTableView from "@/components/app/table/RoomSmallTableView.tsx";
+import {useInvalidateEntities} from "@/api/invalidate.ts";
 
 export const showDeleteRoomFromTeamDialogAtom = atom(false)
 
@@ -38,6 +39,7 @@ function DeleteTeamFromRoomContent(props: {
         }
     }, [open]);
 
+    const invalidate = useInvalidateEntities()
 
     const {
         mutate,
@@ -46,9 +48,7 @@ function DeleteTeamFromRoomContent(props: {
         onSuccess: async (data) => {
             setDialogStep(0)
             setResults(data)
-            await queryClient.invalidateQueries({
-                queryKey: $teamsQueryOptions(selectedSpaceId!, true).queryKey
-            })
+            invalidate()
         }
     }))
 
