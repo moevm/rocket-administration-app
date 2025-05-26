@@ -85,7 +85,7 @@ async def remove_users_from_team(body: UsersAndTeamsDto, space=Depends(get_space
             rooms = [team_rid]
             if body.ban_in_rooms:
                 rooms_list = await rocket_request(
-                    rocket.teams_list_rooms, **rocket_query_args(team_id=team_id)
+                    rocket.teams_list_rooms, **rocket_query_args(team_id=team_id, count=0)
                 )
                 rooms += [ i["_id"] for i in rooms_list["rooms"]]
             

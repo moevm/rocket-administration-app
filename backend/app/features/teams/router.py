@@ -97,7 +97,7 @@ async def remove_teams(body: TeamsDeleteDto, space=Depends(get_space)) -> List[T
             rooms = []
             if body.delete_linked_rooms:
                 rooms_list = await rocket_request(
-                    rocket.teams_list_rooms, **rocket_query_args(team_id=team_id)
+                    rocket.teams_list_rooms, **rocket_query_args(team_id=team_id, count=0)
                 )
                 rooms += [ i["_id"] for i in rooms_list["rooms"]]
         except Exception as e:
