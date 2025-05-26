@@ -14,7 +14,12 @@ router = APIRouter()
 @router.post("/")
 async def create_space(create_space_request: CreateSpaceRequest, db=Depends(get_db)) -> SpaceDto:
     space = convert_to(SpaceModel, create_space_request)
-    await obtain_rocket_instance(key_for_space(space))
+    rocket = await obtain_rocket_instance(key_for_space(space))
+
+    await rocket_request(
+        rocket.me,
+        **rocket_query_args()
+    )
 
     insert_result = await db.spaces.insert_one(space.model_dump(mode='json'))
     space_model = SpaceModel.model_validate(await db.spaces.find_one({"_id": insert_result.inserted_id}))
@@ -24,7 +29,12 @@ async def create_space(create_space_request: CreateSpaceRequest, db=Depends(get_
 async def update_space(update_space_request: CreateSpaceRequest, db=Depends(get_db), original_space=Depends(get_space)) -> SpaceDto:
     space_id = original_space.id
     space = convert_to(SpaceModel, update_space_request)
-    await obtain_rocket_instance(key_for_space(space))
+    rocket = await obtain_rocket_instance(key_for_space(space))
+
+    await rocket_request(
+        rocket.me,
+        **rocket_query_args()
+    )
 
     space_data = space.model_dump(mode='json')
 
