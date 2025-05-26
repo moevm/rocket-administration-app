@@ -187,8 +187,8 @@ function SMTPSettingsContent(props: {
         isPending
     } = $api.useMutation('post', '/spaces/{space_id}/settings/smtp', createMutationOptions({
         onSuccess: async (data: any) => {
-            await queryClient.invalidateQueries({
-                queryKey: $smtpSettingsQueryOptions().queryKey
+            queryClient.invalidateQueries({
+                queryKey: $smtpSettingsQueryOptions(selectedSpaceId, true).queryKey
             })
         }
     }))
