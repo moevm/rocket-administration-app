@@ -1,27 +1,8 @@
 import DataTableColumnHeader from "@/components/app/table/DataTableColumnHeader.tsx";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
 import {ApiRoomModel} from "@/store/global-store.ts";
-import {TypedColumnDef} from "@/store/columnsUser.tsx";
 import {CheckboxRenderer, MonoRenderer, OptRenderer} from "@/components/app/ValueRenderers.tsx";
-
-
-//TODO: вынести в отдельный компонент
-const customSortingFn = (rowA, rowB, columnId) => {
-    const getValue = (row) => {
-        const value = row.getValue(columnId);
-        if (value === undefined || value === null) return "";
-        return String(value);
-    };
-
-    const a = getValue(rowA);
-    const b = getValue(rowB);
-
-    if (a === b) return 0;
-    if (a === "+" || a === "-") return 1;
-    if (b === "+" || b === "-") return -1;
-
-    return a.localeCompare(b, "ru", {numeric: true});
-};
+import {customSortingFn, TypedColumnDef} from "@/lib/table.ts";
 
 const typesName = {
     d: "Личные сообщения",
@@ -60,11 +41,7 @@ export const columnsRoom = [
     },
     {
         accessorKey: "_id",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="id"/>
-            )
-        },
+        header: DataTableColumnHeader,
         meta: {
             title: "id",
             type: 'string',
@@ -75,11 +52,7 @@ export const columnsRoom = [
     },
     {
         accessorKey: "description",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Описание"/>
-            )
-        },
+        header: DataTableColumnHeader,
         meta: {
             title: "Описание",
             type: 'string'
@@ -89,11 +62,7 @@ export const columnsRoom = [
     },
     {
         accessorKey: "broadcast",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Бродкаст"/>
-            )
-        },
+        header: DataTableColumnHeader,
         meta: {
             title: "Бродкаст",
             type: 'boolean'
@@ -102,11 +71,7 @@ export const columnsRoom = [
     },
     {
         accessorKey: "name",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Имя"/>
-            )
-        },
+        header: DataTableColumnHeader,
         meta: {
             title: "Имя",
             type: 'string',
@@ -117,11 +82,7 @@ export const columnsRoom = [
     },
     {
         id: "t",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Тип"/>
-            )
-        },
+        header: DataTableColumnHeader,
         accessorFn: (row) => {
             return typesName[row.t] ?? row.t
         },
@@ -133,11 +94,7 @@ export const columnsRoom = [
     },
     {
         accessorKey: "msgs",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Сообщения"/>
-            )
-        },
+        header: DataTableColumnHeader,
         meta: {
             title: "Сообщения",
             type: 'number'
@@ -145,11 +102,7 @@ export const columnsRoom = [
     },
     {
         accessorKey: "usersCount",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Пользователи"/>
-            )
-        },
+        header: DataTableColumnHeader,
         meta: {
             title: "Пользователи",
             type: 'number'
@@ -157,11 +110,7 @@ export const columnsRoom = [
     },
     {
         accessorKey: "u._id",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Администратор"/>
-            )
-        },
+        header: DataTableColumnHeader,
         meta: {
             title: "Администратор",
             type: 'string'
@@ -171,11 +120,7 @@ export const columnsRoom = [
     },
     {
         accessorKey: "ro",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Read only"/>
-            )
-        },
+        header: DataTableColumnHeader,
         meta: {
             title: "Read only",
             type: 'boolean'
@@ -184,11 +129,7 @@ export const columnsRoom = [
     },
     {
         accessorKey: "default",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Default"/>
-            )
-        },
+        header: DataTableColumnHeader,
         meta: {
             title: "Default",
             type: 'boolean'
@@ -197,11 +138,7 @@ export const columnsRoom = [
     },
     {
         accessorKey: "topic",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Тема"/>
-            )
-        },
+        header: DataTableColumnHeader,
         meta: {
             title: "Тема",
             type: 'string'
@@ -211,11 +148,7 @@ export const columnsRoom = [
     },
     {
         accessorKey: "announcement",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Объявление"/>
-            )
-        },
+        header: DataTableColumnHeader,
         meta: {
             title: "Объявление",
             type: 'string'

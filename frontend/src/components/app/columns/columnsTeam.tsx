@@ -1,28 +1,9 @@
 import DataTableColumnHeader from "@/components/app/table/DataTableColumnHeader.tsx";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
 import {ApiTeamModel} from "@/store/global-store.ts";
-import {TypedColumnDef} from "@/store/columnsUser.tsx";
 import dayjs from 'dayjs';
-import {MonoRenderer, OptRenderer} from "@/components/app/ValueRenderers.tsx";
-
-
-//TODO: вынести в отдельный компонент
-const customSortingFn = (rowA, rowB, columnId) => {
-    const getValue = (row) => {
-        const value = row.getValue(columnId);
-        if (value === undefined || value === null) return "";
-        return String(value);
-    };
-
-    const a = getValue(rowA);
-    const b = getValue(rowB);
-
-    if (a === b) return 0;
-    if (a === "+" || a === "-") return 1;
-    if (b === "+" || b === "-") return -1;
-
-    return a.localeCompare(b, "ru", {numeric: true});
-};
+import {DateRenderer, MonoRenderer, OptRenderer} from "@/components/app/ValueRenderers.tsx";
+import {customSortingFn, TypedColumnDef} from "@/lib/table.ts";
 
 const typesType = {
     "1": "Закрытый канал",
@@ -58,11 +39,7 @@ export const columnsTeam = [
     },
     {
         accessorKey: "_id",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="id"/>
-            )
-        },
+        header: DataTableColumnHeader,
         meta: {
             title: "id",
             type: 'string',
@@ -73,11 +50,7 @@ export const columnsTeam = [
     },
     {
         accessorKey: "name",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Имя"/>
-            )
-        },
+        header: DataTableColumnHeader,
         meta: {
             title: "Имя",
             type: 'string',
@@ -87,42 +60,31 @@ export const columnsTeam = [
     },
     {
         id: "type",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Тип"/>
-            )
-        },
+        header: DataTableColumnHeader,
         accessorFn: (row) => {
             return typesType[row.type]
         },
         meta: {
             title: "Тип",
-            type: 'boolean'
+            type: 'string'
         },
     },
     {
         id: "createdAt",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Создано в"/>
-            )
-        },
+        header: DataTableColumnHeader,
         accessorFn: (row) => {
             return dayjs(row.createdAt)
         },
+        cell: ({ cell }) => <DateRenderer value={cell.getValue()} />,
         meta: {
             title: "Создано в",
-            type: 'string'
+            type: 'datetime'
         },
         sortingFn: customSortingFn
     },
     {
         accessorKey: "createdBy._id",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Создатель"/>
-            )
-        },
+        header: DataTableColumnHeader,
         meta: {
             title: "Создатель",
             type: 'string'
@@ -132,24 +94,19 @@ export const columnsTeam = [
     },
     {
         accessorKey: "updatedAt",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Обновлено в"/>
-            )
+        header: DataTableColumnHeader,
+        accessorFn: (row) => {
+            return dayjs(row.createdAt)
         },
         meta: {
             title: "Обновлено в",
-            type: 'boolean'
+            type: 'datetime'
         },
-        cell: ({cell}) => <OptRenderer value={cell.getValue()} />
+        cell: ({ cell }) => <DateRenderer value={cell.getValue()} />,
     },
     {
         accessorKey: "roomId",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Id комнаты"/>
-            )
-        },
+        header: DataTableColumnHeader,
         meta: {
             title: "Id комнаты",
             type: 'string',
@@ -160,11 +117,7 @@ export const columnsTeam = [
     },
     {
         accessorKey: "rooms",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Комнаты"/>
-            )
-        },
+        header: DataTableColumnHeader,
         meta: {
             title: "Комнаты",
             type: 'number'
@@ -173,11 +126,7 @@ export const columnsTeam = [
     },
     {
         accessorKey: "numberOfUsers",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Количество пользователей"/>
-            )
-        },
+        header: DataTableColumnHeader,
         meta: {
             title: "Количество пользователей",
             type: 'number'

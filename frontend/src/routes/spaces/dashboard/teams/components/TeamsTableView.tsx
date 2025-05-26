@@ -1,5 +1,5 @@
 import RichTableView from "@/components/app/table/RichTableView.tsx";
-import {columnsTeam} from "@/store/columnsTeam.tsx";
+import {columnsTeam} from "@/components/app/columns/columnsTeam.tsx";
 import {$selectedSpaceId, ApiTeamModel, showAddNewTeamDialogAtom} from "@/store/global-store.ts";
 import {useNavigate} from "react-router";
 import {teamContextMenuConfig} from "@/components/app/ContextMenuConfigs.tsx";
@@ -16,10 +16,8 @@ function TeamsTableView(props: {
 
     return (
         <>
-            <Button onClick={() => {setAddNewTeamDialogOpen(true)}}>
-                Создать новую команду
-            </Button>
             <RichTableView
+                tableId={'teams'}
                 entries={props.data}
                 tableConfig={{
                     columns: columnsTeam
@@ -33,6 +31,11 @@ function TeamsTableView(props: {
                     enableColumnVisibilityToggle: true,
                     rowClickHandler: (team) => navigate(`/spaces/${selectedSpaceId}/dashboard/teams/${team._id}`)
                 }}
+                buttonsSlot={() => (
+                    <Button variant="outline" size="sm" onClick={() => {setAddNewTeamDialogOpen(true)}}>
+                        Создать команду
+                    </Button>
+                )}
             />
         </>
     )

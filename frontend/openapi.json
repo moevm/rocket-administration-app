@@ -113,6 +113,57 @@
             }
           }
         }
+      },
+      "delete": {
+        "summary": "Remove Teams",
+        "operationId": "remove_teams_spaces__space_id__teams__delete",
+        "parameters": [
+          {
+            "name": "space_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Space Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TeamsDeleteDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TeamDeletedDto"
+                  },
+                  "title": "Response Remove Teams Spaces  Space Id  Teams  Delete"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/spaces/{space_id}/teams/{team_id}": {
@@ -189,6 +240,57 @@
                     "$ref": "#/components/schemas/RoomDto"
                   },
                   "title": "Response Get Rooms Spaces  Space Id  Rooms  Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete Rooms",
+        "operationId": "delete_rooms_spaces__space_id__rooms__delete",
+        "parameters": [
+          {
+            "name": "space_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Space Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoomsDeleteDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RoomDeleteResDto"
+                  },
+                  "title": "Response Delete Rooms Spaces  Space Id  Rooms  Delete"
                 }
               }
             }
@@ -418,6 +520,55 @@
         }
       }
     },
+    "/spaces/{space_id}": {
+      "patch": {
+        "summary": "Update Space",
+        "operationId": "update_space_spaces__space_id__patch",
+        "parameters": [
+          {
+            "name": "space_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Space Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSpaceRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpaceDto"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/spaces/{space_id}/users/": {
       "get": {
         "summary": "Get Users",
@@ -495,6 +646,57 @@
                     "$ref": "#/components/schemas/ImportedUserResultDto"
                   },
                   "title": "Response Create Users Spaces  Space Id  Users  Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete Users",
+        "operationId": "delete_users_spaces__space_id__users__delete",
+        "parameters": [
+          {
+            "name": "space_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Space Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UsersDeleteDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserDeleteResDto"
+                  },
+                  "title": "Response Delete Users Spaces  Space Id  Users  Delete"
                 }
               }
             }
@@ -742,8 +944,8 @@
     },
     "/spaces/{space_id}/user_room/": {
       "post": {
-        "summary": "Add Users To Channel",
-        "operationId": "add_users_to_channel_spaces__space_id__user_room__post",
+        "summary": "Add Users To Rooms",
+        "operationId": "add_users_to_rooms_spaces__space_id__user_room__post",
         "parameters": [
           {
             "name": "space_id",
@@ -773,9 +975,219 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/UsersAndRoomsResDto"
+                    "$ref": "#/components/schemas/UsersAndRoomResDto"
                   },
-                  "title": "Response Add Users To Channel Spaces  Space Id  User Room  Post"
+                  "title": "Response Add Users To Rooms Spaces  Space Id  User Room  Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spaces/{space_id}/user_room/group": {
+      "delete": {
+        "summary": "Remove Users From Room",
+        "operationId": "remove_users_from_room_spaces__space_id__user_room_group_delete",
+        "parameters": [
+          {
+            "name": "space_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Space Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UsersAndRoomsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UsersAndRoomResDto"
+                  },
+                  "title": "Response Remove Users From Room Spaces  Space Id  User Room Group Delete"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spaces/{space_id}/user_room/team": {
+      "delete": {
+        "summary": "Remove Users From Team",
+        "operationId": "remove_users_from_team_spaces__space_id__user_room_team_delete",
+        "parameters": [
+          {
+            "name": "space_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Space Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UsersAndTeamsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UsersAndTeamResDto"
+                  },
+                  "title": "Response Remove Users From Team Spaces  Space Id  User Room Team Delete"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spaces/{space_id}/team_room/": {
+      "post": {
+        "summary": "Add Rooms To Team",
+        "operationId": "add_rooms_to_team_spaces__space_id__team_room__post",
+        "parameters": [
+          {
+            "name": "space_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Space Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TeamsAndRoomsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TeamsAndRoomsResDto"
+                  },
+                  "title": "Response Add Rooms To Team Spaces  Space Id  Team Room  Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Remove Rooms From Team",
+        "operationId": "remove_rooms_from_team_spaces__space_id__team_room__delete",
+        "parameters": [
+          {
+            "name": "space_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Space Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TeamsAndRoomsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TeamsAndRoomsResDto"
+                  },
+                  "title": "Response Remove Rooms From Team Spaces  Space Id  Team Room  Delete"
                 }
               }
             }
@@ -877,6 +1289,24 @@
           "name"
         ],
         "title": "CreateSpaceRequest"
+      },
+      "DeleteTeamDto": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "rid": {
+            "type": "string",
+            "title": "Rid"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "rid"
+        ],
+        "title": "DeleteTeamDto"
       },
       "HTTPValidationError": {
         "properties": {
@@ -1063,10 +1493,10 @@
             "title": "Readonly",
             "default": false
           },
-          "excludeSelf": {
+          "disable_system_messages": {
             "type": "boolean",
-            "title": "Excludeself",
-            "default": false
+            "title": "Disable System Messages",
+            "default": true
           },
           "teamId": {
             "anyOf": [
@@ -1085,6 +1515,35 @@
           "name"
         ],
         "title": "RoomCreateDto"
+      },
+      "RoomDeleteResDto": {
+        "properties": {
+          "room": {
+            "type": "string",
+            "title": "Room"
+          },
+          "success": {
+            "type": "boolean",
+            "title": "Success",
+            "default": false
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "room"
+        ],
+        "title": "RoomDeleteResDto"
       },
       "RoomDto": {
         "properties": {
@@ -1126,7 +1585,14 @@
             "title": "Name"
           },
           "t": {
-            "type": "string",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "T"
           },
           "msgs": {
@@ -1225,10 +1691,17 @@
             ]
           },
           "members": {
-            "items": {
-              "$ref": "#/components/schemas/RoomUserDto"
-            },
-            "type": "array",
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/RoomUserDto"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Members"
           }
         },
@@ -1262,6 +1735,22 @@
           "status"
         ],
         "title": "RoomUserDto"
+      },
+      "RoomsDeleteDto": {
+        "properties": {
+          "rooms": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Rooms"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rooms"
+        ],
+        "title": "RoomsDeleteDto"
       },
       "RoomsImportRequestDto": {
         "properties": {
@@ -1416,6 +1905,11 @@
           "team_type": {
             "type": "integer",
             "title": "Team Type"
+          },
+          "disable_system_messages": {
+            "type": "boolean",
+            "title": "Disable System Messages",
+            "default": true
           }
         },
         "type": "object",
@@ -1424,6 +1918,43 @@
           "team_type"
         ],
         "title": "TeamCreateDto"
+      },
+      "TeamDeletedDto": {
+        "properties": {
+          "team": {
+            "type": "string",
+            "title": "Team"
+          },
+          "rooms": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Rooms",
+            "default": []
+          },
+          "success": {
+            "type": "boolean",
+            "title": "Success"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "team",
+          "success"
+        ],
+        "title": "TeamDeletedDto"
       },
       "TeamDto": {
         "properties": {
@@ -1527,6 +2058,85 @@
         ],
         "title": "TeamInfoDto"
       },
+      "TeamsAndRoomsDto": {
+        "properties": {
+          "teams": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Teams"
+          },
+          "rooms": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Rooms"
+          }
+        },
+        "type": "object",
+        "required": [
+          "teams",
+          "rooms"
+        ],
+        "title": "TeamsAndRoomsDto"
+      },
+      "TeamsAndRoomsResDto": {
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "title": "Success",
+            "default": true
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "room": {
+            "type": "string",
+            "title": "Room"
+          },
+          "team": {
+            "type": "string",
+            "title": "Team"
+          }
+        },
+        "type": "object",
+        "required": [
+          "room",
+          "team"
+        ],
+        "title": "TeamsAndRoomsResDto"
+      },
+      "TeamsDeleteDto": {
+        "properties": {
+          "teams": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Teams"
+          },
+          "delete_linked_rooms": {
+            "type": "boolean",
+            "title": "Delete Linked Rooms",
+            "default": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "teams"
+        ],
+        "title": "TeamsDeleteDto"
+      },
       "TeamsImportRequestDto": {
         "properties": {
           "teams": {
@@ -1566,6 +2176,40 @@
           "name"
         ],
         "title": "UserCreateDto"
+      },
+      "UserDeleteResDto": {
+        "properties": {
+          "user": {
+            "type": "string",
+            "title": "User"
+          },
+          "force_delete": {
+            "type": "boolean",
+            "title": "Force Delete"
+          },
+          "success": {
+            "type": "boolean",
+            "title": "Success",
+            "default": false
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user",
+          "force_delete"
+        ],
+        "title": "UserDeleteResDto"
       },
       "UserDto": {
         "properties": {
@@ -1739,6 +2383,43 @@
         ],
         "title": "UserInfoRoomDto"
       },
+      "UsersAndRoomResDto": {
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "title": "Success",
+            "default": true
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "user_list": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "User List"
+          },
+          "room": {
+            "type": "string",
+            "title": "Room"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_list",
+          "room"
+        ],
+        "title": "UsersAndRoomResDto"
+      },
       "UsersAndRoomsDto": {
         "properties": {
           "users": {
@@ -1763,14 +2444,14 @@
         ],
         "title": "UsersAndRoomsDto"
       },
-      "UsersAndRoomsResDto": {
+      "UsersAndTeamResDto": {
         "properties": {
           "success": {
             "type": "boolean",
             "title": "Success",
             "default": true
           },
-          "msg": {
+          "error": {
             "anyOf": [
               {
                 "type": "string"
@@ -1779,7 +2460,7 @@
                 "type": "null"
               }
             ],
-            "title": "Msg"
+            "title": "Error"
           },
           "user_list": {
             "items": {
@@ -1788,17 +2469,67 @@
             "type": "array",
             "title": "User List"
           },
-          "room": {
+          "team": {
             "type": "string",
-            "title": "Room"
+            "title": "Team"
           }
         },
         "type": "object",
         "required": [
           "user_list",
-          "room"
+          "team"
         ],
-        "title": "UsersAndRoomsResDto"
+        "title": "UsersAndTeamResDto"
+      },
+      "UsersAndTeamsDto": {
+        "properties": {
+          "users": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Users"
+          },
+          "teams": {
+            "items": {
+              "$ref": "#/components/schemas/DeleteTeamDto"
+            },
+            "type": "array",
+            "title": "Teams"
+          },
+          "ban_in_rooms": {
+            "type": "boolean",
+            "title": "Ban In Rooms",
+            "default": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "users",
+          "teams"
+        ],
+        "title": "UsersAndTeamsDto"
+      },
+      "UsersDeleteDto": {
+        "properties": {
+          "users": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Users"
+          },
+          "force_delete": {
+            "type": "boolean",
+            "title": "Force Delete",
+            "default": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "users"
+        ],
+        "title": "UsersDeleteDto"
       },
       "UsersImportRequestDto": {
         "properties": {
@@ -1848,6 +2579,17 @@
           "sendEmail": {
             "type": "boolean",
             "title": "Sendemail"
+          },
+          "password": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Password"
           }
         },
         "type": "object",

@@ -8,7 +8,7 @@ import {useAtomValue} from "jotai";
 import {
     $selectedSpaceId,
     $selectedUser,
-    $selectedUserId,
+    $selectedUserId, $selectedUsersData,
     $userInfo
 } from "@/store/global-store.ts";
 import {NavLink, useParams} from "react-router";
@@ -22,11 +22,33 @@ import UserInfoRoomTableView from "@/components/app/table/UserInfoRoomTableView.
 import ShortTeamTableView from "@/components/app/table/ShortTeamTableView.tsx";
 import EntityCard from "@/components/app/EntityCard.tsx";
 import {ListRenderer, MonoRenderer, OptRenderer} from "@/components/app/ValueRenderers.tsx";
+import {showPasswordChangeDialogAtom} from "@/components/app/dialogs/user-page-dialogs/PasswordChangeDialog.tsx";
+import {showAddUserInRoomDialogAtom} from "@/components/app/dialogs/user-page-dialogs/AddUserInRoomDialog.tsx";
+import {showAddUserInTeamDialogAtom} from "@/components/app/dialogs/user-page-dialogs/AddUserInTeamDialog.tsx";
+import {showDeleteUserFromRoomDialogAtom} from "@/components/app/dialogs/user-page-dialogs/DeleteUserFromRoomDialog.tsx";
+import {showDeleteUserFromTeamDialogAtom} from "@/components/app/dialogs/user-page-dialogs/DeleteUserFromTeamDialog.tsx";
+import {showDeleteUserDialogAtom} from "@/components/app/dialogs/user-page-dialogs/DeleteUserDialog.tsx";
 
 function UserPageContent() {
     const user = loaded(useAtomValue($selectedUser)).data
     const selectedSpaceId = useAtomValue($selectedSpaceId)!
     const {teams, rooms} = loaded(useAtomValue($userInfo)).data
+
+    const setPasswordChangeDialogOpen = useSetAtom(showPasswordChangeDialogAtom)
+    const setAddUserInRoomOpen = useSetAtom(showAddUserInRoomDialogAtom)
+    const setAddUserInTeamOpen = useSetAtom(showAddUserInTeamDialogAtom)
+    const setDeleteUserFromRoomOpen = useSetAtom(showDeleteUserFromRoomDialogAtom)
+    const setDeleteUserFromTeamOpen = useSetAtom(showDeleteUserFromTeamDialogAtom)
+    const setDeleteUserOpen = useSetAtom(showDeleteUserDialogAtom)
+
+    const setSelectedUsersData = useSetAtom($selectedUsersData)
+    const data = [
+        {
+            _id: user._id as string,
+            username: user.username as string
+        }
+    ]
+    setSelectedUsersData(data)
 
     return (
         <div className="flex flex-col py-6 mx-6">
@@ -58,23 +80,23 @@ function UserPageContent() {
                     ]}
                 />
                 <div className={"flex justify-between gap-6"}>
-                    <div className="flex justify-between gap-2">
-                        <Button variant="outline">
-                            Добавить пользователей
+                    <div className="flex flex-wrap gap-2">
+                        <Button variant="outline" onClick={() => {setAddUserInRoomOpen(true)}}>
+                            Добавить в комнату
                         </Button>
-                        <Button variant="outline">
+                        <Button variant="outline" onClick={() => {setAddUserInTeamOpen(true)}}>
                             Добавить в команду
                         </Button>
-                        <Button variant="outline">
-                            Удалить из комнаты
-                        </Button>
-                        <Button variant="outline">
+                        <Button variant="outline" onClick={() => {setDeleteUserFromTeamOpen(true)}}>
                             Удалить из команды
                         </Button>
-                        <Button variant="outline">
+                        <Button variant="outline" onClick={() => {setDeleteUserFromRoomOpen(true)}}>
+                            Удалить из комнаты
+                        </Button>
+                        <Button variant="outline" onClick={() => {setPasswordChangeDialogOpen(true)}}>
                             Сменить пароль
                         </Button>
-                        <Button variant="outline">
+                        <Button variant="outline" onClick={() => {setDeleteUserOpen(true)}}>
                             Удалить
                         </Button>
                     </div>

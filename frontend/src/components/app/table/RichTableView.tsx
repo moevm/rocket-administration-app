@@ -1,32 +1,33 @@
 import * as React from "react";
 import {
-    ColumnFiltersState, flexRender,
+    ColumnFiltersState, FilterFn, flexRender,
     getCoreRowModel, getFilteredRowModel,
-    getPaginationRowModel, getSortedRowModel, Row, RowSelectionState,
-    SortingState,
+    getPaginationRowModel, getSortedRowModel, Row, SortingState,
     useReactTable,
     VisibilityState
 } from "@tanstack/react-table";
 import {Point} from "@/components/custom-radix/context-menu.tsx";
-import {useEffect} from "react";
+import {useCallback, useEffect, useMemo} from "react";
 import {ContextMenuLabel} from "@/components/ui/context-menu.tsx";
 import {Input} from "@/components/ui/input.tsx";
 import {MultiSelect} from "@/components/ui/multi-select.tsx";
 import {Button} from "@/components/ui/button.tsx";
-import {CheckIcon, FileDown, FileUp, Filter, SettingsIcon} from "lucide-react";
+import {CheckIcon, FileDown, FileUp, SettingsIcon} from "lucide-react";
 import {DataTableViewOptions} from "@/components/app/table/DataTableViewOptions.tsx";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {DataTablePagination} from "@/components/app/table/DataTablePagination.tsx";
 import {ColumnDef} from "@tanstack/table-core";
 import ExternallyTriggeredContextMenu from "@/components/app/ExternallyTriggeredContextMenu.tsx";
-import {Label} from "@/components/ui/label.tsx";
-import {getColumnTypeRelations, relationFullName} from "@/store/columnsUser.tsx";
-import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
-import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover.tsx";
-import {ExportDialog} from "@/components/app/ExportDialog.tsx";
-import {FileDialog} from "@/components/app/FileDialog.tsx";
+import {ExportDialog} from "@/components/app/dialogs/ExportDialog.tsx";
+import {FileDialog} from "@/components/app/dialogs/FileDialog.tsx";
 import {toast} from "sonner";
-import {UserImportDialog} from "@/components/app/UserImportDialog.tsx";
+import {UserImportDialog} from "@/components/app/dialogs/UserImportDialog.tsx";
+import TableFilters from "@/components/app/table/TableFilters.tsx";
+import {FilterConfig, performFilter} from "@/lib/filters.ts";
+import {FilterMeta} from "@tanstack/table-core/src/types.ts";
+import {useAtom} from "jotai/index";
+import {$hideColumnsAtomFamily, $searchColumnsAtomFamily, showContextMenuAtom} from "@/store/global-store.ts";
+import {useAtomValue} from "jotai";
 
 export interface ContextMenuConfig<TData> {
     getLabel?: (rows: Row<TData>[]) => string;
@@ -34,6 +35,7 @@ export interface ContextMenuConfig<TData> {
 }
 
 interface RichTableViewProps<TData, TValue> {
+    tableId: string,
     entries: TData[]; // состояние с данными
     tableConfig: {
         columns: ColumnDef<TData, TValue>[];
@@ -49,18 +51,18 @@ interface RichTableViewProps<TData, TValue> {
         rowClickHandler?: (data: TData) => void;
     };
     onSelectionUpdated?: (data: Row<TData>[]) => void;
+    buttonsSlot?: () => React.ReactNode;
 }
 
 function RichTableView<TData, TValue>({
+                                          tableId,
                                           entries,
                                           tableConfig,
                                           contextMenuConfig,
                                           settings = {},
-                                          onSelectionUpdated
+                                          onSelectionUpdated,
+                                          buttonsSlot
                                       }: RichTableViewProps<TData, TValue>) {
-    console.info({
-        entries: entries
-    })
     const data = entries;
 
     const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -68,19 +70,40 @@ function RichTableView<TData, TValue>({
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
     const [filterString, setFilterString] = React.useState<string>();
-    const [searchPosition, setSearchPosition] = React.useState<string[]>([]);
+    const [searchColumns, setSearchColumns] = useAtom($searchColumnsAtomFamily(tableId))
 
     const contextMenuPosition = React.useRef<Point>({x: 0, y: 0});
-    const [contextMenuOpen, setContextMenuOpen] = React.useState(false);
+    const [contextMenuOpen, setContextMenuOpen] = useAtom(showContextMenuAtom)
     const contextMenuRows = React.useRef<Row<TData>[]>([]);
 
     const [showDialogExport, setShowDialogExport] = React.useState<boolean>(false);
     const [showDialogImport, setShowDialogImport] = React.useState<boolean>(false);
     const [showDialogSelectFromFile, setShowDialogSelectFromFile] = React.useState<boolean>(false);
 
-    const defaultGlobalFilter = (row, columnId, filterValue) => {
-        return row.getValue(columnId)?.toString().toLowerCase().includes(filterValue.toLowerCase());
-    };
+    const customGlobalFilterFn: FilterFn<TData> = React.useCallback(
+        (
+            row: Row<TData>,
+            columnId: string
+        ): boolean => {
+            const searchTerm = String(filterString).toLowerCase().trim();
+
+            if (!searchTerm) {
+                return true;
+            }
+
+            if (searchColumns.length === 0) {
+                return false;
+            }
+
+            if (!searchColumns.includes(columnId)) {
+                return false;
+            }
+
+            const cellValue = row.getValue(columnId);
+            return String(cellValue).toLowerCase().includes(searchTerm);
+        },
+        [searchColumns, filterString]
+    );
 
     const table = useReactTable<TData>({
         data,
@@ -104,16 +127,93 @@ function RichTableView<TData, TValue>({
         getFilteredRowModel: getFilteredRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
         getSortedRowModel: getSortedRowModel(),
-        globalFilterFn: tableConfig.globalFilterFn || defaultGlobalFilter
+        enableGlobalFilter: true,
+        globalFilterFn: customGlobalFilterFn,
+        defaultColumn: {
+            filterFn(
+                row: Row<TData>,
+                columnId: string,
+                filterValue: FilterConfig[],
+                addMeta: (meta: FilterMeta) => void
+            ) {
+                if (!filterValue.length) {
+                    return true;
+                }
+                return filterValue.every(it => performFilter(
+                    it,
+                    row.getValue(columnId)
+                ))
+            },
+            enableColumnFilter: true
+        }
     });
+
+    const [hiddenColumns, setHiddenColumns] = useAtom($hideColumnsAtomFamily(tableId))
+
+    const allTableColumns = useMemo(() => {
+        return table.getAllColumns()
+            .filter(
+                (column) =>
+                    typeof column.accessorFn !== "undefined" && column.getCanHide()
+            )
+    }, [table])
+
+    const visibleColumns = useMemo(() => {
+        return allTableColumns.filter(it => !hiddenColumns.includes(it.id)).map(it => it.id)
+    }, [allTableColumns, hiddenColumns])
+
+    const setVisibleColumns = useCallback((newVisibleColumns: string[]) => {
+        setHiddenColumns(
+            allTableColumns
+                .filter(it => !newVisibleColumns.includes(it.id))
+                .map(it => it.id)
+        )
+
+    }, [allTableColumns, setHiddenColumns])
+
+    // const hideColumn = useCallback((id: string) => {
+    //     console.log('hiding column', id)
+    //     console.log('prev hidden: ', hiddenColumns)
+    //     const newHidden = [...hiddenColumns, id]
+    //     console.log('new hidden', newHidden)
+    //     setHiddenColumns(newHidden)
+    // }, [setHiddenColumns, hiddenColumns])
+
+    useEffect(() => {
+        for (const col of allTableColumns) {
+            col.toggleVisibility(visibleColumns.includes(col.id))
+        }
+    }, [allTableColumns, visibleColumns]);
 
     useEffect(() => {
         table.setGlobalFilter(filterString)
-    }, [filterString, table, searchPosition]);
+    }, [filterString, table, searchColumns]);
 
+    const [tableFilters, setTableFilters] = React.useState<FilterConfig[]>([])
+    const updateTableFilters = useCallback((filters: FilterConfig[]) => {
+        const filtersByColumn = new Map()
+        filters.map(filter => {
+            if (!filtersByColumn.has(filter.columnId)) {
+                filtersByColumn.set(filter.columnId, [])
+            }
+            filtersByColumn.get(filter.columnId).push(filter)
+        })
+        for (const col of table.getAllColumns()) {
+            if (filtersByColumn.has(col.id)) {
+                col.setFilterValue(filtersByColumn.get(col.id))
+            } else {
+                col.setFilterValue([])
+            }
+        }
+        setTableFilters(filters)
+    }, [])
+
+    useEffect(() => {
+        updateTableFilters([])
+    }, []);
 
     return (
-        <div className={"flex w-full max-w-screen-lg flex-col"}>
+        <div className={"flex w-full flex-col"}>
             <ExternallyTriggeredContextMenu
                 open={contextMenuOpen}
                 onOpenChange={setContextMenuOpen}
@@ -132,13 +232,13 @@ function RichTableView<TData, TValue>({
                     <div className="flex gap-2">
                         <Input
                             placeholder={
-                                searchPosition.length
-                                    ? "Поиск по " + searchPosition.join(", ")
+                                searchColumns.length
+                                    ? "Поиск по " + searchColumns.join(", ")
                                     : "Выберите колонку для поиска"
                             }
                             value={filterString}
                             onChange={(event) => setFilterString(event.target.value)}
-                            disabled={searchPosition.length === 0}
+                            disabled={searchColumns.length === 0}
                             className="max-w-sm"
                         />
                         <MultiSelect
@@ -152,94 +252,23 @@ function RichTableView<TData, TValue>({
                                 )
                                 .map(it => ({
                                     label: it.columnDef.meta?.title || it.id,
-                                    value: it.id
+                                    value: it.columnDef.meta?.title || it.id
                                 }))}
-                            onValueChange={setSearchPosition}
+                            defaultValue={searchColumns}
+                            onValueChange={setSearchColumns}
                         >
                             <Button variant={"outline"}>
                                 <SettingsIcon/>
                             </Button>
                         </MultiSelect>
-                        <Popover>
-                            <PopoverTrigger asChild>
-                                <Button variant="outline">
-                                    <Filter/>
-                                </Button>
-                            </PopoverTrigger>
-
-                            <PopoverContent className="w-80">
-                                <div className="mb-4">
-                                    <h4 className="font-medium leading-none">Фильтры</h4>
-                                </div>
-
-                                <div className="flex flex-col gap-2 justify-items-stretch">
-                                    <Label htmlFor="width">Атрибут</Label>
-                                    <Select>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Выберите атрибут"/>
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectGroup>
-                                                {table
-                                                    .getAllColumns()
-                                                    .filter(
-                                                        (column) =>
-                                                            typeof column.accessorFn !== "undefined" && column.getCanHide()
-                                                    )
-                                                    .map((column) => {
-                                                        return (
-                                                            <SelectItem
-                                                                key={column.id}
-                                                                value={column.id}>{column.columnDef.meta?.title ? column.columnDef.meta.title : column.id}</SelectItem>
-                                                        )
-                                                    })}
-                                            </SelectGroup>
-                                        </SelectContent>
-                                    </Select>
-
-                                    <Label htmlFor="width">Отношение</Label>
-                                    <Select>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Выберите отношение"/>
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectGroup>
-                                                {getColumnTypeRelations('number')
-                                                    .map((relation) => {
-                                                        return (
-                                                            <SelectItem
-                                                                key={relation}
-                                                                value={relation}>{relationFullName[relation]}</SelectItem>
-                                                        )
-                                                    })
-                                                }
-                                            </SelectGroup>
-                                        </SelectContent>
-                                    </Select>
-
-                                    <Label htmlFor="width">Значение</Label>
-                                    <Input
-                                        //TODO закончить форму
-                                        placeholder="gmail.com"
-                                        onChange={
-                                            (event) => {
-                                            }
-                                        }
-                                        className="max-w-sm"
-                                    />
-                                    <Button variant="outline">Добавить фильтр</Button>
-                                    <Button variant="outline">Очистить фильтры</Button>
-                                    <Button variant="outline">Применить</Button>
-                                </div>
-                            </PopoverContent>
-                        </Popover>
                     </div>
                 )}
 
+                <TableFilters table={table} filters={tableFilters} onFiltersUpdated={updateTableFilters}/>
 
                 <div className="flex justify-between">
                     <div className="flex gap-2">
-                        {settings?.enableExport &&
+                        {/*{settings?.enableExport &&*/
                             <Button variant="outline" size="sm" onClick={() => setShowDialogExport(true)}>
                                 <FileUp/> Экспорт
                             </Button>}
@@ -251,8 +280,9 @@ function RichTableView<TData, TValue>({
                             <Button variant="outline" size="sm" onClick={() => setShowDialogSelectFromFile(true)}>
                                 <CheckIcon/> Выделить из файла
                             </Button>}
+                        {buttonsSlot && buttonsSlot()}
                     </div>
-                    {settings?.enableColumnVisibilityToggle && <DataTableViewOptions table={table}/>}
+                    {settings?.enableColumnVisibilityToggle && <DataTableViewOptions allTableColumns={allTableColumns} visibleColumns={visibleColumns} setVisibleColumns={setVisibleColumns}/>}
                 </div>
             </div>
 
@@ -262,10 +292,10 @@ function RichTableView<TData, TValue>({
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
                                 {headerGroup.headers.map((header) => (
-                                    <TableHead key={header.id} className="truncate max-w-screen-lg">
+                                    <TableHead key={header.id}>
                                         {header.isPlaceholder
                                             ? null
-                                            : flexRender(header.column.columnDef.header, header.getContext())}
+                                            : flexRender(header.column.columnDef.header, {...header.getContext() })}
                                     </TableHead>
                                 ))}
                             </TableRow>
@@ -276,7 +306,7 @@ function RichTableView<TData, TValue>({
                         {table.getRowModel().rows.length ? (
                             table.getRowModel().rows.map((row) => (
                                 <TableRow
-                                    className={"cursor-pointer truncate max-w-screen-lg"}
+                                    className={"cursor-pointer"}
                                     key={row.id}
                                     data-state={row.getIsSelected() && "selected"}
                                     // TODO: проваливание здесь
@@ -296,7 +326,7 @@ function RichTableView<TData, TValue>({
                                     }}
                                 >
                                     {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id} className="truncate max-w-screen-lg">
+                                        <TableCell key={cell.id} className={"whitespace-nowrap"}>
                                             {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                         </TableCell>
                                     ))}
@@ -323,13 +353,13 @@ function RichTableView<TData, TValue>({
             />
             <FileDialog
                 open={showDialogSelectFromFile}
+                dialogStep={1}
                 onOpenChange={setShowDialogSelectFromFile}
                 title={"Выделить из файла"}
                 description={"Будут выделены все строки с совпадениями основных полей"}
                 buttonText={"Выделить из файла"}
                 onSubmit={(data) => {
                     const matches = new Set(data.flatMap(it => Object.values(it).map(it => String(it).toLowerCase())))
-                    console.info(matches)
 
                     const cols = table.getAllColumns()
                         .filter(
@@ -338,7 +368,7 @@ function RichTableView<TData, TValue>({
                         )
 
                     let count = 0
-                    table.getRowModel().rows.forEach(row => {
+                    table.getPrePaginationRowModel().rows.forEach(row => {
                         if (cols.some(it => matches.has(String(row.getValue(it.id)).toLowerCase()))) {
                             row.toggleSelected(true)
                             count++

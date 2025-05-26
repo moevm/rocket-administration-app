@@ -9,10 +9,10 @@ from app.features.spaces.utils import get_space
 from app.models import TeamDto
 from app.models import UserDto
 from app.lib.rocket import obtain_rocket_instance, rocket_request, rocket_query_args
-from app.lib.utils import batch_execute, generate_password, extract_exception_message
+from app.lib.utils import batch_execute, generate_password, extract_exception_message, hide_system_messages
 from app.config import settings
 
-from app.models import RoomsImportRequestDto, ImportedRoomResultDto, RoomCreateDto
+from app.models import RoomsImportRequestDto, ImportedRoomResultDto, RoomCreateDto, RoomsDeleteDto, RoomDeleteResDto
 
 router = APIRouter()
 
@@ -26,11 +26,36 @@ async def get_rooms(space=Depends(get_space)) -> List[RoomDto]:
         for room
         in (await rocket_request(
             rocket.rooms_admin_rooms,
-            **rocket_query_args(types=['discussions', 'teams', 'd', 'c', 'p'], count=0)
+            **rocket_query_args(types=['c', 'p'], count=0)
         ))['rooms']
     ]
     return rooms
 
+@router.delete("/")
+async def delete_rooms(body: RoomsDeleteDto, space=Depends(get_space)) -> List[RoomDeleteResDto]:
+    rocket = await obtain_rocket_instance(key_for_space(space))
+
+    async def _process(room: str) -> RoomDeleteResDto:
+        res = RoomDeleteResDto(room=room)
+        try:
+            await rocket_request(
+                rocket.call_api_post,
+                "rooms.delete",
+                **rocket_query_args(roomId=room)
+            )
+        except Exception as e:
+            res.error = extract_exception_message(e)
+        else:
+            res.success = True
+        return res
+    
+    rooms = await batch_execute(
+        _process,
+        [(room,) for room in body.rooms],
+        settings.app.batch_delay
+    )
+
+    return rooms
 
 @router.get("/{room_id}")
 async def get_room_information(room_id: str, space=Depends(get_space)) -> RoomInfoDto:
@@ -59,15 +84,19 @@ async def create_groups(
         )
 
         try:
-            create_args = group_data.model_dump(exclude_unset=True)
-
             response_data = await rocket_request(
                 rocket.groups_create,
-                **rocket_query_args(**create_args)
+                **rocket_query_args(
+                    name=group_data.name,
+                    readOnly=group_data.readOnly
+                )
             )
 
             created_group = response_data['group']
             result.created_id = created_group['_id']
+            if group_data.disable_system_messages:
+                await hide_system_messages(rocket, result.created_id)
+
 
         except Exception as e:
             result.error = extract_exception_message(e)
@@ -96,15 +125,18 @@ async def create_channel(
         )
 
         try:
-            create_args = channel_data.model_dump(exclude_unset=True)
-
             response_data = await rocket_request(
                 rocket.channels_create,
-                **rocket_query_args(**create_args)
+                **rocket_query_args(
+                    name=channel_data.name,
+                    readOnly=channel_data.readOnly,
+                    teamId=channel_data.teamId
+                )
             )
-
             created_channel = response_data['channel']
             result.created_id = created_channel['_id']
+            if channel_data.disable_system_messages:
+                await hide_system_messages(rocket, result.created_id)
 
         except Exception as e:
             result.error = extract_exception_message(e)

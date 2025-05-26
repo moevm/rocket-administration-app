@@ -5,14 +5,12 @@ import {
 } from "@/components/ui/dialog.tsx";
 import {useAtom, useAtomValue} from "jotai/index";
 import {Button} from "@/components/ui/button.tsx";
-import {$api, createMutationOptions} from "@/api";
+import {$api, createMutationOptions, queryClient} from "@/api";
 import {
-    $rooms,
-    $selectedSpaceId,
-    showAddNewTeamDialogAtom
+    $roomsQueryOptions,
+    $selectedSpaceId, $teamsQueryOptions, showAddNewTeamDialogAtom
 } from "@/store/global-store.ts";
-import {Loader2, Plus} from "lucide-react";
-import {BatchLoader} from "@/components/app/DataLoader.tsx";
+import {Loader2} from "lucide-react";
 import {Input} from "@/components/ui/input.tsx";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
@@ -20,21 +18,22 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form.tsx";
 import {toast} from "sonner";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
-
-
+import {useInvalidateTeams} from "@/api/invalidate.ts";
 
 function AddNewTeamContent() {
     const [open, setOpen] = useAtom(showAddNewTeamDialogAtom)
     const selectedSpaceId = useAtomValue($selectedSpaceId)!
+
+    const invalidate = useInvalidateTeams()
 
     const {
         mutate,
         isPending
     } = $api.useMutation('post', '/spaces/{space_id}/teams/', createMutationOptions({
         onSuccess: async (data) => {
-            console.log(data)
             toast.success("Команда успешно создана");
             setOpen(false);
+            invalidate()
         },
         onError: async (error) => {
             console.log(error);
@@ -59,7 +58,6 @@ function AddNewTeamContent() {
     })
 
     function onSubmit(values: z.infer<typeof formSchema>) {
-        console.log(values)
         mutate({
             body: {
                 teams: [
@@ -134,26 +132,14 @@ function AddNewTeamContent() {
                         </form>
                     </Form>
                 </div>
-
-                {/*<DialogFooter className="sm:justify-start">*/}
-                {/*    <Button type="button" variant="default" onClick={handleAddClick} disabled={isPending}>*/}
-                {/*        Создать*/}
-                {/*    </Button>*/}
-                {/*</DialogFooter>*/}
             </DialogContent>
         </Dialog>
     )
 }
 
 const AddNewTeamDialog = () => {
-    const rooms = useAtomValue($rooms)
-
     return (
-        <BatchLoader
-            states={[rooms]}
-            loadingMessage='Загрузка комнат'
-            display={() => <AddNewTeamContent/>}
-        />
+        <AddNewTeamContent/>
     )
 }
 

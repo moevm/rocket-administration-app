@@ -4,10 +4,53 @@ from app.services.db import DbModel
 from datetime import datetime
 
 
+class TeamsAndRoomsDto(BaseModel):
+    teams: List[str]
+    rooms: List[str]
+
+
+class TeamsAndRoomsResDto(BaseModel):
+    success: bool = True
+    error: Optional[str] = None
+    room: str
+    team: str
+
+
+class ShortUserDto(BaseModel):
+    id: str = Field(alias='_id')
+    username: str
+
+
+class RoomDto(BaseModel):
+    id: str = Field(alias='_id')
+    description: Optional[str] = None
+    broadcast: Optional[bool] = None
+    name: Optional[str] = None
+    t: Optional[str] = None
+    msgs: Optional[int] = None
+    usersCount: Optional[int] = None
+    u: Optional[ShortUserDto] = None
+    ro: Optional[bool] = None
+    default: Optional[bool] = None
+    topic: Optional[str] = None
+    announcement: Optional[str] = None
+
+
+class TeamDto(BaseModel):
+    id: str = Field(alias='_id')
+    name: Optional[str] = None
+    type: Optional[int] = None
+    createdAt: Optional[str] = None
+    createdBy: Optional[ShortUserDto] = None
+    updatedAt: Optional[str] = None
+    roomId: Optional[str] = None
+
+
 class UserCreateDto(BaseModel):
     username: str
     email: EmailStr
     name: str
+
 
 class UsersImportRequestDto(BaseModel):
     users: List[UserCreateDto]
@@ -29,7 +72,7 @@ class ImportedUserResultDto(BaseModel):
 class RoomCreateDto(BaseModel):
     name: str
     readOnly: bool = False
-    excludeSelf: bool = False
+    disable_system_messages: bool = True
     teamId: Optional[str] = None
 
 
@@ -46,6 +89,7 @@ class ImportedRoomResultDto(BaseModel):
 class TeamCreateDto(BaseModel):
     name: str
     team_type: int
+    disable_system_messages: bool = True
 
 
 class TeamsImportRequestDto(BaseModel):
@@ -56,11 +100,6 @@ class ImportedTeamResultDto(BaseModel):
     request: TeamCreateDto
     created_id: Optional[str] = None
     error: Optional[str] = None
-
-
-class ShortUserDto(BaseModel):
-    id: str = Field(alias='_id')
-    username: str
 
 
 class UserEmailDto(BaseModel):
@@ -98,26 +137,13 @@ class RoleDto(BaseModel):
     protected: bool
 
 
-class RoomDto(BaseModel):
-    id: str = Field(alias='_id')
-    description: Optional[str] = None
-    broadcast: Optional[bool] = None
-    name: Optional[str] = None
-    t: str = None
-    msgs: Optional[int] = None
-    usersCount: Optional[int] = None
-    u: Optional[ShortUserDto] = None
-    ro: Optional[bool] = None
-    default: Optional[bool] = None
-    topic: Optional[str] = None
-    announcement: Optional[str] = None
-
 class UserInfoRoomDto(BaseModel):
     id: str = Field(alias='_id')
     name: str
     rid: str
     t: str
     roles: Optional[List[str]] = None
+
 
 class RoomUserDto(BaseModel):
     id: str = Field(alias='_id')
@@ -128,7 +154,7 @@ class RoomUserDto(BaseModel):
 
 class RoomInfoDto(BaseModel):
     team: Optional[ShortTeamDto] = None
-    members: List[RoomUserDto] = None
+    members: Optional[List[RoomUserDto]] = None
 
 
 class CreateSpaceRequest(BaseModel):
@@ -149,41 +175,46 @@ class SpaceDto(SpaceModel):
     pass
 
 
-class TeamDto(BaseModel):
-    id: str = Field(alias='_id')
-    name: Optional[str] = None
-    type: Optional[int] = None
-    createdAt: Optional[str] = None
-    createdBy: Optional[ShortUserDto] = None
-    updatedAt: Optional[str] = None
-    roomId: Optional[str] = None
-
 class TeamInfoDto(BaseModel):
     users: List[RoomUserDto]
     rooms: List[RoomDto]
+
+class TeamDeletedDto(BaseModel):
+    team: str
+    rooms: List[str] = []
+    success: bool
+    error: Optional[str] = None
+
 
 class UserInfoDto(BaseModel):
     teams: List[ShortTeamDto]
     rooms: List[UserInfoRoomDto]
 
+
 class SmtpSettingsDto(BaseModel):
     host: AnyUrl
     sender: EmailStr
+
 
 class SmtpSettingsModel(DbModel):
     host: AnyUrl
     sender: EmailStr
 
+
 class SmtpSettingsResponseDto(BaseModel):
     value: Optional[SmtpSettingsDto]
+
 
 class UsersToChangePasswordDto(BaseModel):
     users: List[str]
     sendEmail: bool
+    password: Optional[str] = None
+
 
 class Result[T](BaseModel):
     value: Optional[T] = None
     error: Optional[str] = None
+
 
 class ChangedPasswordDto(BaseModel):
     user: str
@@ -192,12 +223,51 @@ class ChangedPasswordDto(BaseModel):
     email_sent: bool = False
     email_send_error: Optional[str] = None
 
+
 class UsersAndRoomsDto(BaseModel):
     users: List[str]
     rooms: List[str]
 
-class UsersAndRoomsResDto(BaseModel):
+class DeleteTeamDto(BaseModel):
+    id: str
+    rid: str
+
+class UsersAndTeamsDto(BaseModel):
+    users: List[str]
+    teams: List[DeleteTeamDto]
+    ban_in_rooms: bool = True
+
+
+class UsersAndRoomResDto(BaseModel):
     success: bool = True
-    msg: Optional[str] = None
+    error: Optional[str] = None
     user_list: List[str]
     room: str
+
+class UsersAndTeamResDto(BaseModel):
+    success: bool = True
+    error: Optional[str] = None
+    user_list: List[str]
+    team: str
+
+class TeamsDeleteDto(BaseModel):
+    teams: List[str]
+    delete_linked_rooms: bool = True
+
+class RoomsDeleteDto(BaseModel):
+    rooms: List[str]
+
+class RoomDeleteResDto(BaseModel):
+    room: str
+    success: bool = False
+    error: Optional[str] = None
+
+class UsersDeleteDto(BaseModel):
+    users: List[str]
+    force_delete: bool = True
+
+class UserDeleteResDto(BaseModel):
+    user: str
+    force_delete: bool
+    success: bool = False
+    error: Optional[str] = None

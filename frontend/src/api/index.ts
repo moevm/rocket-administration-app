@@ -21,14 +21,28 @@ export const queryClient = new QueryClient({
     },
 })
 
-export const HydrateAtoms = ({ children }: { children: ReactNode }) => {
-    // @ts-ignore
+export const HydrateAtoms = ({children}: { children: ReactNode }) => {
     useHydrateAtoms(new Map([[queryClientAtom, queryClient]]))
     return children
 }
 
 const fetchClient = createFetchClient<paths>({
-    baseUrl: "http://localhost:8000",
+    baseUrl: import.meta.env.VITE_BACKEND_URL ?? "http://localhost:8000",
+    async fetch(request) {
+        const originalResponse = await globalThis.fetch(request);
+
+        if (originalResponse.status === 502) {
+            toast.error(
+                'Не удалось авторизоваться в RocketChat. Проверьте валидность токена или измените его в настройках',
+                {
+                    id: 'cannot-auth',
+                    duration: Infinity,
+                }
+            )
+        }
+
+        return originalResponse;
+    }
 });
 export const $api = createClient(fetchClient);
 
@@ -38,7 +52,7 @@ export function loadableQuery<Value, Error>(anAtom: Atom<AtomWithQueryResult<Awa
     }))
 }
 
-export function loaded<T> (loadable: Loadable<T>) {
+export function loaded<T>(loadable: Loadable<T>) {
     return loadable as {
         state: 'hasData';
         data: Awaited<T>;
@@ -60,7 +74,6 @@ export const errorMessage: (error: unknown) => string = error => {
     return 'Неизвестная ошибка'
 }
 
-// TODO show loader & toast
 export function createMutationOptions<D, E, I>(options?: Omit<UseMutationOptions<D, E, I>, "mutationKey" | "mutationFn">): Omit<UseMutationOptions<D, E, I>, "mutationKey" | "mutationFn"> {
     return {
         onMutate: (variables) => {
@@ -68,11 +81,11 @@ export function createMutationOptions<D, E, I>(options?: Omit<UseMutationOptions
         },
         onError: (error, variables, context) => {
             console.log(`mutation error`, {error, variables, context})
-            toast.error("Ошибка ", { description: errorMessage(error) })
+            toast.error("Ошибка ", {description: errorMessage(error)})
             if (options?.onError) options.onError(error, variables, context)
         },
         onSuccess: (data, variables, context) => {
-            toast.success("Успех")
+            toast.success("Запрос выполнен")
             if (options?.onSuccess) options.onSuccess(data, variables, context)
         },
     }

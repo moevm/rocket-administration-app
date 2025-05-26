@@ -1,28 +1,9 @@
 import DataTableColumnHeader from "@/components/app/table/DataTableColumnHeader.tsx";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
 import {ApiUserInfoRoomModel} from "@/store/global-store.ts";
-import {TypedColumnDef} from "@/store/columnsUser.tsx";
 import React from "react";
 import {ListRenderer, MonoRenderer, OptRenderer} from "@/components/app/ValueRenderers.tsx";
-
-
-//TODO: вынести в отдельный компонент
-const customSortingFn = (rowA, rowB, columnId) => {
-    const getValue = (row) => {
-        const value = row.getValue(columnId);
-        if (value === undefined || value === null) return "";
-        return String(value);
-    };
-
-    const a = getValue(rowA);
-    const b = getValue(rowB);
-
-    if (a === b) return 0;
-    if (a === "+" || a === "-") return 1;
-    if (b === "+" || b === "-") return -1;
-
-    return a.localeCompare(b, "ru", {numeric: true});
-};
+import {customSortingFn, TypedColumnDef} from "@/lib/table.ts";
 
 const typesName = {
     d: "Личные сообщения",
@@ -61,11 +42,7 @@ export const columnsUserInfoRoom = [
     },
     {
         accessorKey: "_id",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="id"/>
-            )
-        },
+        header: DataTableColumnHeader,
         meta: {
             title: "id",
             type: 'string',
@@ -76,11 +53,7 @@ export const columnsUserInfoRoom = [
     },
     {
         accessorKey: "name",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Имя"/>
-            )
-        },
+        header: DataTableColumnHeader,
         meta: {
             title: "Имя",
             type: 'string',
@@ -91,11 +64,7 @@ export const columnsUserInfoRoom = [
     },
     {
         id: "t",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Тип"/>
-            )
-        },
+        header: DataTableColumnHeader,
         accessorFn: (row) => {
             return typesName[row.t] ?? row.t
         },
@@ -107,11 +76,7 @@ export const columnsUserInfoRoom = [
     },
     {
         accessorKey: "rid",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="rid"/>
-            )
-        },
+        header: DataTableColumnHeader,
         meta: {
             title: "rid",
             type: 'string',
@@ -122,11 +87,7 @@ export const columnsUserInfoRoom = [
     },
     {
         accessorKey: "roles",
-        header: ({column}) => {
-            return (
-                <DataTableColumnHeader column={column} title="Роли"/>
-            )
-        },
+        header: DataTableColumnHeader,
         meta: {
             title: "Роли",
             type: 'list'
