@@ -53,7 +53,6 @@ async def remove_users_from_room(body: UsersAndRoomsDto, space=Depends(get_space
         result = UsersAndRoomResDto(success=False, user_list=[user], room=room)
         try:
             room_info = await rocket_request(rocket.rooms_info,**rocket_query_args(room_id=room))
-            print(room_info)
             if room_info['room']['t'] == 'p':
                 tmp = await rocket_request(
                     rocket.groups_kick, **rocket_query_args(room_id=room, user_id=user)
