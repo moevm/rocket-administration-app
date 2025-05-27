@@ -372,13 +372,16 @@ function RichTableView<TData, TValue>({
 
                     let count = 0
                     table.getPrePaginationRowModel().rows.forEach(row => {
-                        if (cols.some(it => matches.has(String(row.getValue(it.id)).toLowerCase()))) {
+                        if (cols.some(it => {
+                            const value = row.getValue(it.id)
+                            return matches.has(String(value).toLowerCase())
+                        })) {
                             row.toggleSelected(true)
                             count++
                         }
                     })
 
-                    toast.success(`Выделено ${count} строк`)
+                    toast.success(`Выделено строк: ${count}`)
                     return true
                 }}
             />
