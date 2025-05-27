@@ -233,7 +233,10 @@ function RichTableView<TData, TValue>({
                         <Input
                             placeholder={
                                 searchColumns.length
-                                    ? "Поиск по " + searchColumns.join(", ")
+                                    ? "Поиск по " + searchColumns.map(id => {
+                                    const column = table.getAllColumns().find(col => col.id === id);
+                                    return column?.columnDef.meta?.title || id;
+                                }).join(", ")
                                     : "Выберите колонку для поиска"
                             }
                             value={filterString}
@@ -252,7 +255,7 @@ function RichTableView<TData, TValue>({
                                 )
                                 .map(it => ({
                                     label: it.columnDef.meta?.title || it.id,
-                                    value: it.columnDef.meta?.title || it.id
+                                    value: it.id
                                 }))}
                             defaultValue={searchColumns}
                             onValueChange={setSearchColumns}
