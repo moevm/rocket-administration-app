@@ -136,7 +136,7 @@ export const FileDialog = ({
                             <Loader2 className="animate-spin"/>
                             Загрузка</>
                         : <>
-                            Ипорт
+                            Импорт
                         </>
                     }
                 </Button>
