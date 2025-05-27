@@ -233,7 +233,10 @@ function RichTableView<TData, TValue>({
                         <Input
                             placeholder={
                                 searchColumns.length
-                                    ? "Поиск по " + searchColumns.join(", ")
+                                    ? "Поиск по " + searchColumns.map(id => {
+                                    const column = table.getAllColumns().find(col => col.id === id);
+                                    return column?.columnDef.meta?.title || id;
+                                }).join(", ")
                                     : "Выберите колонку для поиска"
                             }
                             value={filterString}
@@ -252,7 +255,7 @@ function RichTableView<TData, TValue>({
                                 )
                                 .map(it => ({
                                     label: it.columnDef.meta?.title || it.id,
-                                    value: it.columnDef.meta?.title || it.id
+                                    value: it.id
                                 }))}
                             defaultValue={searchColumns}
                             onValueChange={setSearchColumns}
@@ -369,13 +372,16 @@ function RichTableView<TData, TValue>({
 
                     let count = 0
                     table.getPrePaginationRowModel().rows.forEach(row => {
-                        if (cols.some(it => matches.has(String(row.getValue(it.id)).toLowerCase()))) {
+                        if (cols.some(it => {
+                            const value = row.getValue(it.id)
+                            return matches.has(String(value).toLowerCase())
+                        })) {
                             row.toggleSelected(true)
                             count++
                         }
                     })
 
-                    toast.success(`Выделено ${count} строк`)
+                    toast.success(`Выделено строк: ${count}`)
                     return true
                 }}
             />

@@ -88,6 +88,7 @@ export const columnsUser = [
         meta: {
             title: "Email",
             type: 'list',
+            selectFromFile: true
         },
         sortingFn: customSortingFn,
     },
