@@ -6,9 +6,7 @@ import {
     useReactTable,
     VisibilityState
 } from "@tanstack/react-table";
-import {Point} from "@/components/custom-radix/context-menu.tsx";
 import {useCallback, useEffect, useMemo} from "react";
-import {ContextMenuLabel} from "@/components/ui/context-menu.tsx";
 import {Input} from "@/components/ui/input.tsx";
 import {MultiSelect} from "@/components/ui/multi-select.tsx";
 import {Button} from "@/components/ui/button.tsx";
@@ -17,7 +15,6 @@ import {DataTableViewOptions} from "@/components/app/table/DataTableViewOptions.
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {DataTablePagination} from "@/components/app/table/DataTablePagination.tsx";
 import {ColumnDef} from "@tanstack/table-core";
-import ExternallyTriggeredContextMenu from "@/components/app/ExternallyTriggeredContextMenu.tsx";
 import {ExportDialog} from "@/components/app/dialogs/ExportDialog.tsx";
 import {FileDialog} from "@/components/app/dialogs/FileDialog.tsx";
 import {toast} from "sonner";
@@ -25,8 +22,8 @@ import {UserImportDialog} from "@/components/app/dialogs/UserImportDialog.tsx";
 import TableFilters from "@/components/app/table/TableFilters.tsx";
 import {FilterConfig, performFilter} from "@/lib/filters.ts";
 import {FilterMeta} from "@tanstack/table-core/src/types.ts";
-import {useAtom} from "jotai/index";
-import {$hideColumnsAtomFamily, $searchColumnsAtomFamily, showContextMenuAtom} from "@/store/global-store.ts";
+import {useAtom, useSetAtom} from "jotai";
+import {$hideColumnsAtomFamily, $searchColumnsAtomFamily, contextMenuDataAtom, showContextMenuAtom} from "@/store/global-store.ts";
 import {useAtomValue} from "jotai";
 
 export interface ContextMenuConfig<TData> {
@@ -72,9 +69,8 @@ function RichTableView<TData, TValue>({
     const [filterString, setFilterString] = React.useState<string>();
     const [searchColumns, setSearchColumns] = useAtom($searchColumnsAtomFamily(tableId))
 
-    const contextMenuPosition = React.useRef<Point>({x: 0, y: 0});
-    const [contextMenuOpen, setContextMenuOpen] = useAtom(showContextMenuAtom)
-    const contextMenuRows = React.useRef<Row<TData>[]>([]);
+    const setContextMenuData = useSetAtom(contextMenuDataAtom);
+    const setContextMenuOpen = useSetAtom(showContextMenuAtom);
 
     const [showDialogExport, setShowDialogExport] = React.useState<boolean>(false);
     const [showDialogImport, setShowDialogImport] = React.useState<boolean>(false);
@@ -214,19 +210,6 @@ function RichTableView<TData, TValue>({
 
     return (
         <div className={"flex w-full flex-col"}>
-            <ExternallyTriggeredContextMenu
-                open={contextMenuOpen}
-                onOpenChange={setContextMenuOpen}
-                point={contextMenuPosition.current}
-            >
-                <ContextMenuLabel>
-                    {contextMenuConfig.getLabel
-                        ? contextMenuConfig.getLabel(contextMenuRows.current)
-                        : "Действия"}
-                </ContextMenuLabel>
-                {contextMenuConfig.items(contextMenuRows.current)}
-            </ExternallyTriggeredContextMenu>
-
             <div className="flex flex-col gap-2 w-full py-2">
                 {!(settings) || settings.enableSearch && (
                     <div className="flex gap-2">
@@ -321,10 +304,16 @@ function RichTableView<TData, TValue>({
                                     }}
                                     onContextMenu={(e) => {
                                         e.preventDefault();
-                                        contextMenuPosition.current = {x: e.clientX, y: e.clientY};
                                         const selectedRows = table.getSelectedRowModel().rows as Row<TData>[];
-                                        contextMenuRows.current = row.getIsSelected() ? selectedRows : [row as Row<TData>];
-
+                                        const rows = row.getIsSelected() ? selectedRows : [row as Row<TData>];
+                                        setContextMenuData({
+                                            point: { x: e.clientX, y: e.clientY },
+                                            rows,
+                                            config: {
+                                                getLabel: contextMenuConfig.getLabel,
+                                                items: contextMenuConfig.items,
+                                            },
+                                        });
                                         setContextMenuOpen(true);
                                     }}
                                 >

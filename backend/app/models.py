@@ -150,11 +150,26 @@ class RoomUserDto(BaseModel):
     username: str
     name: str
     status: str
+    roles: Optional[List[str]] = None
 
 
 class RoomInfoDto(BaseModel):
     team: Optional[ShortTeamDto] = None
     members: Optional[List[RoomUserDto]] = None
+
+
+class RoomMemberRolesDto(BaseModel):
+    roles: List[str]
+
+
+class RoomMemberRolesResDto(BaseModel):
+    success: bool = True
+    error: Optional[str] = None
+
+
+class RoomRoleTypeDto(BaseModel):
+    id: str
+    label: str
 
 
 class CreateSpaceRequest(BaseModel):

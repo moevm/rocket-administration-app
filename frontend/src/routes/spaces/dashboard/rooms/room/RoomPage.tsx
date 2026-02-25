@@ -123,7 +123,7 @@ function RoomPageContent() {
 
             <div className={"pt-8"}>
                 <Label className={"text-3xl"}>Пользователи</Label>
-                <RoomUserTableView data={members}/>
+                <RoomUserTableView data={members} roomId={room._id} roomName={room.name}/>
             </div>
 
             <div className={"pt-8"}>
