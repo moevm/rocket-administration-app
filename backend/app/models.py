@@ -272,7 +272,15 @@ class TeamsDeleteDto(BaseModel):
 class RoomsDeleteDto(BaseModel):
     rooms: List[str]
 
+class RoomsArchiveDto(BaseModel):
+    rooms: List[str]
+
 class RoomDeleteResDto(BaseModel):
+    room: str
+    success: bool = False
+    error: Optional[str] = None
+
+class RoomArchiveResDto(BaseModel):
     room: str
     success: bool = False
     error: Optional[str] = None

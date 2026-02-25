@@ -308,6 +308,10 @@
         }
       }
     },
+    "/spaces/{space_id}/rooms/archive/": {
+      "post": {
+        "summary": "Archive Rooms",
+        "operationId": "archive_rooms_spaces__space_id__rooms_archive__post",
     "/spaces/{space_id}/rooms/role-types/": {
       "get": {
         "summary": "Get Room Role Types",
@@ -323,6 +327,16 @@
             }
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoomsArchiveDto"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -331,6 +345,9 @@
                 "schema": {
                   "type": "array",
                   "items": {
+                    "$ref": "#/components/schemas/RoomArchiveResDto"
+                  },
+                  "title": "Response Archive Rooms Spaces  Space Id  Rooms Archive  Post"
                     "$ref": "#/components/schemas/RoomRoleTypeDto"
                   },
                   "title": "Response Get Room Role Types Spaces  Space Id  Rooms Role Types  Get"
@@ -1691,6 +1708,35 @@
         ],
         "title": "RoomCreateDto"
       },
+      "RoomArchiveResDto": {
+        "properties": {
+          "room": {
+            "type": "string",
+            "title": "Room"
+          },
+          "success": {
+            "type": "boolean",
+            "title": "Success",
+            "default": false
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "room"
+        ],
+        "title": "RoomArchiveResDto"
+      },
       "RoomDeleteResDto": {
         "properties": {
           "room": {
@@ -1980,6 +2026,22 @@
           "status"
         ],
         "title": "RoomUserDto"
+      },
+      "RoomsArchiveDto": {
+        "properties": {
+          "rooms": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Rooms"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rooms"
+        ],
+        "title": "RoomsArchiveDto"
       },
       "RoomsDeleteDto": {
         "properties": {
