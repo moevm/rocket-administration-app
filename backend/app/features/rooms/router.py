@@ -12,7 +12,7 @@ from app.lib.rocket import obtain_rocket_instance, rocket_request, rocket_query_
 from app.lib.utils import batch_execute, generate_password, extract_exception_message, hide_system_messages
 from app.config import settings
 
-from app.models import RoomsImportRequestDto, ImportedRoomResultDto, RoomCreateDto, RoomsDeleteDto, RoomDeleteResDto
+from app.models import RoomsImportRequestDto, ImportedRoomResultDto, RoomCreateDto, RoomsDeleteDto, RoomDeleteResDto, RoomsArchiveDto, RoomArchiveResDto
 
 router = APIRouter()
 
@@ -49,6 +49,44 @@ async def delete_rooms(body: RoomsDeleteDto, space=Depends(get_space)) -> List[R
             res.success = True
         return res
     
+    rooms = await batch_execute(
+        _process,
+        [(room,) for room in body.rooms],
+        settings.app.batch_delay
+    )
+
+    return rooms
+
+@router.post("/archive/")
+async def archive_rooms(body: RoomsArchiveDto, space=Depends(get_space)) -> List[RoomArchiveResDto]:
+    rocket = await obtain_rocket_instance(key_for_space(space))
+
+    async def _process(room: str) -> RoomArchiveResDto:
+        res = RoomArchiveResDto(room=room)
+        try:
+            room_info = await rocket_request(rocket.rooms_info, **rocket_query_args(room_id=room))
+            room_type = room_info["room"]["t"]
+
+            archive_method = {
+                "c": "channels.archive",
+                "p": "groups.archive",
+            }.get(room_type)
+
+            if archive_method is None:
+                raise ValueError(f"Unsupported room type for archiving: {room_type}")
+
+            await rocket_request(
+                rocket.call_api_post,
+                archive_method,
+                **rocket_query_args(roomId=room)
+            )
+
+        except Exception as e:
+            res.error = extract_exception_message(e)
+        else:
+            res.success = True
+        return res
+
     rooms = await batch_execute(
         _process,
         [(room,) for room in body.rooms],
