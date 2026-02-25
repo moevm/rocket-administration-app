@@ -16,6 +16,7 @@ import AddTeamsToRoomsDialog from "@/components/app/dialogs/room-page-dialogs/Ad
 import DeleteTeamsOutOfRoomsDialog from "@/components/app/dialogs/room-page-dialogs/DeleteTeamsOutOfRoomsDialog.tsx";
 import HideRoomDialog from "@/components/app/dialogs/room-page-dialogs/HideRoomDialog.tsx";
 import DeleteRoomDialog from "@/components/app/dialogs/room-page-dialogs/DeleteRoomDialog.tsx";
+import {EditRoomMemberRolesDialog} from "@/components/app/dialogs/room-page-dialogs/EditRoomMemberRolesDialog.tsx";
 import AddUsersToTeamDialog from "@/components/app/dialogs/team-page-dialogs/AddUsersToTeamDialog.tsx";
 import DeleteUsersOutOfTeamDialog from "@/components/app/dialogs/team-page-dialogs/DeleteUsersOutOfTeamDialog.tsx";
 import AddTeamIntoRoomDialog from "@/components/app/dialogs/team-page-dialogs/AddTeamIntoRoomDialog.tsx";
@@ -23,6 +24,7 @@ import DeleteTeamFromRoomDialog from "@/components/app/dialogs/team-page-dialogs
 import DeleteTeamDialog from "@/components/app/dialogs/team-page-dialogs/DeleteTeamDialog.tsx";
 import AddNewUserDialog from "@/components/app/dialogs/AddNewUserDialog.tsx";
 import AddNewRoomDialog from "@/components/app/dialogs/AddNewRoomDialog.tsx";
+import GlobalContextMenu from "@/components/app/GlobalContextMenu.tsx";
 
 function DashboardLayout() {
     const context = useOutletContext<{
@@ -31,6 +33,7 @@ function DashboardLayout() {
     }>()
     return (
         <>
+            <GlobalContextMenu/>
             <AddUserInRoomDialog/>
             <PasswordChangeDialog/>
             <AddUserInTeamDialog/>
@@ -44,6 +47,7 @@ function DashboardLayout() {
             <DeleteTeamsOutOfRoomsDialog/>
             <HideRoomDialog/>
             <DeleteRoomDialog/>
+            <EditRoomMemberRolesDialog/>
 
             <AddUsersToTeamDialog/>
             <DeleteUsersOutOfTeamDialog/>

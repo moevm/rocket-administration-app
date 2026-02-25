@@ -2,8 +2,8 @@ import React from 'react';
 import {ContextMenuItem} from "@/components/ui/context-menu.tsx";
 import {ContextMenuConfig} from "@/components/app/table/RichTableView.tsx";
 import {showPasswordChangeDialogAtom} from "@/components/app/dialogs/user-page-dialogs/PasswordChangeDialog.tsx";
-import {useSetAtom} from "jotai/react";
-import {$selectedRoomsData, $selectedTeamsData, $selectedUsersData, showContextMenuAtom} from "@/store/global-store.ts";
+import {useAtomValue, useSetAtom} from "jotai/react";
+import {$selectedRoomsData, $selectedSpaceId, $selectedTeamsData, $selectedUsersData, showContextMenuAtom} from "@/store/global-store.ts";
 import {Row} from "@tanstack/react-table";
 import {showAddUserInRoomDialogAtom} from "@/components/app/dialogs/user-page-dialogs/AddUserInRoomDialog.tsx";
 import {showAddUserInTeamDialogAtom} from "@/components/app/dialogs/user-page-dialogs/AddUserInTeamDialog.tsx";
@@ -24,6 +24,7 @@ import {
 } from "@/components/app/dialogs/room-page-dialogs/DeleteTeamsOutOfRoomsDialog.tsx";
 import {showHideRoomDialogAtom} from "@/components/app/dialogs/room-page-dialogs/HideRoomDialog.tsx";
 import {showDeleteRoomDialogAtom} from "@/components/app/dialogs/room-page-dialogs/DeleteRoomDialog.tsx";
+import {editRoomMemberRolesDialogDataAtom} from "@/components/app/dialogs/room-page-dialogs/EditRoomMemberRolesDialog.tsx";
 import {showAddUsersToTeamDialogAtom} from "@/components/app/dialogs/team-page-dialogs/AddUsersToTeamDialog.tsx";
 import {
     showDeleteUsersOutOfTeamDialogAtom
@@ -35,8 +36,8 @@ import {
 import {showDeleteTeamDialogAtom} from "@/components/app/dialogs/team-page-dialogs/DeleteTeamDialog.tsx";
 import {useNavigate} from "react-router";
 
-const RoomContextMenuItems = ({rows}: { rows: Row<{ _id: string }>[] }) => {
-
+const RoomContextMenuItems = ({rows}: { rows: Row<{ _id: string; name?: string }>[] }) => {
+    const setEditRolesDialogData = useSetAtom(editRoomMemberRolesDialogDataAtom)
     const setAddRoomToUsersDialogOpen = useSetAtom(showAddRoomsToUsersDialogAtom)
     const setDeleteUsersOutOfRoomDialogOpen = useSetAtom(showDeleteUsersOutOfRoomDialogAtom)
     const setAddRoomsToTeamsDialogOpen = useSetAtom(showAddRoomsToTeamsDialogAtom)
@@ -83,6 +84,19 @@ const RoomContextMenuItems = ({rows}: { rows: Row<{ _id: string }>[] }) => {
                 setDeleteRoomsDialogOpen(true)
                 setContextMenuOpen(false)
             }}>Удалить комнату</ContextMenuItem>
+            {rows.length === 1 && (
+                <ContextMenuItem onClick={() => {
+                    setSelectedRoomsData(data)
+                    const roomName = rows[0].getValue("name") as string | undefined
+                    setEditRolesDialogData({
+                        open: true,
+                        roomId: data[0]._id,
+                        roomName: roomName ?? undefined,
+                        user: null,
+                    })
+                    setContextMenuOpen(false)
+                }}>Сменить роли</ContextMenuItem>
+            )}
             {rows.length === 1 && <ContextMenuItem onClick={() => {
                 setSelectedRoomsData(data)
                 setContextMenuOpen(false)
@@ -220,6 +234,129 @@ const TeamContextMenuItems = ({rows}: { rows: Row<{ _id: string }>[] }) => {
             }}>Управление</ContextMenuItem>}
         </>
     )
+};
+
+export const roomMemberContextMenuConfig = (
+    roomId: string,
+    roomName?: string
+): ContextMenuConfig<{ _id: string; username: string; roles?: string[] }> => ({
+    getLabel: (rows) =>
+        rows.length === 1
+            ? (rows[0].getValue("username") as string)
+            : `Выбрано: ${rows.length}`,
+    items: (rows) => (
+        <RoomMemberContextMenuItems rows={rows} roomId={roomId} roomName={roomName} />
+    ),
+});
+
+const RoomMemberContextMenuItems = ({
+    rows,
+    roomId,
+    roomName,
+}: {
+    rows: Row<{ _id: string; username: string; roles?: string[] }>[];
+    roomId: string;
+    roomName?: string;
+}) => {
+    const setEditRolesDialogData = useSetAtom(editRoomMemberRolesDialogDataAtom);
+    const setContextMenuOpen = useSetAtom(showContextMenuAtom);
+    const setDeleteUsersOutOfRoomDialogOpen = useSetAtom(showDeleteUsersOutOfRoomDialogAtom);
+    const setAddUserInTeamDialogOpen = useSetAtom(showAddUserInTeamDialogAtom);
+    const setDeleteUserFromRoomDialogOpen = useSetAtom(showDeleteUserFromRoomDialogAtom);
+    const setDeleteUserFromTeamDialogOpen = useSetAtom(showDeleteUserFromTeamDialogAtom);
+    const setPasswordChangeDialogOpen = useSetAtom(showPasswordChangeDialogAtom);
+    const setDeleteUserDialogOpen = useSetAtom(showDeleteUserDialogAtom);
+    const setSelectedUsersData = useSetAtom($selectedUsersData);
+    const setSelectedRoomsData = useSetAtom($selectedRoomsData);
+    const nav = useNavigate();
+    const selectedSpaceId = useAtomValue($selectedSpaceId);
+
+    const userData = rows.map((it) => {
+        const orig = it.original as { _id?: string; username?: string; roles?: string[] } | undefined;
+        return {
+            _id: orig?._id ?? (it.getValue?.("_id") as string) ?? "",
+            username: orig?.username ?? (it.getValue?.("username") as string) ?? "",
+            roles: orig?.roles ?? (it.getValue?.("roles") as string[] | undefined),
+        };
+    });
+
+    return (
+        <>
+            {rows.length === 1 && (
+                <ContextMenuItem
+                    onClick={() => {
+                        const u = userData[0];
+                        setEditRolesDialogData({
+                            open: true,
+                            roomId,
+                            roomName,
+                            user: { _id: u._id, username: u.username, roles: u.roles },
+                        });
+                        setContextMenuOpen(false);
+                    }}
+                >
+                    Изменить роли
+                </ContextMenuItem>
+            )}
+            <ContextMenuItem
+                onClick={() => {
+                    setSelectedUsersData(userData);
+                    setSelectedRoomsData([{ _id: roomId, name: roomName ?? "" }]);
+                    setDeleteUsersOutOfRoomDialogOpen(true);
+                    setContextMenuOpen(false);
+                }}
+            >
+                Удалить из комнаты
+            </ContextMenuItem>
+            <ContextMenuItem
+                onClick={() => {
+                    setSelectedUsersData(userData);
+                    setAddUserInTeamDialogOpen(true);
+                    setContextMenuOpen(false);
+                }}
+            >
+                Добавить в команду
+            </ContextMenuItem>
+            <ContextMenuItem
+                onClick={() => {
+                    setSelectedUsersData(userData);
+                    setDeleteUserFromTeamDialogOpen(true);
+                    setContextMenuOpen(false);
+                }}
+            >
+                Удалить из команды
+            </ContextMenuItem>
+            <ContextMenuItem
+                onClick={() => {
+                    setSelectedUsersData(userData);
+                    setPasswordChangeDialogOpen(true);
+                    setContextMenuOpen(false);
+                }}
+            >
+                Сменить пароль
+            </ContextMenuItem>
+            <ContextMenuItem
+                onClick={() => {
+                    setSelectedUsersData(userData);
+                    setDeleteUserDialogOpen(true);
+                    setContextMenuOpen(false);
+                }}
+            >
+                Удалить
+            </ContextMenuItem>
+            {rows.length === 1 && selectedSpaceId && (
+                <ContextMenuItem
+                    onClick={() => {
+                        setSelectedUsersData(userData);
+                        setContextMenuOpen(false);
+                        nav(`/spaces/${selectedSpaceId}/dashboard/users/${userData[0]._id}`);
+                    }}
+                >
+                    Управление
+                </ContextMenuItem>
+            )}
+        </>
+    );
 };
 
 export const teamContextMenuConfig: ContextMenuConfig<{

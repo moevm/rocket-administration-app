@@ -2,12 +2,14 @@ import RichTableView from "@/components/app/table/RichTableView.tsx";
 import {$selectedSpaceId, ApiRoomUserModel} from "@/store/global-store.ts";
 import {useNavigate} from "react-router";
 import {columnsRoomUser} from "@/components/app/columns/columnsRoomUser.tsx";
-import {userContextMenuConfig} from "@/components/app/ContextMenuConfigs.tsx";
+import {roomMemberContextMenuConfig, userContextMenuConfig} from "@/components/app/ContextMenuConfigs.tsx";
 import {useAtomValue} from "jotai";
 
 
 function RoomUserTableView(props: {
-    data: ApiRoomUserModel[]
+    data: ApiRoomUserModel[];
+    roomId?: string;
+    roomName?: string;
 }) {
     const navigate = useNavigate();
     const selectedSpaceId = useAtomValue($selectedSpaceId)
@@ -20,7 +22,9 @@ function RoomUserTableView(props: {
                     columns: columnsRoomUser
                 }}
                 contextMenuConfig={
-                    userContextMenuConfig
+                    props.roomId
+                        ? roomMemberContextMenuConfig(props.roomId, props.roomName)
+                        : userContextMenuConfig
                 }
                 settings={{
                     enableSearch: true,
