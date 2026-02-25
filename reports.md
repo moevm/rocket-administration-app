@@ -22,39 +22,12 @@
 
 ### Собранные и проанализированные требования [Ссылка на файл](https://docs.google.com/spreadsheets/d/1kFtNcfJ5LSXiRemEKN3Jp4_cDXKjKZzD_wAxjGqOEXo/edit?usp=drive_link)
 
-### Все файлы, которые представлены внешними ссылками, продублированы тут: [Перейти в папку "files"](docs/files/)
 
 ## Важные ссылки по проекту:
-- [Google диск](https://drive.google.com/drive/folders/17UqM0HQxNNSFASZToOG31zvY4lBywogW?usp=sharing)
 - [Гайд для установки и запуска релизной версии](docs/files/deployment_guide.md)
-
-## Созвоны
-- 19.02 "Установочный созвон с заказчиком" - [Видео созвона](https://drive.google.com/file/d/1fuV6T1Pz0x65xq_crpFkzh3fJxcRnu-M/view?usp=drive_link),[Протокол созвона](https://docs.google.com/document/d/13HYdbLqcll7nwrs00wcXWWKeJ4-dftQDDA2424svJtc/edit?usp=drive_link)
-- 28.04 "Созовон с заказчиком" - [Видео созвона](https://drive.google.com/file/d/1us8EU02PRC8MiZrD6LZcyddWHmM8m7--/view?usp=sharing),[Протокол созвона](https://docs.google.com/document/d/1QdUJP7gTy0UDSMEBgGXwyO2gufR9L35N2ET2OIKvchg/edit?usp=sharing)
-
-## Презентационные материалы по итерациям
-- [Итерация 1](https://drive.google.com/drive/folders/1cgXuRVM2eAp7yFS5OYtudYH-PBtbQSNq?usp=sharing)
-- [Итерация 2](https://drive.google.com/drive/folders/1SJm08sUdA8MLXN2RVRCKJ4dqcyaZYY6z?usp=sharing)
-- [Итерация 3](https://drive.google.com/drive/folders/1t6ETYGQydHmT-OFfqr1GdcGjVoDtWogv?usp=sharing)
-- [Итерация 4](https://drive.google.com/drive/folders/1M1Op9lR1ru3d7IPCavYrx5TQcKNl-mYm?usp=sharing)
 
 ## Макет проекта в фигме
 [Ссылка на макет](https://www.figma.com/design/1Fm0lzr0mrgXzQTRJC4MYu/RocketManager?node-id=0-1&t=BaHwGUoHsekZdO76-1)
-
-![maket_1](docs/images/maket_1.png)
-![maket_2](docs/images/maket_2.png)
-![maket_3](docs/images/maket_3.png)
-![maket_4](docs/images/maket_4.png)
-![maket_5](docs/images/maket_5.png)
-![maket_6](docs/images/maket_6.png)
-![maket_7](docs/images/maket_7.png)
-![maket_8](docs/images/maket_8.png)
-![maket_9](docs/images/maket_9.png)
-![maket_10](docs/images/maket_10.png)
-
-## Сценарии использования
-
-### Добавление пространства
 
 #### Предусловия
 
