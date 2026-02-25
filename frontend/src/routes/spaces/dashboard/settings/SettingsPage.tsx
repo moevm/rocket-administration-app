@@ -12,6 +12,7 @@ import {
     FormMessage
 } from "@/components/ui/form.tsx";
 import {Input} from "@/components/ui/input.tsx";
+import {Checkbox} from "@/components/ui/checkbox.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {$api, createMutationOptions, loaded, queryClient} from "@/api";
 import {
@@ -46,7 +47,8 @@ const smtpSettingsSchema = z.object({
             .nonnegative("Ожидается положительное число")
     ),
     path: z.string().optional(),
-    sender: z.string().email()
+    sender: z.string().email(),
+    use_tls: z.boolean().default(false)
 })
 
 function EditSpaceContent(props: {
@@ -194,13 +196,14 @@ function SMTPSettingsContent(props: {
     }))
 
     function onSubmit(values: z.infer<typeof smtpSettingsSchema>) {
-        const {login, password, host, port, path, sender} = values;
+        const {login, password, host, port, path, sender, use_tls} = values;
         const fullUrl = `smtp://${login}:${password}@${host}:${port}${path ? `/${path}` : ''}`;
 
         mutate({
             body: {
                 host: fullUrl,
-                sender: sender
+                sender: sender,
+                use_tls: use_tls
             },
             params: {
                 path: {
@@ -221,7 +224,8 @@ function SMTPSettingsContent(props: {
             new URL(props.smtpSettings.value?.host).port : '',
         path: props.smtpSettings?.value?.host ?
             new URL(props.smtpSettings.value?.host).pathname.slice(1) : '',
-        sender: props.smtpSettings?.value?.sender || ''
+        sender: props.smtpSettings?.value?.sender || '',
+        use_tls: props.smtpSettings?.value?.use_tls ?? false
     };
 
     const form = useForm<z.infer<typeof smtpSettingsSchema>>({
@@ -329,6 +333,28 @@ function SMTPSettingsContent(props: {
                                         <Input {...field} />
                                     </FormControl>
                                     <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="use_tls"
+                            render={({field}) => (
+                                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                                    <FormControl>
+                                        <Checkbox
+                                            checked={field.value}
+                                            onCheckedChange={field.onChange}
+                                        />
+                                    </FormControl>
+                                    <div className="space-y-1 leading-none">
+                                        <FormLabel>
+                                            Использовать SSL/TLS
+                                        </FormLabel>
+                                        <FormDescription>
+                                            Включите для безопасного соединения через SSL/TLS
+                                        </FormDescription>
+                                    </div>
                                 </FormItem>
                             )}
                         />

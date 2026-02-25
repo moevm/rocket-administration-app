@@ -19,7 +19,7 @@ def _get_credentials(config: SmtpSettingsDto) -> tuple[str, str]:
 
 async def validate_config(config: SmtpSettingsDto):
     username, password = _get_credentials(config)
-    smtp = SMTP(hostname=config.host.host, port=config.host.port)
+    smtp = SMTP(hostname=config.host.host, port=config.host.port, use_tls=config.use_tls)
     try:
         await smtp.connect()
     except Exception as e:
@@ -65,7 +65,7 @@ async def require_smtp_settings(db: AsyncDatabase, space_id: str) -> SmtpSetting
 
 async def send_email(config: SmtpSettingsDto, to: str, subject: str, message: str):
     username, password = _get_credentials(config)
-    async with SMTP(hostname=config.host.host, port=config.host.port) as smtp:
+    async with SMTP(hostname=config.host.host, port=config.host.port, use_tls=config.use_tls) as smtp:
         await smtp.login(username, password)
         email_message = EmailMessage()
         email_message["From"] = config.sender
