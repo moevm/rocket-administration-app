@@ -1,5 +1,6 @@
 from fastapi import HTTPException
 from typing import Optional
+from urllib.parse import unquote
 
 from app.models import SmtpSettingsDto
 from aiosmtplib import SMTP
@@ -7,7 +8,17 @@ from pymongo.asynchronous.database import AsyncDatabase
 from email.message import EmailMessage
 
 
+def _get_credentials(config: SmtpSettingsDto) -> tuple[str, str]:
+    """
+    Деэкранирует имя пользователя и пароль из конфигурации SMTP, если они присутствуют.
+    """
+    username = unquote(config.host.username) if config.host.username else ""
+    password = unquote(config.host.password) if config.host.password else ""
+    return username, password
+
+
 async def validate_config(config: SmtpSettingsDto):
+    username, password = _get_credentials(config)
     smtp = SMTP(hostname=config.host.host, port=config.host.port)
     try:
         await smtp.connect()
@@ -15,7 +26,7 @@ async def validate_config(config: SmtpSettingsDto):
         print(e)
         raise HTTPException(status_code=400, detail="Ошибка подключения к SMTP-серверу")
     try:
-        await smtp.login(config.host.username or "", config.host.password or "")
+        await smtp.login(username, password)
     except Exception as e:
         print(e)
         raise HTTPException(status_code=400, detail="Ошибка авторизации SMTP-сервера")
@@ -53,8 +64,9 @@ async def require_smtp_settings(db: AsyncDatabase, space_id: str) -> SmtpSetting
 
 
 async def send_email(config: SmtpSettingsDto, to: str, subject: str, message: str):
+    username, password = _get_credentials(config)
     async with SMTP(hostname=config.host.host, port=config.host.port) as smtp:
-        await smtp.login(config.host.username or "", config.host.password or "")
+        await smtp.login(username, password)
         email_message = EmailMessage()
         email_message["From"] = config.sender
         email_message["To"] = to
