@@ -85,6 +85,15 @@ class UpdateRoomRequest(BaseModel):
     description: Optional[str] = None
 
 
+class UpdateUserRequest(BaseModel):
+    name: Optional[str] = None
+    username: Optional[str] = None
+    email: Optional[str] = None
+    active: Optional[bool] = None
+    roles: Optional[List[str]] = None
+    status: Optional[str] = None
+
+
 class RoomsImportRequestDto(BaseModel):
     rooms: List[RoomCreateDto]
 
@@ -125,7 +134,7 @@ class UserDto(BaseModel):
     type: str
     roles: List[str]
     avatarETag: Optional[str] = None
-    nameInsensitive: str
+    nameInsensitive: Optional[str] = None
     emails: Optional[List[UserEmailDto]] = None
     lastLogin: Optional[datetime] = None
 

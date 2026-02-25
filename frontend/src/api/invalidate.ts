@@ -180,3 +180,12 @@ export const useInvalidateRoom = (roomId: string) => {
         queryKey: ['room', spaceId, roomId]
     });
 };
+
+export const useInvalidateUser = (userId: string) => {
+    const queryClient = useQueryClient();
+    const spaceId = useAtomValue($selectedSpaceId);
+    
+    return () => queryClient.invalidateQueries({
+        queryKey: ['user', spaceId, userId]
+    });
+};

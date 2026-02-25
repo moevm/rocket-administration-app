@@ -1,11 +1,12 @@
 import asyncio
 
 from fastapi import APIRouter, Depends
+from fastapi import HTTPException
 
 from app.lib.cache import key_for_space
 from app.models import UserDto, TeamDto, UserInfoDto, UsersToChangePasswordDto,\
     ChangedPasswordDto, UsersImportRequestDto, ImportedUserResultDto, UserCreateDto, \
-    UsersDeleteDto, UserDeleteResDto
+    UsersDeleteDto, UserDeleteResDto, UpdateUserRequest
 from typing import Optional, List
 from app.features.spaces.utils import get_space
 from app.lib.rocket import obtain_rocket_instance, rocket_request, rocket_query_args
@@ -189,9 +190,76 @@ async def delete_users(
         else:
             res.success = True
         return res
-    
+
     return await batch_execute(
         _process,
         [(user,) for user in body.users],
         settings.app.batch_delay
     )
+
+
+@router.patch("/{user_id}")
+async def update_user(
+    user_id: str,
+    user_data: UpdateUserRequest,
+    space=Depends(get_space)
+) -> UserDto:
+    """
+    Обновляет информацию о пользователе
+    """
+    rocket = await obtain_rocket_instance(key_for_space(space))
+
+    try:
+        user_info = await rocket_request(
+            rocket.users_info,
+            **rocket_query_args(user_id=user_id)
+        )
+
+        if not user_info or 'user' not in user_info:
+            raise HTTPException(status_code=404, detail="Пользователь не найден")
+
+        update_data = {}
+
+        if user_data.name is not None:
+            update_data['name'] = user_data.name
+
+        if user_data.username is not None:
+            update_data['username'] = user_data.username
+
+        if user_data.email is not None:
+            update_data['email'] = user_data.email
+
+        if user_data.active is not None:
+            update_data['active'] = user_data.active
+
+        if user_data.roles is not None:
+            update_data['roles'] = user_data.roles
+
+        if update_data:
+            response = await rocket_request(
+                rocket.call_api_post,
+                "users.update",
+                **rocket_query_args(
+                    userId=user_id,
+                    data=update_data
+                )
+            )
+
+        updated_info = await rocket_request(
+            rocket.users_info,
+            **rocket_query_args(user_id=user_id)
+        )
+
+        if 'nameInsensitive' not in user_data and 'name' in user_data:
+            user_data['nameInsensitive'] = user_data['name'].lower()
+
+        return UserDto.model_validate(updated_info['user'])
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Ошибка обновления пользователя: {e}")
+        raise HTTPException(
+            status_code=400,
+            detail=f"Ошибка обновления пользователя: {str(e)}"
+        )
