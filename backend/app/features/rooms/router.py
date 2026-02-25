@@ -5,6 +5,7 @@ from typing import Optional, List
 
 from app.lib.cache import key_for_space
 from app.models import RoomDto, RoomInfoDto, RoomSettingsPatchDto
+from app.models import UpdateRoomRequest
 from app.features.spaces.utils import get_space
 from app.models import TeamDto
 from app.models import UserDto
@@ -41,6 +42,7 @@ async def get_rooms(space=Depends(get_space)) -> List[RoomDto]:
         ))['rooms']
     ]
     return rooms
+
 
 @router.delete("/")
 async def delete_rooms(body: RoomsDeleteDto, space=Depends(get_space)) -> List[RoomDeleteResDto]:
@@ -162,6 +164,27 @@ async def get_room_information(room_id: str, space=Depends(get_space)) -> RoomIn
     room_payload = room_info_raw.get("room") or {}
     raw_react = room_payload.get("reactWhenReadOnly")
     react_when_ro = False if raw_react is None else bool(raw_react)
+    try:
+        room_roles_raw = await rocket_request(
+            rocket.call_api_get, method="rooms.roles", **rocket_query_args(rid=room_id)
+        )
+    except Exception:
+        room_roles_raw = {"roles": []}
+
+    roles_by_user: dict[str, list[str]] = {}
+    for item in room_roles_raw.get("roles", []):
+        user = item.get("u", {})
+        user_id = user.get("_id") if isinstance(user, dict) else getattr(user, "_id", None)
+        if user_id:
+            user_roles = item.get("roles", [])
+            roles_by_user[user_id] = list(user_roles) if user_roles else []
+
+    members_with_roles = []
+    for member in room_members_raw.get("members", []):
+        member_id = member.get("_id")
+        member_copy = dict(member)
+        member_copy["roles"] = roles_by_user.get(member_id, [])
+        members_with_roles.append(member_copy)
 
     return RoomInfoDto.model_validate({
         "team": room_info_raw.get("team") if "team" in room_info_raw else None,
@@ -263,6 +286,7 @@ async def remove_room_member_roles(
     return result
 
 
+
 @router.post("/groups/")
 async def create_groups(
         body: RoomsImportRequestDto,
@@ -289,7 +313,6 @@ async def create_groups(
             if group_data.disable_system_messages:
                 await hide_system_messages(rocket, result.created_id)
 
-
         except Exception as e:
             result.error = extract_exception_message(e)
 
@@ -303,6 +326,7 @@ async def create_groups(
     )
 
     return results
+
 
 @router.post("/channels/")
 async def create_channel(
@@ -343,3 +367,185 @@ async def create_channel(
     )
 
     return results
+
+
+@router.patch("/groups/{room_id}")
+async def update_room_group(
+    room_id: str,
+    room_data: UpdateRoomRequest,
+    space=Depends(get_space)
+) -> RoomDto:
+    """
+    Обновляет информацию о комнате (группа)
+    """
+    rocket = await obtain_rocket_instance(key_for_space(space))
+
+    try:
+        room_info = await rocket_request(
+            rocket.rooms_info,
+            **rocket_query_args(room_id=room_id)
+        )
+
+        if not room_info or 'room' not in room_info:
+            raise HTTPException(status_code=404, detail="Комната не найдена")
+
+        room_type = room_info['room']['t']
+        if room_type != 'p':
+            raise HTTPException(
+                status_code=400, 
+                detail=f"Эта комната имеет тип {room_type} - ожидалась группа:("
+            )
+
+        current_room = room_info['room']
+
+        if room_data.name is not None and room_data.name != current_room.get('name'):
+            await rocket_request(
+                rocket.groups_rename,
+                **rocket_query_args(
+                    room_id=room_id,
+                    name=room_data.name
+                )
+            )
+
+        if room_data.readOnly is not None and room_data.readOnly != current_room.get('ro'):
+            await rocket_request(
+                rocket.groups_set_read_only,
+                **rocket_query_args(
+                    room_id=room_id,
+                    read_only=room_data.readOnly
+                )
+            )
+
+        if room_data.topic is not None and room_data.topic != current_room.get('topic'):
+            await rocket_request(
+                rocket.groups_set_topic,
+                **rocket_query_args(
+                    room_id=room_id,
+                    topic=room_data.topic
+                )
+            )
+
+        if room_data.announcement is not None and room_data.announcement != current_room.get('announcement'):
+            await rocket_request(
+                rocket.groups_set_announcement,
+                **rocket_query_args(
+                    room_id=room_id,
+                    announcement=room_data.announcement
+                )
+            )
+
+        if room_data.description is not None and room_data.description != current_room.get('description'):
+            await rocket_request(
+                rocket.groups_set_description,
+                **rocket_query_args(
+                    room_id=room_id,
+                    description=room_data.description
+                )
+            )
+
+        updated_info = await rocket_request(
+            rocket.rooms_info,
+            **rocket_query_args(room_id=room_id)
+        )
+
+        return RoomDto.model_validate(updated_info['room'])
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Ошибка обновления группы: {e}")
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Ошибка обновления группы: {str(e)}"
+        )
+
+
+@router.patch("/channels/{room_id}")
+async def update_room_channels(
+    room_id: str,
+    room_data: UpdateRoomRequest,
+    space=Depends(get_space)
+) -> RoomDto:
+    """
+    Обновляет информацию о комнате (группа)
+    """
+    rocket = await obtain_rocket_instance(key_for_space(space))
+
+    try:
+        room_info = await rocket_request(
+            rocket.rooms_info,
+            **rocket_query_args(room_id=room_id)
+        )
+
+        if not room_info or 'room' not in room_info:
+            raise HTTPException(status_code=404, detail="Комната не найдена")
+
+        room_type = room_info['room']['t']
+        if room_type != 'p':
+            raise HTTPException(
+                status_code=400,
+                detail=f"Эта комната имеет тип {room_type} - ожидался канал:("
+            )
+
+        current_room = room_info['room']
+
+        if room_data.name is not None and room_data.name != current_room.get('name'):
+            await rocket_request(
+                rocket.channels_rename,
+                **rocket_query_args(
+                    room_id=room_id,
+                    name=room_data.name
+                )
+            )
+
+        if room_data.readOnly is not None and room_data.readOnly != current_room.get('ro'):
+            await rocket_request(
+                rocket.channels_set_read_only,
+                **rocket_query_args(
+                    room_id=room_id,
+                    read_only=room_data.readOnly
+                )
+            )
+
+        if room_data.topic is not None and room_data.topic != current_room.get('topic'):
+            await rocket_request(
+                rocket.channels_set_topic,
+                **rocket_query_args(
+                    room_id=room_id,
+                    topic=room_data.topic
+                )
+            )
+
+        if room_data.announcement is not None and room_data.announcement != current_room.get('announcement'):
+            await rocket_request(
+                rocket.channels_set_announcement,
+                **rocket_query_args(
+                    room_id=room_id,
+                    announcement=room_data.announcement
+                )
+            )
+
+        if room_data.description is not None and room_data.description != current_room.get('description'):
+            await rocket_request(
+                rocket.channels_set_description,
+                **rocket_query_args(
+                    room_id=room_id,
+                    description=room_data.description
+                )
+            )
+
+        updated_info = await rocket_request(
+            rocket.rooms_info,
+            **rocket_query_args(room_id=room_id)
+        )
+
+        return RoomDto.model_validate(updated_info['room'])
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Ошибка обновления группы: {e}")
+        raise HTTPException(
+            status_code=400,
+            detail=f"Ошибка обновления группы: {str(e)}"
+        )

@@ -77,6 +77,14 @@ class RoomCreateDto(BaseModel):
     teamId: Optional[str] = None
 
 
+class UpdateRoomRequest(BaseModel):
+    name: Optional[str] = None
+    readOnly: Optional[bool] = None
+    topic: Optional[str] = None
+    announcement: Optional[str] = None
+    description: Optional[str] = None
+
+
 class RoomsImportRequestDto(BaseModel):
     rooms: List[RoomCreateDto]
 

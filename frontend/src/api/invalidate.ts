@@ -13,6 +13,7 @@ import {
 } from "@/store/global-store.ts";
 import {useAtomValue} from "jotai";
 import {useCallback} from "react";
+import { useQueryClient } from "@tanstack/react-query"
 
 export const useInvalidateTeams = () => {
     const selectedSpaceId = useAtomValue($selectedSpaceId)
@@ -170,3 +171,12 @@ export const useInvalidateEntities = () => {
         }
     }, [selectedRoomId, selectedSpaceId, selectedTeamId, selectedUserId])
 }
+
+export const useInvalidateRoom = (roomId: string) => {
+    const queryClient = useQueryClient();
+    const spaceId = useAtomValue($selectedSpaceId);
+    
+    return () => queryClient.invalidateQueries({
+        queryKey: ['room', spaceId, roomId]
+    });
+};
