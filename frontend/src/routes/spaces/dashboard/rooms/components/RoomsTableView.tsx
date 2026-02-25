@@ -1,48 +1,113 @@
 import RichTableView from "@/components/app/table/RichTableView.tsx";
-import {columnsRoom} from "@/components/app/columns/columnsRoom.tsx";
+import { columnsRoom } from "@/components/app/columns/columnsRoom.tsx";
 import {
-    $selectedSpaceId,
-    ApiRoomModel,
-    showAddNewRoomDialogAtom
+  $selectedSpaceId,
+  ApiRoomModel,
+  showAddNewRoomDialogAtom
 } from "@/store/global-store.ts";
-import {useNavigate} from "react-router";
-import {roomContextMenuConfig} from "@/components/app/ContextMenuConfigs.tsx";
-import {useAtomValue} from "jotai";
-import {Button} from "@/components/ui/button.tsx";
-import {useSetAtom} from "jotai/react";
+import { useNavigate } from "react-router";
+import { roomContextMenuConfig } from "@/components/app/ContextMenuConfigs.tsx";
+import { useAtomValue, useSetAtom } from "jotai";
+import { Button } from "@/components/ui/button.tsx";
+import { useState } from "react";
+import { Row } from "@tanstack/react-table";
+import { $api, createMutationOptions } from "@/api";
+import { useInvalidateRooms } from "@/api/invalidate";
+import { toast } from "sonner";
 
-function RoomsTableView(props: {
-    data: ApiRoomModel[]
-}) {
-    const navigate = useNavigate();
-    const selectedSpaceId = useAtomValue($selectedSpaceId)
-    const setAddNewRoomDialogOpen = useSetAtom(showAddNewRoomDialogAtom)
-
-    return (
-        <>
-            <RichTableView
-                tableId={'rooms'}
-                entries={props.data}
-                tableConfig={{
-                    columns: columnsRoom
-                }}
-                contextMenuConfig={
-                    roomContextMenuConfig
-                }
-                settings={{
-                    enableSearch: true,
-                    enableExport: true,
-                    enableColumnVisibilityToggle: true,
-                    rowClickHandler: (room) => navigate(`/spaces/${selectedSpaceId}/dashboard/rooms/${room._id}`)
-                }}
-                buttonsSlot={() => (
-                    <Button variant="outline" size="sm" onClick={() => {setAddNewRoomDialogOpen(true)}}>
-                        Создать комнату
-                    </Button>
-                )}
-            />
-        </>
-    )
+interface RoomsTableViewProps {
+  data: ApiRoomModel[];
+  onArchiveSuccess?: () => void;
 }
 
-export default RoomsTableView
+function RoomsTableView({ data, onArchiveSuccess }: RoomsTableViewProps) {
+  const navigate = useNavigate();
+  const selectedSpaceId = useAtomValue($selectedSpaceId);
+  const setAddNewRoomDialogOpen = useSetAtom(showAddNewRoomDialogAtom);
+  const invalidateRooms = useInvalidateRooms();
+
+  const [selectedRows, setSelectedRows] = useState<Row<ApiRoomModel>[]>([]);
+  const [tableKey, setTableKey] = useState(Date.now());
+
+  const selectedRoomIds = selectedRows.map(row => row.original._id);
+
+  const { mutate: archiveRooms, isPending: isArchiving } = $api.useMutation(
+    'post',
+    '/spaces/{space_id}/rooms/archive/',
+    createMutationOptions({})
+  );
+
+  const handleArchive = () => {
+    if (selectedRoomIds.length === 0) return;
+
+    archiveRooms(
+      {
+        params: {
+          path: { space_id: selectedSpaceId! }
+        },
+        body: { rooms: selectedRoomIds }
+      },
+      {
+        onSuccess: (data) => {
+          let error: string | null = null;
+          if (!(Array.isArray(data) && data.length === 1)) {
+            error = 'Непредвиденная ошибка';
+          } else if (data[0].error) {
+            error = data[0].error;
+          }
+          if (error) {
+            toast.error(error);
+          } else {
+            toast.success(`Комнаты (${selectedRoomIds.length}) отправлены в архив`);
+            invalidateRooms();
+            setTableKey(Date.now());
+            setSelectedRows([]);
+            onArchiveSuccess?.();
+          }
+        },
+        onError: (error) => {
+          toast.error(error.message || 'Не удалось архивировать комнаты');
+        }
+      }
+    );
+  };
+
+  return (
+    <RichTableView
+      key={tableKey}
+      tableId="rooms"
+      entries={data}
+      tableConfig={{ columns: columnsRoom }}
+      contextMenuConfig={roomContextMenuConfig}
+      settings={{
+        enableSearch: true,
+        enableExport: true,
+        enableColumnVisibilityToggle: true,
+        rowClickHandler: (room) =>
+          navigate(`/spaces/${selectedSpaceId}/dashboard/rooms/${room._id}`),
+      }}
+      onSelectionUpdated={(rows) => setSelectedRows(rows)}
+      buttonsSlot={() => (
+        <div className="flex justify-between w-full">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setAddNewRoomDialogOpen(true)}
+          >
+            Создать комнату
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleArchive}
+            disabled={selectedRoomIds.length === 0 || isArchiving}
+          >
+            Архивировать выбранные {selectedRoomIds.length > 0 && `(${selectedRoomIds.length})`}
+          </Button>
+        </div>
+      )}
+    />
+  );
+}
+
+export default RoomsTableView;
