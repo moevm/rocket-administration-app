@@ -308,6 +308,49 @@
         }
       }
     },
+    "/spaces/{space_id}/rooms/role-types/": {
+      "get": {
+        "summary": "Get Room Role Types",
+        "operationId": "get_room_role_types_spaces__space_id__rooms_role_types__get",
+        "parameters": [
+          {
+            "name": "space_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Space Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RoomRoleTypeDto"
+                  },
+                  "title": "Response Get Room Role Types Spaces  Space Id  Rooms Role Types  Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/spaces/{space_id}/rooms/{room_id}": {
       "get": {
         "summary": "Get Room Information",
@@ -339,6 +382,138 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/RoomInfoDto"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spaces/{space_id}/rooms/{room_id}/members/{user_id}/roles": {
+      "post": {
+        "summary": "Add Room Member Roles",
+        "operationId": "add_room_member_roles_spaces__space_id__rooms__room_id__members__user_id__roles_post",
+        "parameters": [
+          {
+            "name": "room_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Room Id"
+            }
+          },
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "User Id"
+            }
+          },
+          {
+            "name": "space_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Space Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoomMemberRolesDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoomMemberRolesResDto"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Remove Room Member Roles",
+        "operationId": "remove_room_member_roles_spaces__space_id__rooms__room_id__members__user_id__roles_delete",
+        "parameters": [
+          {
+            "name": "room_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Room Id"
+            }
+          },
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "User Id"
+            }
+          },
+          {
+            "name": "space_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Space Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoomMemberRolesDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoomMemberRolesResDto"
                 }
               }
             }
@@ -1708,6 +1883,62 @@
         "type": "object",
         "title": "RoomInfoDto"
       },
+      "RoomMemberRolesDto": {
+        "properties": {
+          "roles": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Roles"
+          }
+        },
+        "type": "object",
+        "required": [
+          "roles"
+        ],
+        "title": "RoomMemberRolesDto"
+      },
+      "RoomMemberRolesResDto": {
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "title": "Success",
+            "default": true
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "title": "RoomMemberRolesResDto"
+      },
+      "RoomRoleTypeDto": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "label"
+        ],
+        "title": "RoomRoleTypeDto"
+      },
       "RoomUserDto": {
         "properties": {
           "_id": {
@@ -1725,6 +1956,20 @@
           "status": {
             "type": "string",
             "title": "Status"
+          },
+          "roles": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Roles"
           }
         },
         "type": "object",

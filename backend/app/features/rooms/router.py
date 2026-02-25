@@ -1,6 +1,6 @@
 import asyncio
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from typing import Optional, List
 
 from app.lib.cache import key_for_space
@@ -12,7 +12,16 @@ from app.lib.rocket import obtain_rocket_instance, rocket_request, rocket_query_
 from app.lib.utils import batch_execute, generate_password, extract_exception_message, hide_system_messages
 from app.config import settings
 
-from app.models import RoomsImportRequestDto, ImportedRoomResultDto, RoomCreateDto, RoomsDeleteDto, RoomDeleteResDto
+from app.models import (
+    RoomsImportRequestDto,
+    ImportedRoomResultDto,
+    RoomCreateDto,
+    RoomsDeleteDto,
+    RoomDeleteResDto,
+    RoomMemberRolesDto,
+    RoomMemberRolesResDto,
+    RoomRoleTypeDto,
+)
 
 router = APIRouter()
 
@@ -57,19 +66,143 @@ async def delete_rooms(body: RoomsDeleteDto, space=Depends(get_space)) -> List[R
 
     return rooms
 
+
+@router.get("/role-types/")
+async def get_room_role_types(space=Depends(get_space)) -> List[RoomRoleTypeDto]:
+    rocket = await obtain_rocket_instance(key_for_space(space))
+    roles_raw = await rocket_request(rocket.roles_list)
+
+    roles_list = []
+    for role in roles_raw.get("roles", []):
+        if (role.get("scope") or "").lower() != "subscriptions":
+            continue
+        role_id = role.get("_id") or role.get("id")
+        if not role_id:
+            continue
+        label = role.get("description") or role.get("name") or role_id
+        roles_list.append(RoomRoleTypeDto(id=role_id, label=str(label)))
+
+    return roles_list
+
+
 @router.get("/{room_id}")
 async def get_room_information(room_id: str, space=Depends(get_space)) -> RoomInfoDto:
     rocket = await obtain_rocket_instance(key_for_space(space))
 
-    (room_info_raw, room_members_raw) = await asyncio.gather(
-        rocket_request(rocket.rooms_info,**rocket_query_args(room_id=room_id)),
-        rocket_request(rocket.call_api_get, method="rooms.membersOrderedByRole", **rocket_query_args(roomId=room_id, count=0))
+    room_info_raw, room_members_raw = await asyncio.gather(
+        rocket_request(rocket.rooms_info, **rocket_query_args(room_id=room_id)),
+        rocket_request(
+            rocket.call_api_get,
+            method="rooms.membersOrderedByRole",
+            **rocket_query_args(roomId=room_id, count=0),
+        ),
     )
 
+    try:
+        room_roles_raw = await rocket_request(
+            rocket.call_api_get, method="rooms.roles", **rocket_query_args(rid=room_id)
+        )
+    except Exception:
+        room_roles_raw = {"roles": []}
+
+    roles_by_user: dict[str, list[str]] = {}
+    for item in room_roles_raw.get("roles", []):
+        user = item.get("u", {})
+        user_id = user.get("_id") if isinstance(user, dict) else getattr(user, "_id", None)
+        if user_id:
+            user_roles = item.get("roles", [])
+            roles_by_user[user_id] = list(user_roles) if user_roles else []
+
+    members_with_roles = []
+    for member in room_members_raw.get("members", []):
+        member_id = member.get("_id")
+        member_copy = dict(member)
+        member_copy["roles"] = roles_by_user.get(member_id, [])
+        members_with_roles.append(member_copy)
+
     return RoomInfoDto.model_validate({
-        'team': room_info_raw['team'] if 'team' in room_info_raw else None,
-        'members': room_members_raw['members']
+        "team": room_info_raw.get("team") if "team" in room_info_raw else None,
+        "members": members_with_roles,
     })
+
+
+def _get_role_methods(rocket, room_type: str):
+    if room_type == "p":
+        return {
+            "moderator": (rocket.groups_add_moderator, rocket.groups_remove_moderator),
+            "leader": (rocket.groups_add_leader, rocket.groups_remove_leader),
+            "owner": (rocket.groups_add_owner, rocket.groups_remove_owner),
+        }
+    if room_type == "c":
+        return {
+            "moderator": (rocket.channels_add_moderator, rocket.channels_remove_moderator),
+            "leader": (rocket.channels_add_leader, rocket.channels_remove_leader),
+            "owner": (rocket.channels_add_owner, rocket.channels_remove_owner),
+        }
+    raise HTTPException(status_code=400, detail="Room type not supported for role management")
+
+
+@router.post("/{room_id}/members/{user_id}/roles")
+async def add_room_member_roles(
+    room_id: str,
+    user_id: str,
+    body: RoomMemberRolesDto,
+    space=Depends(get_space),
+) -> RoomMemberRolesResDto:
+    rocket = await obtain_rocket_instance(key_for_space(space))
+    room_info = await rocket_request(
+        rocket.rooms_info, **rocket_query_args(room_id=room_id)
+    )
+    room_type = room_info.get("room", {}).get("t")
+    methods = _get_role_methods(rocket, room_type)
+
+    result = RoomMemberRolesResDto()
+    for role in body.roles:
+        role_lower = role.lower()
+        if role_lower not in methods:
+            continue
+        add_fn, _ = methods[role_lower]
+        try:
+            await rocket_request(
+                add_fn, **rocket_query_args(room_id=room_id, user_id=user_id)
+            )
+        except Exception as e:
+            result.success = False
+            result.error = extract_exception_message(e)
+            return result
+    return result
+
+
+@router.delete("/{room_id}/members/{user_id}/roles")
+async def remove_room_member_roles(
+    room_id: str,
+    user_id: str,
+    body: RoomMemberRolesDto,
+    space=Depends(get_space),
+) -> RoomMemberRolesResDto:
+    rocket = await obtain_rocket_instance(key_for_space(space))
+    room_info = await rocket_request(
+        rocket.rooms_info, **rocket_query_args(room_id=room_id)
+    )
+    room_type = room_info.get("room", {}).get("t")
+    methods = _get_role_methods(rocket, room_type)
+
+    result = RoomMemberRolesResDto()
+    for role in body.roles:
+        role_lower = role.lower()
+        if role_lower not in methods:
+            continue
+        _, remove_fn = methods[role_lower]
+        try:
+            await rocket_request(
+                remove_fn, **rocket_query_args(room_id=room_id, user_id=user_id)
+            )
+        except Exception as e:
+            result.success = False
+            result.error = extract_exception_message(e)
+            return result
+    return result
+
 
 @router.post("/groups/")
 async def create_groups(

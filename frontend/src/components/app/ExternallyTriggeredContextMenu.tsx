@@ -7,7 +7,6 @@ import {
 } from "@/components/custom-radix/context-menu.tsx";
 import {useCallbackRef} from "@radix-ui/react-use-callback-ref";
 import * as React from "react";
-import {useEffect} from "react";
 import * as MenuPrimitive from "@radix-ui/react-menu";
 import {ContextMenuContent} from "@/components/ui/context-menu.tsx";
 
@@ -25,14 +24,11 @@ const ExternallyTriggeredContextMenu = (props: ScopedProps<ContextMenuProps & {o
         [handleOpenChangeProp]
     );
 
-    const point = React.useRef<Point>({x: 0, y: 0})
+    const point = React.useRef<Point>({x: 0, y: 0});
+    point.current = props.point; // синхронно, чтобы Radix получил координаты при первом getBoundingClientRect
     const virtualRef = React.useRef({
         getBoundingClientRect: () => DOMRect.fromRect({ width: 0, height: 0, ...point.current }),
     });
-
-    useEffect(() => {
-        point.current = props.point
-    }, [props.point]);
 
     return (
         <ContextMenuProvider

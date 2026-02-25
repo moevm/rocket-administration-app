@@ -76,4 +76,14 @@ export const columnsRoomUser = [
         sortingFn: customSortingFn,
         cell: ({cell}) => <OptRenderer value={cell.getValue()}/>
     },
+    {
+        accessorKey: "roles",
+        header: DataTableColumnHeader,
+        meta: {
+            title: "Роли",
+            type: 'string'
+        },
+        sortingFn: customSortingFn,
+        cell: ({cell}) => <OptRenderer value={(cell.getValue() as string[] | undefined)?.join(", ") ?? ""}/>
+    },
 ] as TypedColumnDef<ApiRoomUserModel>[]
