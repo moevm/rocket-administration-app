@@ -308,6 +308,59 @@
         }
       }
     },
+    "/spaces/{space_id}/rooms/archive/": {
+      "post": {
+        "summary": "Archive Rooms",
+        "operationId": "archive_rooms_spaces__space_id__rooms_archive__post",
+        "parameters": [
+          {
+            "name": "space_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Space Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoomsArchiveDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RoomArchiveResDto"
+                  },
+                  "title": "Response Archive Rooms Spaces  Space Id  Rooms Archive  Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/spaces/{space_id}/rooms/{room_id}": {
       "get": {
         "summary": "Get Room Information",
@@ -1516,6 +1569,35 @@
         ],
         "title": "RoomCreateDto"
       },
+      "RoomArchiveResDto": {
+        "properties": {
+          "room": {
+            "type": "string",
+            "title": "Room"
+          },
+          "success": {
+            "type": "boolean",
+            "title": "Success",
+            "default": false
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "room"
+        ],
+        "title": "RoomArchiveResDto"
+      },
       "RoomDeleteResDto": {
         "properties": {
           "room": {
@@ -1735,6 +1817,22 @@
           "status"
         ],
         "title": "RoomUserDto"
+      },
+      "RoomsArchiveDto": {
+        "properties": {
+          "rooms": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Rooms"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rooms"
+        ],
+        "title": "RoomsArchiveDto"
       },
       "RoomsDeleteDto": {
         "properties": {
