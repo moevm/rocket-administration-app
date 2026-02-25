@@ -83,7 +83,13 @@ export const columnsRoomUser = [
             title: "Роли",
             type: 'string'
         },
-        sortingFn: customSortingFn,
+        sortingFn: (rowA, rowB, columnId) => {
+            const toStr = (v: unknown): string =>
+                Array.isArray(v) ? (v as string[]).join(", ") : String(v ?? "");
+            const a = toStr(rowA.getValue(columnId));
+            const b = toStr(rowB.getValue(columnId));
+            return a.localeCompare(b, "ru", {numeric: true});
+        },
         cell: ({cell}) => <OptRenderer value={(cell.getValue() as string[] | undefined)?.join(", ") ?? ""}/>
     },
 ] as TypedColumnDef<ApiRoomUserModel>[]

@@ -14,7 +14,7 @@ import {Label} from "@/components/ui/label.tsx";
 import {useEffect, useState} from "react";
 import {$selectedSpaceId} from "@/store/global-store.ts";
 import {toast} from "sonner";
-import {$api} from "@/api";
+import {$api, errorMessage} from "@/api";
 import {useInvalidateEntities} from "@/api/invalidate.ts";
 
 const FALLBACK_ROLES = [
@@ -29,14 +29,6 @@ export const editRoomMemberRolesDialogDataAtom = atom<{
     roomName?: string;
     user: {_id: string; username: string; roles?: string[]} | null;
 }>({open: false, roomId: null, user: null});
-
-export const showEditRoomMemberRolesDialogAtom = atom(
-    (get) => get(editRoomMemberRolesDialogDataAtom).open,
-    (get, set, open: boolean) => {
-        const prev = get(editRoomMemberRolesDialogDataAtom);
-        set(editRoomMemberRolesDialogDataAtom, {...prev, open});
-    }
-);
 
 export function EditRoomMemberRolesDialog() {
     const [dialogData, setDialogData] = useAtom(editRoomMemberRolesDialogDataAtom);
@@ -68,7 +60,7 @@ export function EditRoomMemberRolesDialog() {
         {
             onSuccess: () => invalidate(),
             onError: (e) => {
-                setError(String(e));
+                setError(errorMessage(e));
                 toast.error("Ошибка добавления роли");
             },
         }
@@ -79,7 +71,7 @@ export function EditRoomMemberRolesDialog() {
         {
             onSuccess: () => invalidate(),
             onError: (e) => {
-                setError(String(e));
+                setError(errorMessage(e));
                 toast.error("Ошибка удаления роли");
             },
         }
@@ -111,21 +103,31 @@ export function EditRoomMemberRolesDialog() {
         setError(null);
         try {
             for (const role of toAdd) {
-                await addMutation.mutateAsync({
+                const res = await addMutation.mutateAsync({
                     params: {path: {space_id: selectedSpaceId, room_id: roomId, user_id: effectiveUser._id}},
                     body: {roles: [role]},
                 });
+                if (!res.success && res.error) {
+                    setError(res.error);
+                    toast.error("Ошибка добавления роли");
+                    return;
+                }
             }
             for (const role of toRemove) {
-                await removeMutation.mutateAsync({
+                const res = await removeMutation.mutateAsync({
                     params: {path: {space_id: selectedSpaceId, room_id: roomId, user_id: effectiveUser._id}},
                     body: {roles: [role]},
                 });
+                if (!res.success && res.error) {
+                    setError(res.error);
+                    toast.error("Ошибка удаления роли");
+                    return;
+                }
             }
             toast.success("Роли обновлены");
             setDialogData({open: false, roomId: null, user: null});
         } catch (e) {
-            setError(String(e));
+            setError(errorMessage(e));
         }
     };
 
