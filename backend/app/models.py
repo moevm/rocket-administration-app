@@ -91,7 +91,6 @@ class UpdateUserRequest(BaseModel):
     email: Optional[str] = None
     active: Optional[bool] = None
     roles: Optional[List[str]] = None
-    status: Optional[str] = None
 
 
 class RoomsImportRequestDto(BaseModel):

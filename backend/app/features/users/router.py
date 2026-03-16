@@ -14,9 +14,11 @@ from app.lib.utils import batch_execute, generate_password, extract_exception_me
 from app.lib.smtp import send_email, require_smtp_settings
 from app.services.db import get_db
 from app.config import settings
+import logging
 
 router = APIRouter()
 
+logger = logging.getLogger(__name__)
 
 @router.get("/")
 async def get_users(space=Depends(get_space)) -> List[UserDto]:
@@ -216,24 +218,9 @@ async def update_user(
         )
 
         if not user_info or 'user' not in user_info:
-            raise HTTPException(status_code=404, detail="Пользователь не найден")
+            raise HTTPException(status_code=404, detail="User is not found")
 
-        update_data = {}
-
-        if user_data.name is not None:
-            update_data['name'] = user_data.name
-
-        if user_data.username is not None:
-            update_data['username'] = user_data.username
-
-        if user_data.email is not None:
-            update_data['email'] = user_data.email
-
-        if user_data.active is not None:
-            update_data['active'] = user_data.active
-
-        if user_data.roles is not None:
-            update_data['roles'] = user_data.roles
+        update_data = user_data.model_dump(exclude_none=True)
 
         if update_data:
             response = await rocket_request(
@@ -250,16 +237,13 @@ async def update_user(
             **rocket_query_args(user_id=user_id)
         )
 
-        # if 'nameInsensitive' not in user_data and 'name' in user_data:
-        #     user_data['nameInsensitive'] = user_data['name'].lower()
-
         return UserDto.model_validate(updated_info['user'])
 
     except HTTPException:
         raise
     except Exception as e:
-        print(f"Ошибка обновления пользователя: {e}")
+        logger.exception(f"Failed to update user: {e}")
         raise HTTPException(
             status_code=400,
-            detail=f"Ошибка обновления пользователя: {str(e)}"
+            detail=f"Failed to update user: {str(e)}"
         )

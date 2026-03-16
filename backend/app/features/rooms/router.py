@@ -12,6 +12,7 @@ from app.models import UserDto
 from app.lib.rocket import obtain_rocket_instance, rocket_request, rocket_query_args
 from app.lib.utils import batch_execute, generate_password, extract_exception_message, hide_system_messages
 from app.config import settings
+import logging
 
 from app.models import (
     RoomsImportRequestDto,
@@ -28,6 +29,7 @@ from app.models import (
 
 router = APIRouter()
 
+logger = logging.getLogger(__name__)
 
 @router.get("/")
 async def get_rooms(space=Depends(get_space)) -> List[RoomDto]:
@@ -387,13 +389,13 @@ async def update_room_group(
         )
 
         if not room_info or 'room' not in room_info:
-            raise HTTPException(status_code=404, detail="Комната не найдена")
+            raise HTTPException(status_code=404, detail="The room is not found")
 
         room_type = room_info['room']['t']
         if room_type != 'p':
             raise HTTPException(
                 status_code=400, 
-                detail=f"Эта комната имеет тип {room_type} - ожидалась группа"
+                detail=f"This rooms' type is {room_type} - group expected"
             )
 
         current_room = room_info['room']
@@ -453,10 +455,10 @@ async def update_room_group(
     except HTTPException:
         raise
     except Exception as e:
-        print(f"Ошибка обновления группы: {e}")
+        logger.exception(f"Failed to update group: {e}")
         raise HTTPException(
             status_code=400, 
-            detail=f"Ошибка обновления группы: {str(e)}"
+            detail=f"Failed to update group: {str(e)}"
         )
 
 
@@ -478,13 +480,13 @@ async def update_room_channels(
         )
 
         if not room_info or 'room' not in room_info:
-            raise HTTPException(status_code=404, detail="Комната не найдена")
+            raise HTTPException(status_code=404, detail="The room is not found")
 
         room_type = room_info['room']['t']
         if room_type != 'c':
             raise HTTPException(
                 status_code=400,
-                detail=f"Эта комната имеет тип {room_type} - ожидался канал"
+                detail=f"This rooms' type is {room_type} - channel expected"
             )
 
         current_room = room_info['room']
@@ -544,8 +546,8 @@ async def update_room_channels(
     except HTTPException:
         raise
     except Exception as e:
-        print(f"Ошибка обновления группы: {e}")
+        logger.exception(f"Failed to update channel: {e}")
         raise HTTPException(
             status_code=400,
-            detail=f"Ошибка обновления группы: {str(e)}"
+            detail=f"Failed to update channel: {str(e)}"
         )
