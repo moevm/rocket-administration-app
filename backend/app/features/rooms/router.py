@@ -370,6 +370,35 @@ async def create_channel(
 
     return results
 
+GROUP_UPDATE_CONFIG = [
+    ('name', 'groups_rename', 'name', 'name'),
+    ('readOnly', 'groups_set_read_only', 'read_only', 'ro'),
+    ('topic', 'groups_set_topic', 'topic', 'topic'),
+    ('announcement', 'groups_set_announcement', 'announcement', 'announcement'),
+    ('description', 'groups_set_description', 'description', 'description'),
+]
+
+CHANNEL_UPDATE_CONFIG = [
+    ('name', 'channels_rename', 'name', 'name'),
+    ('readOnly', 'channels_set_read_only', 'read_only', 'ro'),
+    ('topic', 'channels_set_topic', 'topic', 'topic'),
+    ('announcement', 'channels_set_announcement', 'announcement', 'announcement'),
+    ('description', 'channels_set_description', 'description', 'description'),
+]
+
+async def _update_room_fields(
+    rocket,
+    room_id: str,
+    room_data: UpdateRoomRequest,
+    current_room: dict,
+    config: list
+):
+    """Общая функция для обновления полей комнаты"""
+    for field, method_name, arg_name, room_key in config:
+        value = getattr(room_data, field)
+        if value is not None and value != current_room.get(room_key):
+            method = getattr(rocket, method_name)
+            await rocket_request(method, **rocket_query_args(room_id=room_id, **{arg_name: value}))
 
 @router.patch("/groups/{room_id}")
 async def update_room_group(
@@ -399,51 +428,7 @@ async def update_room_group(
             )
 
         current_room = room_info['room']
-
-        if room_data.name is not None and room_data.name != current_room.get('name'):
-            await rocket_request(
-                rocket.groups_rename,
-                **rocket_query_args(
-                    room_id=room_id,
-                    name=room_data.name
-                )
-            )
-
-        if room_data.readOnly is not None and room_data.readOnly != current_room.get('ro'):
-            await rocket_request(
-                rocket.groups_set_read_only,
-                **rocket_query_args(
-                    room_id=room_id,
-                    read_only=room_data.readOnly
-                )
-            )
-
-        if room_data.topic is not None and room_data.topic != current_room.get('topic'):
-            await rocket_request(
-                rocket.groups_set_topic,
-                **rocket_query_args(
-                    room_id=room_id,
-                    topic=room_data.topic
-                )
-            )
-
-        if room_data.announcement is not None and room_data.announcement != current_room.get('announcement'):
-            await rocket_request(
-                rocket.groups_set_announcement,
-                **rocket_query_args(
-                    room_id=room_id,
-                    announcement=room_data.announcement
-                )
-            )
-
-        if room_data.description is not None and room_data.description != current_room.get('description'):
-            await rocket_request(
-                rocket.groups_set_description,
-                **rocket_query_args(
-                    room_id=room_id,
-                    description=room_data.description
-                )
-            )
+        await _update_room_fields(rocket, room_id, room_data, current_room, GROUP_UPDATE_CONFIG)
 
         updated_info = await rocket_request(
             rocket.rooms_info,
@@ -491,50 +476,7 @@ async def update_room_channels(
 
         current_room = room_info['room']
 
-        if room_data.name is not None and room_data.name != current_room.get('name'):
-            await rocket_request(
-                rocket.channels_rename,
-                **rocket_query_args(
-                    room_id=room_id,
-                    name=room_data.name
-                )
-            )
-
-        if room_data.readOnly is not None and room_data.readOnly != current_room.get('ro'):
-            await rocket_request(
-                rocket.channels_set_read_only,
-                **rocket_query_args(
-                    room_id=room_id,
-                    read_only=room_data.readOnly
-                )
-            )
-
-        if room_data.topic is not None and room_data.topic != current_room.get('topic'):
-            await rocket_request(
-                rocket.channels_set_topic,
-                **rocket_query_args(
-                    room_id=room_id,
-                    topic=room_data.topic
-                )
-            )
-
-        if room_data.announcement is not None and room_data.announcement != current_room.get('announcement'):
-            await rocket_request(
-                rocket.channels_set_announcement,
-                **rocket_query_args(
-                    room_id=room_id,
-                    announcement=room_data.announcement
-                )
-            )
-
-        if room_data.description is not None and room_data.description != current_room.get('description'):
-            await rocket_request(
-                rocket.channels_set_description,
-                **rocket_query_args(
-                    room_id=room_id,
-                    description=room_data.description
-                )
-            )
+        await _update_room_fields(rocket, room_id, room_data, current_room, CHANNEL_UPDATE_CONFIG)
 
         updated_info = await rocket_request(
             rocket.rooms_info,
