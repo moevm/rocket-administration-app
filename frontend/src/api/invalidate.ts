@@ -176,16 +176,24 @@ export const useInvalidateRoom = (roomId: string) => {
     const queryClient = useQueryClient();
     const spaceId = useAtomValue($selectedSpaceId);
     
-    return () => queryClient.invalidateQueries({
-        queryKey: ['room', spaceId, roomId]
-    });
+    return useCallback(() => {
+        if (spaceId && roomId) {
+            queryClient.invalidateQueries({
+                queryKey: $roomInfoQueryOptions(spaceId, roomId, true).queryKey
+            });
+        }
+    }, [queryClient, spaceId, roomId]);
 };
 
 export const useInvalidateUser = (userId: string) => {
     const queryClient = useQueryClient();
     const spaceId = useAtomValue($selectedSpaceId);
     
-    return () => queryClient.invalidateQueries({
-        queryKey: ['user', spaceId, userId]
-    });
+    return useCallback(() => {
+        if (spaceId && userId) {
+            queryClient.invalidateQueries({
+                queryKey: $userInfoQueryOptions(spaceId, userId, true).queryKey
+            });
+        }
+    }, [queryClient, spaceId, userId]);
 };

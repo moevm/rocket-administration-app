@@ -31,7 +31,7 @@ function EditRoomContent()
     const [topic, setTopic] = useState('');
     const [announcement, setAnnouncement] = useState('');
 
-    const invalidateRoom = useInvalidateRoom();
+    const invalidateRoom = useInvalidateRoom(room._id);
     const invalidateRooms = useInvalidateRooms();
 
     const isChannel = room?.t === 'c';
@@ -56,7 +56,7 @@ function EditRoomContent()
     } = $api.useMutation('patch', `/spaces/{space_id}/rooms/${endpoint}/{room_id}`, createMutationOptions({
         onSuccess: async (data) =>
         {
-            await invalidateRoom(room._id);
+            await invalidateRoom();
             await invalidateRooms();
             setOpen(false);
         }
