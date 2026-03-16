@@ -250,8 +250,8 @@ async def update_user(
             **rocket_query_args(user_id=user_id)
         )
 
-        if 'nameInsensitive' not in user_data and 'name' in user_data:
-            user_data['nameInsensitive'] = user_data['name'].lower()
+        # if 'nameInsensitive' not in user_data and 'name' in user_data:
+        #     user_data['nameInsensitive'] = user_data['name'].lower()
 
         return UserDto.model_validate(updated_info['user'])
 

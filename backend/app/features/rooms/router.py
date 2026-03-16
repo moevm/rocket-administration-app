@@ -393,7 +393,7 @@ async def update_room_group(
         if room_type != 'p':
             raise HTTPException(
                 status_code=400, 
-                detail=f"Эта комната имеет тип {room_type} - ожидалась группа:("
+                detail=f"Эта комната имеет тип {room_type} - ожидалась группа"
             )
 
         current_room = room_info['room']
@@ -467,7 +467,7 @@ async def update_room_channels(
     space=Depends(get_space)
 ) -> RoomDto:
     """
-    Обновляет информацию о комнате (группа)
+    Обновляет информацию о комнате (канал)
     """
     rocket = await obtain_rocket_instance(key_for_space(space))
 
@@ -481,10 +481,10 @@ async def update_room_channels(
             raise HTTPException(status_code=404, detail="Комната не найдена")
 
         room_type = room_info['room']['t']
-        if room_type != 'p':
+        if room_type != 'c':
             raise HTTPException(
                 status_code=400,
-                detail=f"Эта комната имеет тип {room_type} - ожидался канал:("
+                detail=f"Эта комната имеет тип {room_type} - ожидался канал"
             )
 
         current_room = room_info['room']
