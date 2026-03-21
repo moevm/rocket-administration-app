@@ -14,6 +14,12 @@ from app.services.db import get_db
 from app.lib.utils import batch_execute, generate_password, extract_exception_message, hide_system_messages
 from app.config import settings
 from app.models import TeamsImportRequestDto, ImportedTeamResultDto, TeamCreateDto, TeamsDeleteDto, TeamDeletedDto
+from fastapi import APIRouter, Depends, HTTPException
+from typing import List
+from app.models import TeamDto, TeamInfoDto, TeamsDeleteDto, TeamDeletedDto
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -31,6 +37,7 @@ async def get_teams(space=Depends(get_space)) -> List[TeamDto]:
     ]
     return teams
 
+
 @router.get("/{team_id}")
 async def get_team_information(team_id: str, space=Depends(get_space)) -> TeamInfoDto:
     rocket = await obtain_rocket_instance(key_for_space(space))
@@ -44,6 +51,7 @@ async def get_team_information(team_id: str, space=Depends(get_space)) -> TeamIn
         'users': [member['user'] for member in team_users_raw['members']],
         'rooms': team_rooms_raw['rooms']
     })
+
 
 @router.post("/")
 async def create_teams(
@@ -87,6 +95,7 @@ async def create_teams(
 
     return results
 
+
 @router.delete("/")
 async def remove_teams(body: TeamsDeleteDto, space=Depends(get_space)) -> List[TeamDeletedDto]:
     rocket = await obtain_rocket_instance(key_for_space(space))
@@ -120,4 +129,18 @@ async def remove_teams(body: TeamsDeleteDto, space=Depends(get_space)) -> List[T
             _process,
             [(team,) for team in body.teams],
             settings.app.batch_delay
+    )
+
+
+@router.patch("/{team_id}")
+async def update_team(
+    team_id: str,
+    space=Depends(get_space)
+) -> TeamDto:
+    """
+    Обновление команд не поддерживается Rocket.Chat API
+    """
+    raise HTTPException(
+        status_code=501,
+        detail="Team editing is not supported by Rocket.Chat API. You can only delete and recreate teams."
     )
