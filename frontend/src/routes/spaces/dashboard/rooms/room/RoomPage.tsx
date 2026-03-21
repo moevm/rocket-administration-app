@@ -31,6 +31,7 @@ import {
 } from "@/components/app/dialogs/room-page-dialogs/DeleteTeamsOutOfRoomsDialog.tsx";
 import {showHideRoomDialogAtom} from "@/components/app/dialogs/room-page-dialogs/HideRoomDialog.tsx";
 import {showDeleteRoomDialogAtom} from "@/components/app/dialogs/room-page-dialogs/DeleteRoomDialog.tsx";
+import {RoomReactWhenReadOnlySetting} from "@/components/app/RoomReactWhenReadOnlySetting.tsx";
 
 const typesName = {
     d: "Личные сообщения",
@@ -43,7 +44,7 @@ const typesName = {
 function RoomPageContent() {
     const room = loaded(useAtomValue($selectedRoom)).data
     const selectedSpaceId = useAtomValue($selectedSpaceId)!
-    const {team, members} = loaded(useAtomValue($roomInfo)).data
+    const {team, members, reactWhenReadOnly} = loaded(useAtomValue($roomInfo)).data
 
     const teams = team ? team : []
 
@@ -92,6 +93,14 @@ function RoomPageContent() {
                         ['Пользователи', room.usersCount],
                         ['Администратор', <MonoRenderer value={room.u._id} />],
                         ['Read only', <CheckboxRenderer value={room.ro} />],
+                        [
+                            'Реакции при read-only',
+                            <RoomReactWhenReadOnlySetting
+                                spaceId={selectedSpaceId}
+                                roomId={room._id}
+                                value={reactWhenReadOnly}
+                            />,
+                        ],
                         ['Default', <CheckboxRenderer value={room.default} />],
                         ['Тема',  <OptRenderer value={room.topic} />],
                         ['Объявление', <OptRenderer value={room.announcement} />],

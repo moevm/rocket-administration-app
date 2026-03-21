@@ -34,6 +34,7 @@ class RoomDto(BaseModel):
     default: Optional[bool] = None
     topic: Optional[str] = None
     announcement: Optional[str] = None
+    reactWhenReadOnly: Optional[bool] = None
 
 
 class TeamDto(BaseModel):
@@ -156,6 +157,11 @@ class RoomUserDto(BaseModel):
 class RoomInfoDto(BaseModel):
     team: Optional[ShortTeamDto] = None
     members: Optional[List[RoomUserDto]] = None
+    reactWhenReadOnly: bool = False
+
+
+class RoomSettingsPatchDto(BaseModel):
+    reactWhenReadOnly: bool
 
 
 class RoomMemberRolesDto(BaseModel):
