@@ -133,10 +133,9 @@ const RoleMultiSelect = ({
   );
 };
 
-// Функция валидации пароля
 const validatePassword = (password: string): { valid: boolean; message?: string } => {
   if (!password) {
-    return { valid: true }; // пустой пароль допустим (автогенерация)
+    return { valid: true };
   }
 
   if (password.length < 14) {
@@ -159,7 +158,6 @@ const validatePassword = (password: string): { valid: boolean; message?: string 
     return { valid: false, message: "Пароль должен содержать хотя бы один символ (например, !@#$%^&*)" };
   }
 
-  // Проверка на более 3 повторяющихся символов подряд
   let repeatCount = 1;
   for (let i = 1; i < password.length; i++) {
     if (password[i] === password[i - 1]) {
