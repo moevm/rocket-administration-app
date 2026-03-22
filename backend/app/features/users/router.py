@@ -116,24 +116,30 @@ async def create_users(
         smtp_settings = await require_smtp_settings(db, space.id)
 
     async def _process_user_creation(user_data: UserCreateDto):
-        generated_password = generate_password(16)
+        if user_data.password and user_data.password.strip():
+            password = user_data.password.strip()
+        else:
+            password = generate_password(16)
 
         result = ImportedUserResultDto(
             request=user_data,
-            password=generated_password
+            password=password
         )
 
         try:
             create_args = user_data.model_dump(exclude_unset=True)
-            create_args['password'] = generated_password
+            create_args.pop('password', None)
+            create_args['password'] = password
             create_args['verified'] = body.verified
             create_args['joinDefaultChannels'] = body.joinDefaultChannels
 
             if body.sendEmail:
                 create_args['requirePasswordChange'] = False
-
             else:
                 create_args['requirePasswordChange'] = body.requirePasswordChange
+
+            if user_data.roles:
+                create_args['roles'] = user_data.roles
 
             response_data = await rocket_request(
                 rocket.users_create,
@@ -152,7 +158,7 @@ async def create_users(
                     smtp_settings,
                     user_data.email,
                     f"Ваш аккаунт в {space.url} создан",
-                    f"Добро пожаловать!\n\nВаш временный пароль для входа в пространство {space.url}:\n{generated_password}\n\nРекомендуем сменить его после первого входа."
+                    f"Добро пожаловать!\n\nВаш временный пароль для входа в пространство {space.url}:\n{password}\n\nРекомендуем сменить его после первого входа."
                 )
                 result.email_sent = True
             except Exception as e:
