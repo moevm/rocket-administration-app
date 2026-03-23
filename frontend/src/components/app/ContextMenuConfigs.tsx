@@ -197,8 +197,13 @@ const TeamContextMenuItems = ({rows}: { rows: Row<{ _id: string }>[] }) => {
 
     const setSelectedRoomsData = useSetAtom($selectedTeamsData)
     const data = rows.map(it => ({
-        _id: it.getValue('_id') as string
+        _id: it.getValue('_id') as string,
+        roomId: (it.original as any)?.roomId || 
+                it.getValue('roomId') || 
+                undefined
     }))
+    
+    console.log('Constructed data:', data);
 
     return (
         <>
