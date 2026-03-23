@@ -21,15 +21,36 @@ router = APIRouter()
 @router.get("/")
 async def get_teams(space=Depends(get_space)) -> List[TeamDto]:
     rocket = await obtain_rocket_instance(key_for_space(space))
-    teams = [
-        TeamDto.model_validate(team)
-        for team
-        in (await rocket_request(
-            rocket.teams_list_all,
-            **rocket_query_args(count=0)
-        ))['teams']
-    ]
+    teams_data = await rocket_request(
+        rocket.teams_list_all,
+        **rocket_query_args(count=0)
+    )
+
+    async def get_team_details(team):
+        try:
+            members = await rocket_request(
+                rocket.teams_members,
+                **rocket_query_args(team_id=team['_id'], count=0)
+            )
+            rooms = await rocket_request(
+                rocket.teams_list_rooms,
+                **rocket_query_args(team_id=team['_id'], count=0)
+            )
+
+            team['numberOfUsers'] = members.get('total', 0)
+            team['rooms'] = rooms.get('total', 0)
+        except Exception:
+            team['numberOfUsers'] = 0
+            team['rooms'] = 0
+
+        return TeamDto.model_validate(team)
+
+    teams = await asyncio.gather(
+        *[get_team_details(team) for team in teams_data['teams']]
+    )
+
     return teams
+
 
 @router.get("/{team_id}")
 async def get_team_information(team_id: str, space=Depends(get_space)) -> TeamInfoDto:

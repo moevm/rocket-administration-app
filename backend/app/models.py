@@ -44,6 +44,8 @@ class TeamDto(BaseModel):
     createdBy: Optional[ShortUserDto] = None
     updatedAt: Optional[str] = None
     roomId: Optional[str] = None
+    numberOfUsers: int = Field(default=0)
+    rooms: int = Field(default=0)
 
 
 class UserCreateDto(BaseModel):
