@@ -18,13 +18,16 @@ import {
     $smtpSettings,
     $selectedSpaceId,
     ApiSmtpSettingsModel,
-    $spacesQueryOptions, $spaces, $selectedSpace, ApiSpaceModel, $roomsQueryOptions, $smtpSettingsQueryOptions
+    $selectedSpace,
+    ApiSpaceModel,
+    $smtpSettingsQueryOptions
 } from "@/store/global-store.ts";
 import {useAtomValue} from "jotai/index";
 import {BatchLoader} from "@/components/app/DataLoader.tsx";
 import {Loader2} from "lucide-react";
 import {registerSchema} from "@/lib/form.ts";
 import {useInvalidateSpace} from "@/api/invalidate.ts";
+import EmailTemplatesSettings from "@/routes/spaces/dashboard/settings/EmailTemplatesSettings.tsx";
 
 
 const smtpSettingsSchema = z.object({
@@ -354,16 +357,22 @@ function SettingsPageContent(props: {
     space: ApiSpaceModel
 }) {
     return (
-        <div className="flex flex-col m-6 h-screen max-w-screen-lg w-screen py-4 ml-6">
+        <div className="flex flex-col max-w-[1160px] w-full p-4">
             <span className="text-4xl">Настройки</span>
 
-            <div className="mt-6 flex space-x-6 w-full">
+            <div className="mt-6 flex flex-wrap gap-6 w-full">
                 <div className="w-[550px]">
                     <SMTPSettingsContent smtpSettings={props.smtpSetting}/>
                 </div>
                 <div className="w-[550px]">
                     <EditSpaceContent space={props.space}/>
                 </div>
+            </div>
+            <div className="mt-6 w-full">
+                <EmailTemplatesSettings
+                    spaceId={props.space._id ?? ""}
+                    spaceUrl={String(props.space.url)}
+                />
             </div>
         </div>
     )
