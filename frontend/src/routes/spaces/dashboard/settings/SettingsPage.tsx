@@ -351,9 +351,6 @@ function SMTPSettingsContent(props: {
                                         <FormLabel>
                                             Использовать SSL/TLS
                                         </FormLabel>
-                                        <FormDescription>
-                                            Включите для безопасного соединения через SSL/TLS
-                                        </FormDescription>
                                     </div>
                                 </FormItem>
                             )}
