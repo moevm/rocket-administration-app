@@ -51,6 +51,18 @@ const smtpSettingsSchema = z.object({
     use_tls: z.boolean().default(false)
 })
 
+const safeDecodeUrlComponent = (value: string) => {
+    if (!value) {
+        return "";
+    }
+
+    try {
+        return decodeURIComponent(value);
+    } catch {
+        return value;
+    }
+}
+
 function EditSpaceContent(props: {
     space: ApiSpaceModel
 }) {
@@ -197,7 +209,7 @@ function SMTPSettingsContent(props: {
 
     function onSubmit(values: z.infer<typeof smtpSettingsSchema>) {
         const {login, password, host, port, path, sender, use_tls} = values;
-        const fullUrl = `smtp://${login}:${password}@${host}:${port}${path ? `/${path}` : ''}`;
+        const fullUrl = `smtp://${encodeURIComponent(login)}:${encodeURIComponent(password)}@${host}:${port}${path ? `/${path}` : ''}`;
 
         mutate({
             body: {
@@ -215,9 +227,9 @@ function SMTPSettingsContent(props: {
 
     const initialFormValues = {
         login: props.smtpSettings?.value?.host ?
-            new URL(props.smtpSettings.value?.host).username : '',
+            safeDecodeUrlComponent(new URL(props.smtpSettings.value?.host).username) : '',
         password: props.smtpSettings?.value?.host ?
-            new URL(props.smtpSettings.value?.host).password : '',
+            safeDecodeUrlComponent(new URL(props.smtpSettings.value?.host).password) : '',
         host: props.smtpSettings?.value?.host ?
             new URL(props.smtpSettings.value?.host).hostname : '',
         port: props.smtpSettings?.value?.host ?
@@ -318,7 +330,7 @@ function SMTPSettingsContent(props: {
                             <span>SMTP-URL</span>
                             <div className="p-2 rounded border bg-muted/50 overflow-hidden">
                                 <code className="text-sm break-all whitespace-pre-wrap">
-                                    {`smtp://${form.watch("login") || "login"}:${form.watch("password") || "password"}@${form.watch("host") || "host"}:${form.watch("port") || "port"}${form.watch("path") ? `/${form.watch("path")}` : ""}`}
+                                    {`smtp://${encodeURIComponent(form.watch("login") || "login")}:${encodeURIComponent(form.watch("password") || "password")}@${form.watch("host") || "host"}:${form.watch("port") || "port"}${form.watch("path") ? `/${form.watch("path")}` : ""}`}
                                 </code>
                             </div>
                         </div>
