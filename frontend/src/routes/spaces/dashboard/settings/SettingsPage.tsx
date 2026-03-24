@@ -352,7 +352,7 @@ function SMTPSettingsContent(props: {
                             control={form.control}
                             name="use_tls"
                             render={({field}) => (
-                                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                                <FormItem className="flex flex-row items-start space-x-3 space-y-0 py-2">
                                     <FormControl>
                                         <Checkbox
                                             checked={field.value}
