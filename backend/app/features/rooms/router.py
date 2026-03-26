@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from typing import Optional, List
 
 from app.lib.cache import key_for_space
-from app.models import RoomDto, RoomInfoDto
+from app.models import RoomDto, RoomInfoDto, RoomSettingsPatchDto
 from app.features.spaces.utils import get_space
 from app.models import TeamDto
 from app.models import UserDto
@@ -159,10 +159,30 @@ async def get_room_information(room_id: str, space=Depends(get_space)) -> RoomIn
         member_copy["roles"] = roles_by_user.get(member_id, [])
         members_with_roles.append(member_copy)
 
+    room_payload = room_info_raw.get("room") or {}
+    raw_react = room_payload.get("reactWhenReadOnly")
+    react_when_ro = False if raw_react is None else bool(raw_react)
+
     return RoomInfoDto.model_validate({
         "team": room_info_raw.get("team") if "team" in room_info_raw else None,
         "members": members_with_roles,
+        "reactWhenReadOnly": react_when_ro,
     })
+
+
+@router.patch("/{room_id}/settings")
+async def patch_room_settings(
+    room_id: str,
+    body: RoomSettingsPatchDto,
+    space=Depends(get_space),
+):
+    rocket = await obtain_rocket_instance(key_for_space(space))
+    await rocket_request(
+        rocket.call_api_post,
+        "rooms.saveRoomSettings",
+        **rocket_query_args(rid=room_id, reactWhenReadOnly=body.reactWhenReadOnly),
+    )
+    return {"success": True}
 
 
 def _get_role_methods(rocket, room_type: str):
