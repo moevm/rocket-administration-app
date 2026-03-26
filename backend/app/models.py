@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, HttpUrl, EmailStr, AnyUrl
-from typing import Optional, List
+from typing import Optional, List, Literal, Dict
 from app.services.db import DbModel
 from datetime import datetime
 
@@ -224,6 +224,65 @@ class SmtpSettingsModel(DbModel):
 
 class SmtpSettingsResponseDto(BaseModel):
     value: Optional[SmtpSettingsDto]
+
+
+EmailTemplateKey = Literal["welcome_user", "password_changed"]
+
+
+class EmailTemplateDto(BaseModel):
+    key: EmailTemplateKey
+    subject: str
+    body: str
+
+
+class EmailTemplatesMapDto(BaseModel):
+    welcome_user: EmailTemplateDto
+    password_changed: EmailTemplateDto
+
+
+class EmailTemplateUpsertDto(BaseModel):
+    subject: str = Field(min_length=1)
+    body: str = Field(min_length=1)
+
+
+class EmailTemplatePreviewRequestDto(BaseModel):
+    template: EmailTemplateUpsertDto
+    context: Optional[Dict[str, str]] = None
+
+
+class EmailTemplatePreviewResponseDto(BaseModel):
+    subject: str
+    body: str
+
+
+class EmailTemplateTestSendRequestDto(BaseModel):
+    template: EmailTemplateUpsertDto
+    context: Optional[Dict[str, str]] = None
+    to: EmailStr
+
+
+class EmailTemplateTestSendResponseDto(BaseModel):
+    recipient: EmailStr
+    message_id: str
+
+
+class EmailTemplateMetaDto(BaseModel):
+    key: EmailTemplateKey
+    description: str
+    available_variables: List[str]
+    required_variables: List[str]
+
+
+class EmailTemplatesMetaResponseDto(BaseModel):
+    items: List[EmailTemplateMetaDto]
+
+
+class EmailTemplateModel(DbModel):
+    space_id: str
+    key: EmailTemplateKey
+    subject: str
+    body: str
+    updated_at: datetime
 
 
 class UsersToChangePasswordDto(BaseModel):
