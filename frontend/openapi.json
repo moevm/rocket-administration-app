@@ -2476,6 +2476,11 @@
             "type": "string",
             "format": "email",
             "title": "Sender"
+          },
+          "use_tls": {
+            "type": "boolean",
+            "title": "Use Tls",
+            "default": false
           }
         },
         "type": "object",

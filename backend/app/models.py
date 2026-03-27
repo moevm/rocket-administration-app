@@ -233,11 +233,13 @@ class UserInfoDto(BaseModel):
 class SmtpSettingsDto(BaseModel):
     host: AnyUrl
     sender: EmailStr
+    use_tls: bool = False
 
 
 class SmtpSettingsModel(DbModel):
     host: AnyUrl
     sender: EmailStr
+    use_tls: bool = False
 
 
 class SmtpSettingsResponseDto(BaseModel):
