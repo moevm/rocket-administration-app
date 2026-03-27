@@ -51,6 +51,8 @@ class UserCreateDto(BaseModel):
     username: str
     email: EmailStr
     name: str
+    password: Optional[str] = None
+    roles: List[str] = []
 
 
 class UsersImportRequestDto(BaseModel):
