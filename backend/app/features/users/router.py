@@ -1,11 +1,12 @@
 import asyncio
 
 from fastapi import APIRouter, Depends
+from fastapi import HTTPException
 
 from app.lib.cache import key_for_space
 from app.models import UserDto, TeamDto, UserInfoDto, UsersToChangePasswordDto,\
     ChangedPasswordDto, UsersImportRequestDto, ImportedUserResultDto, UserCreateDto, \
-    UsersDeleteDto, UserDeleteResDto
+    UsersDeleteDto, UserDeleteResDto, UpdateUserRequest
 from typing import Optional, List
 from app.features.spaces.utils import get_space
 from app.lib.rocket import obtain_rocket_instance, rocket_request, rocket_query_args
@@ -13,9 +14,11 @@ from app.lib.utils import batch_execute, generate_password, extract_exception_me
 from app.lib.smtp import send_email, require_smtp_settings
 from app.services.db import get_db
 from app.config import settings
+import logging
 
 router = APIRouter()
 
+logger = logging.getLogger(__name__)
 
 @router.get("/")
 async def get_users(space=Depends(get_space)) -> List[UserDto]:
@@ -189,9 +192,58 @@ async def delete_users(
         else:
             res.success = True
         return res
-    
+
     return await batch_execute(
         _process,
         [(user,) for user in body.users],
         settings.app.batch_delay
     )
+
+
+@router.patch("/{user_id}")
+async def update_user(
+    user_id: str,
+    user_data: UpdateUserRequest,
+    space=Depends(get_space)
+) -> UserDto:
+    """
+    Обновляет информацию о пользователе
+    """
+    rocket = await obtain_rocket_instance(key_for_space(space))
+
+    try:
+        user_info = await rocket_request(
+            rocket.users_info,
+            **rocket_query_args(user_id=user_id)
+        )
+
+        if not user_info or 'user' not in user_info:
+            raise HTTPException(status_code=404, detail="User is not found")
+
+        update_data = user_data.model_dump(exclude_none=True)
+
+        if update_data:
+            response = await rocket_request(
+                rocket.call_api_post,
+                "users.update",
+                **rocket_query_args(
+                    userId=user_id,
+                    data=update_data
+                )
+            )
+
+        updated_info = await rocket_request(
+            rocket.users_info,
+            **rocket_query_args(user_id=user_id)
+        )
+
+        return UserDto.model_validate(updated_info['user'])
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception(f"Failed to update user: {e}")
+        raise HTTPException(
+            status_code=400,
+            detail=f"Failed to update user: {str(e)}"
+        )

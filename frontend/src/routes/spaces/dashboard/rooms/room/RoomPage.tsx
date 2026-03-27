@@ -32,6 +32,9 @@ import {
 import {showHideRoomDialogAtom} from "@/components/app/dialogs/room-page-dialogs/HideRoomDialog.tsx";
 import {showDeleteRoomDialogAtom} from "@/components/app/dialogs/room-page-dialogs/DeleteRoomDialog.tsx";
 import {RoomReactWhenReadOnlySetting} from "@/components/app/RoomReactWhenReadOnlySetting.tsx";
+import {showEditRoomDialogAtom} from "@/components/app/dialogs/room-page-dialogs/EditRoomDialog.tsx";
+import EditRoomDialog from "@/components/app/dialogs/room-page-dialogs/EditRoomDialog.tsx";
+import {Pencil} from "lucide-react";
 
 const typesName = {
     d: "Личные сообщения",
@@ -54,6 +57,7 @@ function RoomPageContent() {
     const setDeleteTeamsOutOfRoomDialogOpen = useSetAtom(showDeleteTeamsOutOfRoomsDialogAtom)
     const setHideRoomDialogOpen = useSetAtom(showHideRoomDialogAtom)
     const setDeleteRoomDialogOpen = useSetAtom(showDeleteRoomDialogAtom)
+    const setEditRoomDialogOpen = useSetAtom(showEditRoomDialogAtom);
 
     const setSelectedRoomsData = useSetAtom($selectedRoomsData)
     const data = [
@@ -126,6 +130,11 @@ function RoomPageContent() {
                         <Button variant="outline" onClick={() => {setDeleteRoomDialogOpen(true)}}>
                             Удалить комнату
                         </Button>
+                        <Button variant="outline" onClick={() => {setEditRoomDialogOpen(true)}}>
+                            <Pencil className="mr-2 h-4 w-4" />
+                            Редактировать
+                        </Button>
+                        <EditRoomDialog />
                     </div>
                 </div>
             </div>
