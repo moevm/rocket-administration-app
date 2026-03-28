@@ -6,7 +6,7 @@ import {
     useReactTable,
     VisibilityState
 } from "@tanstack/react-table";
-import {useCallback, useEffect, useMemo} from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import {Input} from "@/components/ui/input.tsx";
 import {MultiSelect} from "@/components/ui/multi-select.tsx";
 import {Button} from "@/components/ui/button.tsx";
@@ -33,17 +33,16 @@ export interface ContextMenuConfig<TData> {
 
 interface RichTableViewProps<TData, TValue> {
     tableId: string,
-    entries: TData[]; // состояние с данными
+    entries: TData[];
     tableConfig: {
         columns: ColumnDef<TData, TValue>[];
-        globalFilterFn?: any; // кастомный фильтр
+        globalFilterFn?: any;
     };
     contextMenuConfig: ContextMenuConfig<TData>
     settings?: {
         enableSearch?: boolean;
         enableExport?: boolean;
         enableImport?: boolean;
-        // enableSelectFromFile?: boolean;
         enableColumnVisibilityToggle?: boolean;
         rowClickHandler?: (data: TData) => void;
     };
@@ -76,29 +75,31 @@ function RichTableView<TData, TValue>({
     const [showDialogImport, setShowDialogImport] = React.useState<boolean>(false);
     const [showDialogSelectFromFile, setShowDialogSelectFromFile] = React.useState<boolean>(false);
 
-    const customGlobalFilterFn: FilterFn<TData> = React.useCallback(
-        (
-            row: Row<TData>,
-            columnId: string
-        ): boolean => {
-            const searchTerm = String(filterString).toLowerCase().trim();
+    const [showOnlySelected, setShowOnlySelected] = React.useState<boolean>(false);
 
-            if (!searchTerm) {
-                return true;
-            }
+    const [globalFilter, setGlobalFilter] = React.useState({
+        filterString: "",
+        showOnlySelected: false,
+        searchColumns: [] as string[],
+    });
 
-            if (searchColumns.length === 0) {
-                return false;
-            }
+    useEffect(() => {
+        setGlobalFilter({ filterString: filterString ?? "", showOnlySelected, searchColumns });
+    }, [filterString, showOnlySelected, searchColumns]);
 
-            if (!searchColumns.includes(columnId)) {
-                return false;
-            }
+    const customGlobalFilterFn: FilterFn<TData> = useCallback(
+        (row: Row<TData>, columnId: string, filterValue): boolean => {
+            const { filterString: search, showOnlySelected: onlySelected, searchColumns: cols } = filterValue;
 
-            const cellValue = row.getValue(columnId);
-            return String(cellValue).toLowerCase().includes(searchTerm);
+            if (onlySelected && !row.getIsSelected()) return false;
+
+            const searchTerm = search.toLowerCase().trim();
+            if (!searchTerm) return true;
+            if (cols.length === 0 || !cols.includes(columnId)) return false;
+
+            return String(row.getValue(columnId)).toLowerCase().includes(searchTerm);
         },
-        [searchColumns, filterString]
+        []
     );
 
     const table = useReactTable<TData>({
@@ -108,7 +109,8 @@ function RichTableView<TData, TValue>({
             sorting,
             rowSelection,
             columnVisibility,
-            columnFilters
+            columnFilters,
+            globalFilter
         },
         onSortingChange: setSorting,
         onRowSelectionChange: data => {
@@ -119,6 +121,7 @@ function RichTableView<TData, TValue>({
         },
         onColumnVisibilityChange: setColumnVisibility,
         onColumnFiltersChange: setColumnFilters,
+        onGlobalFilterChange: setGlobalFilter,
         getCoreRowModel: getCoreRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
@@ -144,6 +147,7 @@ function RichTableView<TData, TValue>({
         }
     });
 
+
     const [hiddenColumns, setHiddenColumns] = useAtom($hideColumnsAtomFamily(tableId))
 
     const allTableColumns = useMemo(() => {
@@ -167,23 +171,11 @@ function RichTableView<TData, TValue>({
 
     }, [allTableColumns, setHiddenColumns])
 
-    // const hideColumn = useCallback((id: string) => {
-    //     console.log('hiding column', id)
-    //     console.log('prev hidden: ', hiddenColumns)
-    //     const newHidden = [...hiddenColumns, id]
-    //     console.log('new hidden', newHidden)
-    //     setHiddenColumns(newHidden)
-    // }, [setHiddenColumns, hiddenColumns])
-
     useEffect(() => {
         for (const col of allTableColumns) {
             col.toggleVisibility(visibleColumns.includes(col.id))
         }
     }, [allTableColumns, visibleColumns]);
-
-    useEffect(() => {
-        table.setGlobalFilter(filterString)
-    }, [filterString, table, searchColumns]);
 
     const [tableFilters, setTableFilters] = React.useState<FilterConfig[]>([])
     const updateTableFilters = useCallback((filters: FilterConfig[]) => {
@@ -207,6 +199,10 @@ function RichTableView<TData, TValue>({
     useEffect(() => {
         updateTableFilters([])
     }, []);
+
+    const selectedRows = table.getSelectedRowModel().rows;
+    const selectedCount = selectedRows.length;
+    const selectedButtonRef = useRef<HTMLButtonElement>(null);
 
     return (
         <div className={"flex w-full flex-col"}>
@@ -250,22 +246,45 @@ function RichTableView<TData, TValue>({
                     </div>
                 )}
 
-                <TableFilters table={table} filters={tableFilters} onFiltersUpdated={updateTableFilters}/>
-
+                <TableFilters 
+                    table={table} 
+                    filters={tableFilters} 
+                    onFiltersUpdated={updateTableFilters}
+                    showOnlySelected={showOnlySelected}
+                    onShowOnlySelectedChange={setShowOnlySelected}
+                />
                 <div className="flex justify-between">
                     <div className="flex gap-2">
-                        {/*{settings?.enableExport &&*/
-                            <Button variant="outline" size="sm" onClick={() => setShowDialogExport(true)}>
-                                <FileUp/> Экспорт
-                            </Button>}
+                        <Button variant="outline" size="sm" onClick={() => setShowDialogExport(true)}>
+                            <FileUp/> Экспорт
+                        </Button>
                         {settings?.enableImport &&
                             <Button variant="outline" size="sm" onClick={() => setShowDialogImport(true)}>
                                 <FileDown/> Импорт
                             </Button>}
-                        {/*settings?.enableSelectFromFile &&*/
-                            <Button variant="outline" size="sm" onClick={() => setShowDialogSelectFromFile(true)}>
-                                <CheckIcon/> Выделить из файла
-                            </Button>}
+                        <Button variant="outline" size="sm" onClick={() => setShowDialogSelectFromFile(true)}>
+                            <CheckIcon/> Выделить из файла
+                        </Button>
+
+                        <Button
+                            ref={selectedButtonRef}
+                            variant="outline"
+                            size="sm"
+                            onClick={(e) => {
+                                if (selectedCount === 0) return;
+                                setContextMenuData({
+                                    point: { x: e.clientX, y: e.clientY },
+                                    rows: selectedRows,
+                                    config: contextMenuConfig,
+                                });
+                                setContextMenuOpen(true);
+                            }}
+                            disabled={selectedCount === 0}
+                        >
+                            <CheckIcon className="mr-2 h-4 w-4" />
+                            Выделено: {selectedCount}
+                        </Button>
+
                         {buttonsSlot && buttonsSlot()}
                     </div>
                     {settings?.enableColumnVisibilityToggle && <DataTableViewOptions allTableColumns={allTableColumns} visibleColumns={visibleColumns} setVisibleColumns={setVisibleColumns}/>}
@@ -295,7 +314,6 @@ function RichTableView<TData, TValue>({
                                     className={"cursor-pointer"}
                                     key={row.id}
                                     data-state={row.getIsSelected() && "selected"}
-                                    // TODO: проваливание здесь
                                     onClick={(e) => {
                                         const isCheckboxClick = (e.target as HTMLElement).closest('.row-select-checkbox');
                                         if (!isCheckboxClick && settings.rowClickHandler) {
