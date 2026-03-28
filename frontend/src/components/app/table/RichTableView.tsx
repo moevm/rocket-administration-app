@@ -33,10 +33,10 @@ export interface ContextMenuConfig<TData> {
 
 interface RichTableViewProps<TData, TValue> {
     tableId: string,
-    entries: TData[];
+    entries: TData[]; // состояние с данными
     tableConfig: {
         columns: ColumnDef<TData, TValue>[];
-        globalFilterFn?: any;
+        globalFilterFn?: any; // кастомный фильтр
     };
     contextMenuConfig: ContextMenuConfig<TData>
     settings?: {
@@ -314,6 +314,7 @@ function RichTableView<TData, TValue>({
                                     className={"cursor-pointer"}
                                     key={row.id}
                                     data-state={row.getIsSelected() && "selected"}
+                                    // TODO: проваливание здесь
                                     onClick={(e) => {
                                         const isCheckboxClick = (e.target as HTMLElement).closest('.row-select-checkbox');
                                         if (!isCheckboxClick && settings.rowClickHandler) {
