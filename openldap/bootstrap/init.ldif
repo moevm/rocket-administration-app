@@ -1,0 +1,283 @@
+dn: ou=test-zone,dc=moevm,dc=info
+objectClass: organizationalUnit
+ou: test-zone
+
+dn: ou=system-groups,ou=test-zone,dc=moevm,dc=info
+objectClass: organizationalUnit
+ou: system-groups
+
+dn: ou=users,dc=moevm,dc=info
+objectClass: organizationalUnit
+ou: users
+
+dn: uid=rocket-ldap-user,ou=users,dc=moevm,dc=info
+objectClass: inetOrgPerson
+uid: rocket-ldap-user
+sn: User
+cn: Rocket LDAP User
+userPassword: testpassword
+
+dn: ou=user-accounts,ou=test-zone,dc=moevm,dc=info
+objectClass: organizationalUnit
+objectClass: top
+ou: user-accounts
+
+dn: uid=student1,ou=user-accounts,ou=test-zone,dc=moevm,dc=info
+objectClass: inetOrgPerson
+cn:: 0KLQtdGB0YLQvtCy0YvQuSDQodGC0YPQtNC10L3RgiAx
+sn:: 0KLQtdGB0YLQvtCy0YvQuQ==
+displayName:: MzM0MSDQotC10YHRgtC+0LLRi9C5INCh0YLRg9C00LXQvdGCIDEg
+givenName:: 0KHRgtGD0LTQtdC90YI=
+mail: student1@localhost.com
+uid: student1
+userPassword:: c3R1ZGVudDFwYXNz
+
+dn: uid=student2,ou=user-accounts,ou=test-zone,dc=moevm,dc=info
+objectClass: inetOrgPerson
+cn:: 0KLQtdGB0YLQvtCy0YvQuSDQodGC0YPQtNC10L3RgiAy
+sn:: 0KLQtdGB0YLQvtCy0YvQuQ==
+displayName:: MzM0MiDQotC10YHRgtC+0LLRi9C5INCh0YLRg9C00LXQvdGCIDIg
+givenName:: 0KHRgtGD0LTQtdC90YI=
+mail: student2@localhost.com
+uid: student2
+userPassword:: c3R1ZGVudDJwYXNz
+
+dn: uid=student3,ou=user-accounts,ou=test-zone,dc=moevm,dc=info
+objectClass: inetOrgPerson
+cn:: 0KLQtdGB0YLQvtCy0YvQuSDQodGC0YPQtNC10L3RgiAz
+sn:: 0KLQtdGB0YLQvtCy0YvQuQ==
+displayName:: MzM0MyDQotC10YHRgtC+0LLRi9C5INCh0YLRg9C00LXQvdGCIDMg
+givenName:: 0KHRgtGD0LTQtdC90YI=
+mail: student3@localhost.com
+uid: student3
+userPassword:: c3R1ZGVudDNwYXNz
+
+dn: uid=student4,ou=user-accounts,ou=test-zone,dc=moevm,dc=info
+objectClass: inetOrgPerson
+cn:: 0KLQtdGB0YLQvtCy0YvQuSDQodGC0YPQtNC10L3RgiA0
+sn:: 0KLQtdGB0YLQvtCy0YvQuQ==
+displayName:: MzM0NCDQotC10YHRgtC+0LLRi9C5INCh0YLRg9C00LXQvdGCIDQg
+givenName:: 0KHRgtGD0LTQtdC90YI=
+mail: student4@localhost.com
+uid: student4
+userPassword:: c3R1ZGVudDRwYXNz
+
+dn: uid=student5,ou=user-accounts,ou=test-zone,dc=moevm,dc=info
+objectClass: inetOrgPerson
+cn:: 0KLQtdGB0YLQvtCy0YvQuSDQodGC0YPQtNC10L3RgiA1
+sn:: 0KLQtdGB0YLQvtCy0YvQuQ==
+displayName:: MzM0NSDQotC10YHRgtC+0LLRi9C5INCh0YLRg9C00LXQvdGCIDUg
+givenName:: 0KHRgtGD0LTQtdC90YI=
+mail: student5@localhost.com
+uid: student5
+userPassword:: c3R1ZGVudDVwYXNz
+
+dn: uid=student6,ou=user-accounts,ou=test-zone,dc=moevm,dc=info
+objectClass: inetOrgPerson
+cn:: 0KLQtdGB0YLQvtCy0YvQuSDQodGC0YPQtNC10L3RgiA2
+sn:: 0KLQtdGB0YLQvtCy0YvQuQ==
+displayName:: MzM0NiDQotC10YHRgtC+0LLRi9C5INCh0YLRg9C00LXQvdGCIDYg
+givenName:: 0KHRgtGD0LTQtdC90YI=
+mail: student6@localhost.com
+uid: student6
+userPassword:: c3R1ZGVudDZwYXNz
+
+dn: uid=student7,ou=user-accounts,ou=test-zone,dc=moevm,dc=info
+objectClass: inetOrgPerson
+cn:: 0KLQtdGB0YLQvtCy0YvQuSDQodGC0YPQtNC10L3RgiA3
+sn:: 0KLQtdGB0YLQvtCy0YvQuQ==
+displayName:: MzM0NyDQotC10YHRgtC+0LLRi9C5INCh0YLRg9C00LXQvdGCIDcg
+givenName:: 0KHRgtGD0LTQtdC90YI=
+mail: student7@localhost.com
+uid: student7
+userPassword:: c3R1ZGVudDdwYXNz
+
+dn: uid=student8,ou=user-accounts,ou=test-zone,dc=moevm,dc=info
+objectClass: inetOrgPerson
+cn:: 0KLQtdGB0YLQvtCy0YvQuSDQn9GA0LXQv9C+0LTQsNCy0LDRgtC10LvRjCA4
+sn:: 0KLQtdGB0YLQvtCy0YvQuQ==
+displayName:: MzM0OCDQotC10YHRgtC+0LLRi9C5INCh0YLRg9C00LXQvdGCIDgg
+givenName:: 0KHRgtGD0LTQtdC90YI=
+mail: student8@localhost.com
+uid: student8
+userPassword:: c3R1ZGVudDhwYXNz
+
+dn: uid=student9,ou=user-accounts,ou=test-zone,dc=moevm,dc=info
+objectClass: inetOrgPerson
+cn:: 0KLQtdGB0YLQvtCy0YvQuSDQn9GA0LXQv9C+0LTQsNCy0LDRgtC10LvRjCA5
+sn:: 0KLQtdGB0YLQvtCy0YvQuQ==
+displayName:: MzM0OSDQotC10YHRgtC+0LLRi9C5INCh0YLRg9C00LXQvdGCIDkg
+givenName:: 0KHRgtGD0LTQtdC90YI=
+mail: student9@localhost.com
+uid: student9
+userPassword:: c3R1ZGVudDlwYXNz
+
+dn: uid=teacher1,ou=user-accounts,ou=test-zone,dc=moevm,dc=info
+objectClass: inetOrgPerson
+cn:: 0KLQtdGB0YLQvtCy0YvQuSDQn9GA0LXQv9C+0LTQsNCy0LDRgtC10LvRjCAx
+sn:: 0KLQtdGB0YLQvtCy0YvQuQ==
+displayName:: 0KLQtdGB0YLQvtCy0YvQuSDQn9GA0LXQv9C+0LTQsNCy0LDRgtC10LvRjCAx
+givenName:: 0J/RgNC10L/QvtC00LDQstCw0YLQtdC70Yw=
+mail: teacher1@localhost.com
+uid: teacher1
+userPassword:: dGVhY2hlcjFwYXNz
+
+dn: uid=teacher2,ou=user-accounts,ou=test-zone,dc=moevm,dc=info
+objectClass: inetOrgPerson
+cn:: 0KLQtdGB0YLQvtCy0YvQuSDQn9GA0LXQv9C+0LTQsNCy0LDRgtC10LvRjCAy
+sn:: 0KLQtdGB0YLQvtCy0YvQuQ==
+displayName:: 0KLQtdGB0YLQvtCy0YvQuSDQn9GA0LXQv9C+0LTQsNCy0LDRgtC10LvRjCAy
+givenName:: 0J/RgNC10L/QvtC00LDQstCw0YLQtdC70Yw=
+mail: teacher2@localhost.com
+uid: teacher2
+userPassword:: dGVhY2hlcjJwYXNz
+
+dn: uid=teacher3,ou=user-accounts,ou=test-zone,dc=moevm,dc=info
+objectClass: inetOrgPerson
+cn:: 0KLQtdGB0YLQvtCy0YvQuSDQn9GA0LXQv9C+0LTQsNCy0LDRgtC10LvRjCAz
+sn:: 0KLQtdGB0YLQvtCy0YvQuQ==
+displayName:: 0KLQtdGB0YLQvtCy0YvQuSDQn9GA0LXQv9C+0LTQsNCy0LDRgtC10LvRjCAz
+givenName:: 0J/RgNC10L/QvtC00LDQstCw0YLQtdC70Yw=
+mail: teacher3@localhost.com
+uid: teacher3
+userPassword:: dGVhY2hlcjNwYXNz
+
+dn: uid=teacher4,ou=user-accounts,ou=test-zone,dc=moevm,dc=info
+objectClass: inetOrgPerson
+cn:: 0KLQtdGB0YLQvtCy0YvQuSDQn9GA0LXQv9C+0LTQsNCy0LDRgtC10LvRjCA0
+sn:: 0KLQtdGB0YLQvtCy0YvQuQ==
+displayName:: 0KLQtdGB0YLQvtCy0YvQuSDQn9GA0LXQv9C+0LTQsNCy0LDRgtC10LvRjCA0
+givenName:: 0J/RgNC10L/QvtC00LDQstCw0YLQtdC70Yw=
+mail: teacher4@localhost.com
+uid: teacher4
+userPassword:: dGVhY2hlcjRwYXNz
+
+dn: uid=teacher5,ou=user-accounts,ou=test-zone,dc=moevm,dc=info
+objectClass: inetOrgPerson
+cn:: 0KLQtdGB0YLQvtCy0YvQuSDQn9GA0LXQv9C+0LTQsNCy0LDRgtC10LvRjCA1
+sn:: 0KLQtdGB0YLQvtCy0YvQuQ==
+displayName:: 0KLQtdGB0YLQvtCy0YvQuSDQn9GA0LXQv9C+0LTQsNCy0LDRgtC10LvRjCA1
+givenName:: 0J/RgNC10L/QvtC00LDQstCw0YLQtdC70Yw=
+mail: teacher5@localhost.com
+uid: teacher5
+userPassword:: dGVhY2hlcjVwYXNz
+
+dn: uid=teacher6,ou=user-accounts,ou=test-zone,dc=moevm,dc=info
+objectClass: inetOrgPerson
+cn:: 0KLQtdGB0YLQvtCy0YvQuSDQn9GA0LXQv9C+0LTQsNCy0LDRgtC10LvRjCA2
+sn:: 0KLQtdGB0YLQvtCy0YvQuQ==
+displayName:: 0KLQtdGB0YLQvtCy0YvQuSDQn9GA0LXQv9C+0LTQsNCy0LDRgtC10LvRjCA2
+givenName:: 0J/RgNC10L/QvtC00LDQstCw0YLQtdC70Yw=
+mail: teacher6@localhost.com
+uid: teacher6
+userPassword:: dGVhY2hlcjZwYXNz
+
+dn: uid=teacher7,ou=user-accounts,ou=test-zone,dc=moevm,dc=info
+objectClass: inetOrgPerson
+cn:: 0KLQtdGB0YLQvtCy0YvQuSDQn9GA0LXQv9C+0LTQsNCy0LDRgtC10LvRjCA3
+sn:: 0KLQtdGB0YLQvtCy0YvQuQ==
+displayName:: 0KLQtdGB0YLQvtCy0YvQuSDQn9GA0LXQv9C+0LTQsNCy0LDRgtC10LvRjCA3
+givenName:: 0J/RgNC10L/QvtC00LDQstCw0YLQtdC70Yw=
+mail: teacher7@localhost.com
+uid: teacher7
+userPassword:: dGVhY2hlcjdwYXNz
+
+dn: uid=teacher8,ou=user-accounts,ou=test-zone,dc=moevm,dc=info
+objectClass: inetOrgPerson
+cn:: 0KLQtdGB0YLQvtCy0YvQuSDQn9GA0LXQv9C+0LTQsNCy0LDRgtC10LvRjCA4
+sn:: 0KLQtdGB0YLQvtCy0YvQuQ==
+displayName:: 0KLQtdGB0YLQvtCy0YvQuSDQn9GA0LXQv9C+0LTQsNCy0LDRgtC10LvRjCA4
+givenName:: 0J/RgNC10L/QvtC00LDQstCw0YLQtdC70Yw=
+mail: teacher8@localhost.com
+uid: teacher8
+userPassword:: dGVhY2hlcjhwYXNz
+
+dn: uid=teacher9,ou=user-accounts,ou=test-zone,dc=moevm,dc=info
+objectClass: inetOrgPerson
+cn:: 0KLQtdGB0YLQvtCy0YvQuSDQn9GA0LXQv9C+0LTQsNCy0LDRgtC10LvRjCA5
+sn:: 0KLQtdGB0YLQvtCy0YvQuQ==
+displayName:: 0KLQtdGB0YLQvtCy0YvQuSDQn9GA0LXQv9C+0LTQsNCy0LDRgtC10LvRjCA5
+givenName:: 0J/RgNC10L/QvtC00LDQstCw0YLQtdC70Yw=
+mail: teacher9@localhost.com
+uid: teacher9
+userPassword:: dGVhY2hlcjlwYXNz
+
+dn: ou=user-groups,ou=test-zone,dc=moevm,dc=info
+objectClass: organizationalUnit
+objectClass: top
+ou: user-groups
+
+dn: cn=group-3341,ou=user-groups,ou=test-zone,dc=moevm,dc=info
+objectClass: groupOfNames
+objectClass: top
+cn: group-3341
+member: uid=student1,ou=user-accounts,ou=test-zone,dc=moevm,dc=info
+
+dn: cn=group-3342,ou=user-groups,ou=test-zone,dc=moevm,dc=info
+objectClass: groupOfNames
+cn: group-3342
+member: uid=student2,ou=user-accounts,ou=test-zone,dc=moevm,dc=info
+
+dn: cn=group-3343,ou=user-groups,ou=test-zone,dc=moevm,dc=info
+objectClass: groupOfNames
+cn: group-3343
+member: uid=student3,ou=user-accounts,ou=test-zone,dc=moevm,dc=info
+
+dn: cn=group-3344,ou=user-groups,ou=test-zone,dc=moevm,dc=info
+objectClass: groupOfNames
+cn: group-3344
+member: uid=student4,ou=user-accounts,ou=test-zone,dc=moevm,dc=info
+
+dn: cn=group-3345,ou=user-groups,ou=test-zone,dc=moevm,dc=info
+objectClass: groupOfNames
+cn: group-3345
+member: uid=student5,ou=user-accounts,ou=test-zone,dc=moevm,dc=info
+
+dn: cn=group-3346,ou=user-groups,ou=test-zone,dc=moevm,dc=info
+objectClass: groupOfNames
+cn: group-3346
+member: uid=student6,ou=user-accounts,ou=test-zone,dc=moevm,dc=info
+
+dn: cn=group-3347,ou=user-groups,ou=test-zone,dc=moevm,dc=info
+objectClass: groupOfNames
+cn: group-3347
+member: uid=student7,ou=user-accounts,ou=test-zone,dc=moevm,dc=info
+
+dn: cn=group-3348,ou=user-groups,ou=test-zone,dc=moevm,dc=info
+objectClass: groupOfNames
+cn: group-3348
+member: uid=student8,ou=user-accounts,ou=test-zone,dc=moevm,dc=info
+
+dn: cn=group-3349,ou=user-groups,ou=test-zone,dc=moevm,dc=info
+objectClass: groupOfNames
+cn: group-3349
+member: uid=student9,ou=user-accounts,ou=test-zone,dc=moevm,dc=info
+
+dn: cn=cs-teachers,ou=user-groups,ou=test-zone,dc=moevm,dc=info
+objectClass: groupOfNames
+objectClass: top
+cn: cs-teachers
+member: uid=teacher1,ou=user-accounts,ou=test-zone,dc=moevm,dc=info
+member: uid=teacher2,ou=user-accounts,ou=test-zone,dc=moevm,dc=info
+
+dn: cn=mse-teachers,ou=user-groups,ou=test-zone,dc=moevm,dc=info
+objectClass: groupOfNames
+objectClass: top
+cn: mse-teachers
+member: uid=teacher1,ou=user-accounts,ou=test-zone,dc=moevm,dc=info
+member: uid=teacher3,ou=user-accounts,ou=test-zone,dc=moevm,dc=info
+
+dn: ou=rocket-users,ou=system-groups,ou=test-zone,dc=moevm,dc=info
+objectClass: organizationalUnit
+objectClass: top
+ou: rocket-users
+
+dn: ou=students,ou=rocket-users,ou=system-groups,ou=test-zone,dc=moevm,dc=info
+objectClass: organizationalUnit
+objectClass: top
+ou: students
+
+dn: ou=teachers,ou=rocket-users,ou=system-groups,ou=test-zone,dc=moevm,dc=info
+objectClass: organizationalUnit
+objectClass: top
+ou: teachers
