@@ -282,6 +282,15 @@ export const $selectedTeamsData = atom<{
     roomId: string
 }[]>([])
 
+
+export const $prefetchedDeleteUsersOutOfRoomSmallUsers = atom<ApiRoomUserModel[] | null>(null)
+export const $prefetchedDeleteUsersOutOfTeamSmallUsers = atom<ApiRoomUserModel[] | null>(null)
+export const $prefetchedDeleteTeamFromRoomSmallRooms = atom<{
+    _id: string
+    name: string | null | undefined
+    t: string
+}[] | null>(null)
+
 export const showAddNewTeamDialogAtom = atom(false)
 export const showAddNewUserDialogAtom = atom(false)
 export const showAddNewRoomDialogAtom = atom(false)

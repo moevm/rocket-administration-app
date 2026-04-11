@@ -1,9 +1,18 @@
-import React from 'react';
 import {ContextMenuItem} from "@/components/ui/context-menu.tsx";
 import {ContextMenuConfig} from "@/components/app/table/RichTableView.tsx";
 import {showPasswordChangeDialogAtom} from "@/components/app/dialogs/user-page-dialogs/PasswordChangeDialog.tsx";
 import {useAtomValue, useSetAtom} from "jotai/react";
-import {$selectedRoomsData, $selectedSpaceId, $selectedTeamsData, $selectedUsersData, showContextMenuAtom} from "@/store/global-store.ts";
+import {
+    ApiRoomUserModel,
+    $prefetchedDeleteTeamFromRoomSmallRooms,
+    $prefetchedDeleteUsersOutOfRoomSmallUsers,
+    $prefetchedDeleteUsersOutOfTeamSmallUsers,
+    $selectedRoomsData,
+    $selectedSpaceId,
+    $selectedTeamsData,
+    $selectedUsersData,
+    showContextMenuAtom
+} from "@/store/global-store.ts";
 import {Row} from "@tanstack/react-table";
 import {showAddUserInRoomDialogAtom} from "@/components/app/dialogs/user-page-dialogs/AddUserInRoomDialog.tsx";
 import {showAddUserInTeamDialogAtom} from "@/components/app/dialogs/user-page-dialogs/AddUserInTeamDialog.tsx";
@@ -22,7 +31,6 @@ import {showAddRoomsToTeamsDialogAtom} from "@/components/app/dialogs/room-page-
 import {
     showDeleteTeamsOutOfRoomsDialogAtom
 } from "@/components/app/dialogs/room-page-dialogs/DeleteTeamsOutOfRoomsDialog.tsx";
-import {showHideRoomDialogAtom} from "@/components/app/dialogs/room-page-dialogs/HideRoomDialog.tsx";
 import {showDeleteRoomDialogAtom} from "@/components/app/dialogs/room-page-dialogs/DeleteRoomDialog.tsx";
 import {editRoomMemberRolesDialogDataAtom} from "@/components/app/dialogs/room-page-dialogs/EditRoomMemberRolesDialog.tsx";
 import {showAddUsersToTeamDialogAtom} from "@/components/app/dialogs/team-page-dialogs/AddUsersToTeamDialog.tsx";
@@ -42,14 +50,15 @@ const RoomContextMenuItems = ({rows}: { rows: Row<{ _id: string; name?: string }
     const setDeleteUsersOutOfRoomDialogOpen = useSetAtom(showDeleteUsersOutOfRoomDialogAtom)
     const setAddRoomsToTeamsDialogOpen = useSetAtom(showAddRoomsToTeamsDialogAtom)
     const setDeleteTeamsOutOfRoomsDialogOpen = useSetAtom(showDeleteTeamsOutOfRoomsDialogAtom)
-    const setHideRoomsDialogOpen = useSetAtom(showHideRoomDialogAtom)
     const setDeleteRoomsDialogOpen = useSetAtom(showDeleteRoomDialogAtom)
     const setContextMenuOpen = useSetAtom(showContextMenuAtom)
     const nav = useNavigate();
 
     const setSelectedRoomsData = useSetAtom($selectedRoomsData)
+    const setPrefetchedDeleteUsersOutOfRoom = useSetAtom($prefetchedDeleteUsersOutOfRoomSmallUsers)
     const data = rows.map(it => ({
-        _id: it.getValue('_id') as string
+        _id: it.getValue('_id') as string,
+        name: (it.getValue('name') as string | undefined) ?? '',
     }))
 
     return (
@@ -61,6 +70,7 @@ const RoomContextMenuItems = ({rows}: { rows: Row<{ _id: string; name?: string }
             }}>Добавить участников</ContextMenuItem>
             <ContextMenuItem onClick={() => {
                 setSelectedRoomsData(data)
+                setPrefetchedDeleteUsersOutOfRoom(null)
                 setDeleteUsersOutOfRoomDialogOpen(true)
                 setContextMenuOpen(false)
             }}>Удалить участников</ContextMenuItem>
@@ -196,14 +206,14 @@ const TeamContextMenuItems = ({rows}: { rows: Row<{ _id: string }>[] }) => {
     const nav = useNavigate();
 
     const setSelectedRoomsData = useSetAtom($selectedTeamsData)
+    const setPrefetchedDeleteUsersOutOfTeam = useSetAtom($prefetchedDeleteUsersOutOfTeamSmallUsers)
+    const setPrefetchedDeleteTeamFromRoom = useSetAtom($prefetchedDeleteTeamFromRoomSmallRooms)
     const data = rows.map(it => ({
         _id: it.getValue('_id') as string,
-        roomId: (it.original as any)?.roomId || 
-                it.getValue('roomId') || 
+        roomId: (it.original as any)?.roomId ||
+                it.getValue('roomId') ||
                 undefined
     }))
-    
-    console.log('Constructed data:', data);
 
     return (
         <>
@@ -214,6 +224,7 @@ const TeamContextMenuItems = ({rows}: { rows: Row<{ _id: string }>[] }) => {
             }}>Добавить участников</ContextMenuItem>
             <ContextMenuItem onClick={() => {
                 setSelectedRoomsData(data)
+                setPrefetchedDeleteUsersOutOfTeam(null)
                 setDeleteUsersOutOfTeamDialogOpen(true)
                 setContextMenuOpen(false)
             }}>Удалить участников</ContextMenuItem>
@@ -224,6 +235,7 @@ const TeamContextMenuItems = ({rows}: { rows: Row<{ _id: string }>[] }) => {
             }}>Привязать комнату</ContextMenuItem>
             <ContextMenuItem onClick={() => {
                 setSelectedRoomsData(data)
+                setPrefetchedDeleteTeamFromRoom(null)
                 setDeleteRoomFromTeamDialogOpen(true)
                 setContextMenuOpen(false)
             }}>Отвязать комнату</ContextMenuItem>
@@ -266,8 +278,8 @@ const RoomMemberContextMenuItems = ({
     const setEditRolesDialogData = useSetAtom(editRoomMemberRolesDialogDataAtom);
     const setContextMenuOpen = useSetAtom(showContextMenuAtom);
     const setDeleteUsersOutOfRoomDialogOpen = useSetAtom(showDeleteUsersOutOfRoomDialogAtom);
+    const setPrefetchedDeleteUsersOutOfRoom = useSetAtom($prefetchedDeleteUsersOutOfRoomSmallUsers);
     const setAddUserInTeamDialogOpen = useSetAtom(showAddUserInTeamDialogAtom);
-    const setDeleteUserFromRoomDialogOpen = useSetAtom(showDeleteUserFromRoomDialogAtom);
     const setDeleteUserFromTeamDialogOpen = useSetAtom(showDeleteUserFromTeamDialogAtom);
     const setPasswordChangeDialogOpen = useSetAtom(showPasswordChangeDialogAtom);
     const setDeleteUserDialogOpen = useSetAtom(showDeleteUserDialogAtom);
@@ -307,6 +319,9 @@ const RoomMemberContextMenuItems = ({
                 onClick={() => {
                     setSelectedUsersData(userData);
                     setSelectedRoomsData([{ _id: roomId, name: roomName ?? "" }]);
+                    setPrefetchedDeleteUsersOutOfRoom(
+                        rows.map((row) => row.original as ApiRoomUserModel)
+                    );
                     setDeleteUsersOutOfRoomDialogOpen(true);
                     setContextMenuOpen(false);
                 }}

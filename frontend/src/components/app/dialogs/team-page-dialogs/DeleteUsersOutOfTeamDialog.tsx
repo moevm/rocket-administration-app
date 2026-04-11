@@ -1,8 +1,10 @@
-import {atom, useAtom, useAtomValue} from "jotai/index";
+import {atom, useAtom, useAtomValue, useSetAtom} from "jotai/index";
 import {
+    ApiRoomUserModel,
+    ApiUserModel,
+    $prefetchedDeleteUsersOutOfTeamSmallUsers,
     $selectedSpaceId,
     $selectedTeamsData,
-    $teamsQueryOptions,
     $users
 } from "@/store/global-store.ts";
 import {BatchLoader} from "@/components/app/DataLoader.tsx";
@@ -15,8 +17,8 @@ import {
     DialogTitle
 } from "@/components/ui/dialog.tsx";
 import {Button} from "@/components/ui/button.tsx";
-import React, {useCallback, useEffect, useState} from "react";
-import {$api, createMutationOptions, loaded, queryClient} from "@/api";
+import {useCallback, useEffect, useState} from "react";
+import {$api, createMutationOptions, loaded} from "@/api";
 import UserSmallTableView from "@/components/app/table/UserSmallTableView.tsx";
 import ExportCard from "@/components/app/dialogs/ExportCard.tsx";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
@@ -24,23 +26,36 @@ import {useInvalidateEntities} from "@/api/invalidate.ts";
 
 export const showDeleteUsersOutOfTeamDialogAtom = atom(false)
 
+function spaceUserToSmallRow(u: ApiUserModel): ApiRoomUserModel {
+    return {
+        _id: u._id,
+        name: u.name,
+        username: u.username,
+        status: u.status,
+        roles: u.roles,
+    }
+}
+
 function DeleteUsersOutOfTeamContent(props: {
-    smallUsers: { _id: string, username: string, name: string }[]
+    smallUsers: ApiRoomUserModel[]
 }) {
     const [open, setOpen] = useAtom(showDeleteUsersOutOfTeamDialogAtom)
     const [dialogStep, setDialogStep] = useState(1);
     const selectedSpaceId = useAtomValue($selectedSpaceId)!
     const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
-    const [results, setResults] = useState<object[]>([]);
+    const [results, setResults] = useState<Record<string, unknown>[]>([]);
     const selectedTeamsData = useAtomValue($selectedTeamsData)
     const [linkedRooms, setLinkedRooms] = useState(false)
+
+    const setPrefetchedSmallUsers = useSetAtom($prefetchedDeleteUsersOutOfTeamSmallUsers)
 
     useEffect(() => {
         if (!open) {
             setDialogStep(1)
             setResults([])
+            setPrefetchedSmallUsers(null)
         }
-    }, [open]);
+    }, [open, setPrefetchedSmallUsers]);
 
     const invalidate = useInvalidateEntities()
 
@@ -49,7 +64,7 @@ function DeleteUsersOutOfTeamContent(props: {
         isPending
     } = $api.useMutation('delete', '/spaces/{space_id}/user_room/team', createMutationOptions({
         onSuccess: async (data) => {
-            setResults(data)
+            setResults(data as Record<string, unknown>[])
             setDialogStep(0)
             invalidate()
         }
@@ -72,7 +87,7 @@ function DeleteUsersOutOfTeamContent(props: {
                 },
             }
         })
-    }, [mutate, selectedUserIds, selectedTeamsData, selectedSpaceId]);
+    }, [mutate, selectedUserIds, selectedTeamsData, selectedSpaceId, linkedRooms]);
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -95,7 +110,7 @@ function DeleteUsersOutOfTeamContent(props: {
                         <div className="max-h-[60vh] overflow-y-auto">
                             <Checkbox
                                 checked={linkedRooms}
-                                onCheckedChange={setLinkedRooms}
+                                onCheckedChange={(v) => setLinkedRooms(v === true)}
                                 className="mr-3"
                             />
                             Удалить из привязанных комнат
@@ -127,13 +142,17 @@ function DeleteUsersOutOfTeamContent(props: {
 
 function DeleteUsersOutOfTeamDialog() {
     const users = useAtomValue($users)
+    const prefetched = useAtomValue($prefetchedDeleteUsersOutOfTeamSmallUsers)
+    const states = prefetched === null ? [users] : []
 
     return (
         <BatchLoader
-            states={[users]}
+            states={states}
             loadingMessage='Загрузка пользователей'
             display={() => <DeleteUsersOutOfTeamContent
-                smallUsers={loaded(users).data.map(({_id, name, username}) => ({_id, name, username}))}/>}
+                smallUsers={prefetched === null
+                    ? loaded(users).data.map(spaceUserToSmallRow)
+                    : prefetched}/>}
         />
     )
 }
