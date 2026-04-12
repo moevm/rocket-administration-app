@@ -110,6 +110,44 @@ async def archive_rooms(body: RoomsArchiveDto, space=Depends(get_space)) -> List
 
     return rooms
 
+@router.post("/unarchive/")
+async def unarchive_rooms(body: RoomsArchiveDto, space=Depends(get_space)) -> List[RoomArchiveResDto]:
+    rocket = await obtain_rocket_instance(key_for_space(space))
+
+    async def _process(room: str) -> RoomArchiveResDto:
+        res = RoomArchiveResDto(room=room)
+        try:
+            await rocket_request(
+                rocket.call_api_post,
+                "channels.unarchive",
+                **rocket_query_args(roomId=room)
+            )
+            res.success = True
+            return res
+        except Exception as e:
+            error_msg = extract_exception_message(e)
+            if "invalid-room" not in error_msg.lower() and "not a channel" not in error_msg.lower():
+                res.error = error_msg
+                return res
+
+        try:
+            await rocket_request(
+                rocket.call_api_post,
+                "groups.unarchive",
+                **rocket_query_args(roomId=room)
+            )
+            res.success = True
+        except Exception as e:
+            res.error = extract_exception_message(e)
+        return res
+
+    rooms = await batch_execute(
+        _process,
+        [(room,) for room in body.rooms],
+        settings.app.batch_delay
+    )
+
+    return rooms
 @router.get("/role-types/")
 async def get_room_role_types(space=Depends(get_space)) -> List[RoomRoleTypeDto]:
     rocket = await obtain_rocket_instance(key_for_space(space))
@@ -132,14 +170,42 @@ async def get_room_role_types(space=Depends(get_space)) -> List[RoomRoleTypeDto]
 async def get_room_information(room_id: str, space=Depends(get_space)) -> RoomInfoDto:
     rocket = await obtain_rocket_instance(key_for_space(space))
 
-    room_info_raw, room_members_raw = await asyncio.gather(
-        rocket_request(rocket.rooms_info, **rocket_query_args(room_id=room_id)),
-        rocket_request(
+    room_info_raw = None
+    room_type = None
+
+    try:
+        room_info_raw = await rocket_request(rocket.rooms_info, **rocket_query_args(room_id=room_id))
+        room_payload = room_info_raw.get("room")
+        if room_payload:
+            room_type = room_payload.get("t")
+    except Exception:
+        pass
+
+    if not room_type:
+        for method in ["channels.info", "groups.info"]:
+            try:
+                resp = await rocket_request(
+                    rocket.call_api_get,
+                    method,
+                    **rocket_query_args(roomId=room_id, includeArchived=True)
+                )
+                room_info_raw = {"room": resp.get("channel") or resp.get("group")}
+                room_type = room_info_raw["room"]["t"]
+                break
+            except Exception:
+                continue
+
+    if not room_type:
+        raise HTTPException(status_code=404, detail="Room not found or inaccessible")
+
+    try:
+        room_members_raw = await rocket_request(
             rocket.call_api_get,
             method="rooms.membersOrderedByRole",
             **rocket_query_args(roomId=room_id, count=0),
-        ),
-    )
+        )
+    except Exception:
+        room_members_raw = {"members": []}
 
     try:
         room_roles_raw = await rocket_request(
@@ -166,27 +232,6 @@ async def get_room_information(room_id: str, space=Depends(get_space)) -> RoomIn
     room_payload = room_info_raw.get("room") or {}
     raw_react = room_payload.get("reactWhenReadOnly")
     react_when_ro = False if raw_react is None else bool(raw_react)
-    try:
-        room_roles_raw = await rocket_request(
-            rocket.call_api_get, method="rooms.roles", **rocket_query_args(rid=room_id)
-        )
-    except Exception:
-        room_roles_raw = {"roles": []}
-
-    roles_by_user: dict[str, list[str]] = {}
-    for item in room_roles_raw.get("roles", []):
-        user = item.get("u", {})
-        user_id = user.get("_id") if isinstance(user, dict) else getattr(user, "_id", None)
-        if user_id:
-            user_roles = item.get("roles", [])
-            roles_by_user[user_id] = list(user_roles) if user_roles else []
-
-    members_with_roles = []
-    for member in room_members_raw.get("members", []):
-        member_id = member.get("_id")
-        member_copy = dict(member)
-        member_copy["roles"] = roles_by_user.get(member_id, [])
-        members_with_roles.append(member_copy)
 
     return RoomInfoDto.model_validate({
         "team": room_info_raw.get("team") if "team" in room_info_raw else None,
