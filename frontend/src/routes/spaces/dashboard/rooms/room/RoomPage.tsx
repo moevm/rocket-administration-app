@@ -6,9 +6,10 @@ import {
 } from "@/components/ui/breadcrumb.tsx";
 import {useAtomValue} from "jotai";
 import {
+    $prefetchedDeleteUsersOutOfRoomSmallUsers,
     $selectedRoom,
     $selectedSpaceId,
-    $selectedRoomId, $roomInfo, $selectedRoomsData, $teams
+    $selectedRoomId, $roomInfo, $selectedRoomsData,
 } from "@/store/global-store.ts";
 import {NavLink, useParams} from "react-router";
 import {Label} from "@/components/ui/label.tsx";
@@ -60,6 +61,7 @@ function RoomPageContent() {
     const setEditRoomDialogOpen = useSetAtom(showEditRoomDialogAtom);
 
     const setSelectedRoomsData = useSetAtom($selectedRoomsData)
+    const setPrefetchedDeleteUsersSmall = useSetAtom($prefetchedDeleteUsersOutOfRoomSmallUsers)
     const data = [
         {
             _id: room._id as string,
@@ -115,7 +117,10 @@ function RoomPageContent() {
                         <Button variant="outline" onClick={() => {setAddRoomToUsersDialogOpen(true)}}>
                             Добавить участников
                         </Button>
-                        <Button variant="outline" onClick={() => {setDeleteUsersOutOfRoomDialogOpen(true)}}>
+                        <Button variant="outline" onClick={() => {
+                            setPrefetchedDeleteUsersSmall([...(members ?? [])])
+                            setDeleteUsersOutOfRoomDialogOpen(true)
+                        }}>
                             Удалить участников
                         </Button>
                         <Button variant="outline" onClick={() => {setAddTeamsToRoomsDialogOpen(true)}}>

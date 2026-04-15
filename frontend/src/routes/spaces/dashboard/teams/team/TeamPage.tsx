@@ -6,7 +6,8 @@ import {
 } from "@/components/ui/breadcrumb.tsx";
 import {useAtomValue} from "jotai";
 import {
-    $selectedRoomsData,
+    $prefetchedDeleteTeamFromRoomSmallRooms,
+    $prefetchedDeleteUsersOutOfTeamSmallUsers,
     $selectedSpaceId, $selectedTeam, $selectedTeamId, $selectedTeamsData,
     $teamInfo
 } from "@/store/global-store.ts";
@@ -51,6 +52,8 @@ function TeamPageContent() {
     const setDeleteTeamDialogOpen = useSetAtom(showDeleteTeamDialogAtom)
 
     const setSelectedTeamsData = useSetAtom($selectedTeamsData)
+    const setPrefetchedDeleteUsersOutOfTeam = useSetAtom($prefetchedDeleteUsersOutOfTeamSmallUsers)
+    const setPrefetchedDeleteTeamFromRoom = useSetAtom($prefetchedDeleteTeamFromRoomSmallRooms)
     const data = [
         {
             _id: team._id as string,
@@ -92,13 +95,25 @@ function TeamPageContent() {
                         <Button variant="outline" onClick={() => {setAddUsersToTeamDialogOpen(true)}}>
                             Добавить участников
                         </Button>
-                        <Button variant="outline" onClick={() => {setDeleteUsersOutOfTeamDialogOpen(true)}}>
+                        <Button variant="outline" onClick={() => {
+                            setPrefetchedDeleteUsersOutOfTeam([...users])
+                            setDeleteUsersOutOfTeamDialogOpen(true)
+                        }}>
                             Удалить участников
                         </Button>
                         <Button variant="outline" onClick={() => {setAddTeamIntoRoomDialogOpen(true)}}>
                             Привязать комнаты
                         </Button>
-                        <Button variant="outline" onClick={() => {setDeleteTeamFromRoomDialogOpen(true)}}>
+                        <Button variant="outline" onClick={() => {
+                            setPrefetchedDeleteTeamFromRoom(
+                                rooms.map((r) => ({
+                                    _id: r._id,
+                                    name: r.name,
+                                    t: r.t ?? 'c',
+                                }))
+                            )
+                            setDeleteTeamFromRoomDialogOpen(true)
+                        }}>
                             Отвязать комнаты
                         </Button>
                         <Button variant="outline" onClick={() => {setDeleteTeamDialogOpen(true)}}>
