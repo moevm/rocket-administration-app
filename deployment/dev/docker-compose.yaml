@@ -1,6 +1,8 @@
 volumes:
   mongodb_data:
     driver: local
+  openldap_data:
+  openldap_config:
 
 services:
   rocketchat:
@@ -41,3 +43,47 @@ services:
       timeout: 10s
       retries: 5
       start_period: 20s
+
+  # https://github.com/bitnami/containers/issues/83267
+  # Альтернатива - https://github.com/nfrastack/container-openldap
+  openldap:
+    image: nfrastack/openldap:2.6-8.0.2
+    restart: unless-stopped
+    ports:
+      - "0.0.0.0:8389:389"
+    environment:
+      - TZ=Europe/Moscow
+      - DOMAIN=moevm.info
+      - ADMIN_PASS=admin
+      - BASE_DN=dc=moevm,dc=info
+      - REMOVE_CONFIG_AFTER_SETUP=FALSE
+      - ENABLE_BACKUP=FALSE
+      - ENABLE_PPOLICY=FALSE
+      - ENABLE_TLS=FALSE
+      - ENABLE_REPLICATION=FALSE
+    volumes:
+      - openldap_data:/data/db
+      - openldap_config:/data/config
+    healthcheck:
+      test: [ "CMD", "ldapwhoami", "-x", "-H", "ldap://localhost:389", "-D", "cn=admin,dc=moevm,dc=info", "-w", "admin" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  # One-shot контейнер для инициализации openldap данными из init.ldif
+  openldap-bootstrap:
+    image: nfrastack/openldap:2.6-8.0.2
+    restart: no
+    environment:
+      - TZ=Europe/Moscow
+      - LDAPNOINIT=1 # Отключаем автоматическую загрузку конфигов
+      - ADMIN_PASS=admin
+      - BASE_DN=dc=moevm,dc=info
+    depends_on:
+      openldap:
+        condition: service_healthy
+    volumes:
+      - ../../openldap/bootstrap:/bootstrap:ro
+    entrypoint: [ "/bin/bash" ]
+    command: [ "/bootstrap/init.sh" ]
