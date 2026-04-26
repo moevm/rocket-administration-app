@@ -12,53 +12,47 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class LDAPConfig:
-    server: str = "openldap"  # имя сервиса в docker-compose
-    port: int = 389
+    host: str                     # адрес LDAP-сервера
+    port: int                     
     use_ssl: bool = False
-    bind_dn: str = "cn=admin,dc=moevm,dc=info"
-    bind_password: str = "admin"
-    
-    base_dn: str = "dc=moevm,dc=info"
+    bind_dn: str
+    bind_password: str            
+
+    base_dn: str                  # базовый DN для поиска
     user_base_dn: str = "ou=user-accounts,ou=test-zone,dc=moevm,dc=info"
     group_base_dn: str = "ou=user-groups,ou=test-zone,dc=moevm,dc=info"
-    
+
     user_filter: str = "(objectClass=inetOrgPerson)"
     group_filter: str = "(objectClass=groupOfNames)"
-    
-    username_attr: str = "uid"           
-    email_attr: str = "mail"             
+
+    username_attr: str = "uid"
+    email_attr: str = "mail"
     name_attr: str = "cn"                # полное имя (Common Name)
     first_name_attr: str = "givenName"   # имя
     last_name_attr: str = "sn"           # фамилия
-    
+
     member_of_attr: str = "memberOf"
 
-    group_role_mapping: Dict[str, str] = field(default_factory=lambda: {
-        "cn=group-3341,ou=user-groups,ou=test-zone,dc=moevm,dc=info": "user",
-        "cn=admins,ou=user-groups,ou=test-zone,dc=moevm,dc=info": "admin",
-    })
-    
-    group_channel_mapping: Dict[str, str] = field(default_factory=lambda: {
-        "cn=group-3341,ou=user-groups,ou=test-zone,dc=moevm,dc=info": "general",
-    })
-    
-    deactivate_missing: bool = False  
-    delete_missing: bool = False      
-    
+    group_role_mapping: Dict[str, str]      # маппинг групп LDAP → роли Rocket.Chat
+    group_channel_mapping: Dict[str, str]   # маппинг групп LDAP → каналы Rocket.Chat
+
+    deactivate_missing: bool = False
+    delete_missing: bool = False
+
     default_password_length: int = 16
     join_default_channels: bool = False
 
 
 class LDAPSyncService:
     def __init__(self, config: LDAPConfig, rocket):
-        self.config = config
-        self.rocket = rocket
+        self.config = config       # конфигурация LDAP
+        self.rocket = rocket       # объект RocketClient, предоставляющий методы для работы с API Rocket.Chat
         self._conn: Optional[Connection] = None
 
     async def _connect(self) -> Connection:
         if self._conn is None or not self._conn.bound:
             server = Server(
-                self.config.server,
+                self.config.host,
                 port=self.config.port,
                 use_ssl=self.config.use_ssl,
                 get_info=ALL
@@ -102,7 +96,7 @@ class LDAPSyncService:
                 attributes=search_attributes,
                 paged_size=500
             )
-            
+
             users = []
             for entry in conn.entries:
                 username = str(entry[self.config.username_attr].value) if entry[self.config.username_attr] else ""
@@ -110,11 +104,11 @@ class LDAPSyncService:
                 name = str(entry[self.config.name_attr].value) if entry[self.config.name_attr] else ""
                 first_name = str(entry[self.config.first_name_attr].value) if entry[self.config.first_name_attr] else ""
                 last_name = str(entry[self.config.last_name_attr].value) if entry[self.config.last_name_attr] else ""
-                
+
                 member_of = []
                 if entry[self.config.member_of_attr]:
                     member_of = [str(dn) for dn in entry[self.config.member_of_attr].values]
-                
+
                 users.append({
                     "username": username,
                     "email": email,
@@ -123,21 +117,21 @@ class LDAPSyncService:
                     "last_name": last_name,
                     "dn": str(entry.entry_dn),
                     "member_of": member_of,
-                    "active": True  # OpenLDAP не имеет стандартного флага блокировки
+                    "active": True
                 })
-            
+
             return users
 
         return await self._run_ldap_sync(_search)
 
     async def _fetch_ldap_user(self, username: str) -> Optional[Dict]:
         conn = await self._connect()
-        
+
         search_filter = (
             f"(&{self.config.user_filter}"
             f"({self.config.username_attr}={username}))"
         )
-        
+
         search_attributes = [
             self.config.username_attr,
             self.config.email_attr,
@@ -154,21 +148,21 @@ class LDAPSyncService:
                 search_scope=SUBTREE,
                 attributes=search_attributes
             )
-            
+
             if not conn.entries:
                 return None
-            
+
             entry = conn.entries[0]
             username_val = str(entry[self.config.username_attr].value) if entry[self.config.username_attr] else ""
             email_val = str(entry[self.config.email_attr].value) if entry[self.config.email_attr] else ""
             name_val = str(entry[self.config.name_attr].value) if entry[self.config.name_attr] else ""
             first_name = str(entry[self.config.first_name_attr].value) if entry[self.config.first_name_attr] else ""
             last_name = str(entry[self.config.last_name_attr].value) if entry[self.config.last_name_attr] else ""
-            
+
             member_of = []
             if entry[self.config.member_of_attr]:
                 member_of = [str(dn) for dn in entry[self.config.member_of_attr].values]
-            
+
             return {
                 "username": username_val,
                 "email": email_val,
@@ -191,7 +185,7 @@ class LDAPSyncService:
 
     async def _create_rc_user(self, ldap_user: Dict) -> dict:
         password = generate_password(self.config.default_password_length)
-        
+
         create_args = {
             "username": ldap_user["username"],
             "email": ldap_user["email"] or f"{ldap_user['username']}@moevm.info",
@@ -201,7 +195,7 @@ class LDAPSyncService:
             "joinDefaultChannels": self.config.join_default_channels,
             "requirePasswordChange": False,
         }
-        
+
         try:
             resp = await rocket_request(
                 self.rocket.users_create,
@@ -243,14 +237,14 @@ class LDAPSyncService:
     async def _add_users_to_room(self, room_id: str, user_ids: List[str]):
         import json
         import uuid
-        
+
         ddp_call = {
             "msg": "method",
             "method": "addUsersToRoom",
             "id": str(uuid.uuid4()),
             "params": [{"rid": room_id, "users": user_ids}]
         }
-        
+
         await rocket_request(
             self.rocket.call_api_post,
             "method.call/addUsersToRoom",
@@ -266,20 +260,20 @@ class LDAPSyncService:
 
     async def sync_all_users(self) -> Dict[str, int]:
         stats = {"created": 0, "updated": 0, "deactivated": 0, "deleted": 0, "errors": 0}
-        
+
         try:
             ldap_users = await self._fetch_ldap_users()
             rc_users = await self._get_all_rc_users()
-            
+
             ldap_usernames = {u["username"] for u in ldap_users if u["username"]}
             rc_usernames = set(rc_users.keys())
-            
+
             # Обработка пользователей из LDAP
             for ldap_user in ldap_users:
                 username = ldap_user["username"]
                 if not username:
                     continue
-                    
+
                 try:
                     if username in rc_users:
                         # Обновление существующего пользователя
@@ -294,17 +288,17 @@ class LDAPSyncService:
                         await self._create_rc_user(ldap_user)
                         stats["created"] += 1
                         logger.info(f"Создан пользователь: {username}")
-                        
+
                 except Exception as e:
                     logger.error(f"Ошибка обработки пользователя {username}: {e}")
                     stats["errors"] += 1
-            
+
             # Обработка пользователей, отсутствующих в LDAP
             missing_users = rc_usernames - ldap_usernames
             for username in missing_users:
                 try:
                     rc_user = rc_users[username]
-                    
+
                     if self.config.delete_missing:
                         # Удаление пользователя
                         await rocket_request(
@@ -316,36 +310,36 @@ class LDAPSyncService:
                         )
                         stats["deleted"] += 1
                         logger.info(f"Удалён пользователь: {username}")
-                        
+
                     elif self.config.deactivate_missing:
                         # Деактивация пользователя
                         if rc_user.get("active", True):
                             await self._update_rc_user(rc_user["_id"], {"active": False})
                             stats["deactivated"] += 1
                             logger.info(f"Деактивирован пользователь: {username}")
-                            
+
                 except Exception as e:
                     logger.error(f"Ошибка обработки отсутствующего пользователя {username}: {e}")
                     stats["errors"] += 1
-                    
+
         finally:
             await self._disconnect()
-            
+
         return stats
 
     def _compute_user_diff(self, rc_user: dict, ldap_user: Dict) -> Dict:
         update_data = {}
-        
+
         if rc_user.get("name") != ldap_user["name"]:
             update_data["name"] = ldap_user["name"]
-        
+
         rc_email = ""
         if rc_user.get("emails"):
             rc_email = rc_user["emails"][0].get("address", "")
         ldap_email = ldap_user.get("email", "")
         if ldap_email and rc_email != ldap_email:
             update_data["email"] = ldap_email
-        
+
         return update_data
 
     async def update_single_user(self, username: str, ldap_data: Optional[Dict] = None) -> Dict:
@@ -356,23 +350,23 @@ class LDAPSyncService:
                 ldap_data = await self._fetch_ldap_user(username)
                 if ldap_data is None:
                     return {"status": "error", "message": f"Пользователь {username} не найден в LDAP"}
-            
+
             # Ищем пользователя в Rocket.Chat
             rc_users = await self._get_all_rc_users()
             rc_user = rc_users.get(username)
-            
+
             if rc_user is None:
                 await self._create_rc_user(ldap_data)
                 return {"status": "created", "message": f"Пользователь {username} создан"}
-            
+
             # Обновляем существующего
             update_data = self._compute_user_diff(rc_user, ldap_data)
             if update_data:
                 await self._update_rc_user(rc_user["_id"], update_data)
                 return {"status": "updated", "message": f"Пользователь {username} обновлён"}
-            
+
             return {"status": "unchanged", "message": f"Пользователь {username} не требует обновления"}
-            
+
         except Exception as e:
             logger.error(f"Ошибка обновления пользователя {username}: {e}")
             return {"status": "error", "message": str(e)}
@@ -382,40 +376,40 @@ class LDAPSyncService:
     async def sync_roles_for_all_users(self) -> Dict[str, int]:
         if not self.config.group_role_mapping:
             return {"updated": 0, "errors": 0, "unchanged": 0, "message": "Маппинг ролей не настроен"}
-        
+
         stats = {"updated": 0, "errors": 0, "unchanged": 0}
-        
+
         try:
             ldap_users = await self._fetch_ldap_users()
             rc_users = await self._get_all_rc_users()
-            
+
             # Строим маппинг: username → желаемые роли
             desired_roles = {}
             for ldap_user in ldap_users:
                 username = ldap_user["username"]
                 roles = set()
-                
+
                 for group_dn in ldap_user.get("member_of", []):
                     if group_dn in self.config.group_role_mapping:
                         roles.add(self.config.group_role_mapping[group_dn])
-                
+
                 if roles:
                     desired_roles[username] = roles
-            
+
             # Применяем изменения
             mapped_role_values = set(self.config.group_role_mapping.values())
-            
+
             for username, desired_set in desired_roles.items():
                 rc_user = rc_users.get(username)
                 if not rc_user:
                     continue
-                
+
                 try:
                     current_roles = set(rc_user.get("roles", []))
                     # Оставляем роли, не участвующие в маппинге
                     other_roles = current_roles - mapped_role_values
                     new_roles = other_roles | desired_set
-                    
+
                     if new_roles != current_roles:
                         await self._update_rc_user(
                             rc_user["_id"],
@@ -425,31 +419,31 @@ class LDAPSyncService:
                         logger.info(f"Обновлены роли пользователя {username}: {sorted(new_roles)}")
                     else:
                         stats["unchanged"] += 1
-                        
+
                 except Exception as e:
                     logger.error(f"Ошибка обновления ролей {username}: {e}")
                     stats["errors"] += 1
-                    
+
         finally:
             await self._disconnect()
-            
+
         return stats
 
     async def sync_channel_memberships(self) -> Dict[str, int]:
         if not self.config.group_channel_mapping:
             return {"added": 0, "removed": 0, "errors": 0, "message": "Маппинг каналов не настроен"}
-        
+
         stats = {"added": 0, "removed": 0, "errors": 0}
-        
+
         try:
             ldap_users = await self._fetch_ldap_users()
-            
+
             rooms_resp = await rocket_request(
                 self.rocket.rooms_admin_rooms,
                 **rocket_query_args(types=['c', 'p'], count=0)
             )
             rooms_by_name = {room["name"]: room for room in rooms_resp.get("rooms", [])}
-            
+
             # Строим маппинг: группа → {usernames}
             group_members = {}
             for ldap_user in ldap_users:
@@ -458,19 +452,19 @@ class LDAPSyncService:
                         if group_dn not in group_members:
                             group_members[group_dn] = set()
                         group_members[group_dn].add(ldap_user["username"])
-            
+
             # Обрабатываем каждую группу
             for group_dn, channel_name in self.config.group_channel_mapping.items():
                 room = rooms_by_name.get(channel_name)
                 if not room:
                     logger.warning(f"Канал '{channel_name}' не найден в Rocket.Chat")
                     continue
-                
+
                 room_id = room["_id"]
                 room_type = room["t"]
-                
+
                 current_member_ids = await self._get_room_members(room_id)
-                
+
                 desired_usernames = group_members.get(group_dn, set())
                 rc_users = await self._get_all_rc_users()
                 desired_ids = {
@@ -478,7 +472,7 @@ class LDAPSyncService:
                     for u in desired_usernames
                     if u in rc_users
                 }
-                
+
                 to_add = desired_ids - current_member_ids
                 if to_add:
                     try:
@@ -488,7 +482,7 @@ class LDAPSyncService:
                     except Exception as e:
                         logger.error(f"Ошибка добавления в канал '{channel_name}': {e}")
                         stats["errors"] += len(to_add)
-                
+
                 to_remove = current_member_ids - desired_ids
                 for user_id in to_remove:
                     try:
@@ -497,16 +491,16 @@ class LDAPSyncService:
                     except Exception as e:
                         logger.error(f"Ошибка удаления пользователя {user_id} из '{channel_name}': {e}")
                         stats["errors"] += 1
-                        
+
         finally:
             await self._disconnect()
-            
+
         return stats
-    
+
     async def test_connection(self) -> Dict:
         try:
             conn = await self._connect()
-            
+
             # Проверяем доступность базового DN
             def _test():
                 conn.search(
@@ -516,15 +510,15 @@ class LDAPSyncService:
                     size_limit=1
                 )
                 return len(conn.entries) > 0
-            
+
             base_ok = await self._run_ldap_sync(_test)
-            
+
             if not base_ok:
                 return {"success": False, "message": "Не удалось выполнить поиск в базовом DN"}
-            
+
             # Считаем пользователей
             ldap_users = await self._fetch_ldap_users()
-            
+
             return {
                 "success": True,
                 "message": "Подключение успешно",
@@ -534,7 +528,7 @@ class LDAPSyncService:
                     "group_base_dn": self.config.group_base_dn
                 }
             }
-            
+
         except Exception as e:
             return {"success": False, "message": f"Ошибка подключения: {str(e)}"}
         finally:
