@@ -4,3 +4,19 @@ mongo:
 
 app:
   batch_delay: 0.2
+
+ldap:
+  host: localhost
+  port: 8389
+  use_ssl: false
+  bind_dn: "cn=admin,dc=moevm,dc=info"
+  bind_password: "admin"
+  base_dn: "dc=moevm,dc=info"
+  users_base: "ou=user-accounts,ou=test-zone,dc=moevm,dc=info"
+  groups_base: "ou=user-groups,ou=test-zone,dc=moevm,dc=info"
+  user_filter: "(objectClass=inetOrgPerson)"
+  group_filter: "(objectClass=groupOfNames)"
+  user_id_attr: "uid"
+  user_name_attr: "cn"
+  user_email_attr: "mail"
+  connection_timeout: 10
