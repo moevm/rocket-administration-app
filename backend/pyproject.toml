@@ -11,4 +11,5 @@ dependencies = [
     "pymongo>=4.11.3",
     "rocketchat-api>=1.35.0",
     "uvicorn>=0.34.0",
+    "ldap3>=2.9.1",
 ]
