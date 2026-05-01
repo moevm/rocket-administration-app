@@ -14,31 +14,25 @@ logger = logging.getLogger(__name__)
 class LDAPConfig:
     host: str                     # адрес LDAP-сервера
     port: int                     
-    use_ssl: bool = False
     bind_dn: str
     bind_password: str            
-
     base_dn: str                  # базовый DN для поиска
+    group_role_mapping: Dict[str, str]      # маппинг групп LDAP → роли Rocket.Chat
+    group_channel_mapping: Dict[str, str]   # маппинг групп LDAP → каналы Rocket.Chat
+    
+    use_ssl: bool = False
     user_base_dn: str = "ou=user-accounts,ou=test-zone,dc=moevm,dc=info"
     group_base_dn: str = "ou=user-groups,ou=test-zone,dc=moevm,dc=info"
-
     user_filter: str = "(objectClass=inetOrgPerson)"
     group_filter: str = "(objectClass=groupOfNames)"
-
     username_attr: str = "uid"
     email_attr: str = "mail"
     name_attr: str = "cn"                # полное имя (Common Name)
     first_name_attr: str = "givenName"   # имя
     last_name_attr: str = "sn"           # фамилия
-
     member_of_attr: str = "memberOf"
-
-    group_role_mapping: Dict[str, str]      # маппинг групп LDAP → роли Rocket.Chat
-    group_channel_mapping: Dict[str, str]   # маппинг групп LDAP → каналы Rocket.Chat
-
     deactivate_missing: bool = False
     delete_missing: bool = False
-
     default_password_length: int = 16
     join_default_channels: bool = False
 
