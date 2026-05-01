@@ -408,6 +408,59 @@
         }
       }
     },
+    "/spaces/{space_id}/rooms/unarchive/": {
+      "post": {
+        "summary": "Unarchive Rooms",
+        "operationId": "unarchive_rooms_spaces__space_id__rooms_unarchive__post",
+        "parameters": [
+          {
+            "name": "space_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Space Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoomsArchiveDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RoomArchiveResDto"
+                  },
+                  "title": "Response Unarchive Rooms Spaces  Space Id  Rooms Unarchive  Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/spaces/{space_id}/rooms/role-types/": {
       "get": {
         "summary": "Get Room Role Types",
@@ -1710,6 +1763,168 @@
           }
         }
       }
+    },
+    "/spaces/{space_id}/ldap/sync": {
+      "post": {
+        "summary": "Sync Ldap",
+        "operationId": "sync_ldap_spaces__space_id__ldap_sync_post",
+        "parameters": [
+          {
+            "name": "space_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Space Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SyncResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spaces/{space_id}/ldap/status": {
+      "get": {
+        "summary": "Sync Status",
+        "operationId": "sync_status_spaces__space_id__ldap_status_get",
+        "parameters": [
+          {
+            "name": "space_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Space Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spaces/{space_id}/ldap/config": {
+      "get": {
+        "summary": "Get Config",
+        "operationId": "get_config_spaces__space_id__ldap_config_get",
+        "parameters": [
+          {
+            "name": "space_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Space Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LDAPConfigResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update Config",
+        "operationId": "update_config_spaces__space_id__ldap_config_put",
+        "parameters": [
+          {
+            "name": "space_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Space Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LDAPConfigRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LDAPConfigResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1949,6 +2164,247 @@
           "password"
         ],
         "title": "ImportedUserResultDto"
+      },
+      "LDAPConfigRequest": {
+        "properties": {
+          "host": {
+            "type": "string",
+            "title": "Host"
+          },
+          "port": {
+            "type": "integer",
+            "title": "Port"
+          },
+          "use_ssl": {
+            "type": "boolean",
+            "title": "Use Ssl",
+            "default": false
+          },
+          "bind_dn": {
+            "type": "string",
+            "title": "Bind Dn"
+          },
+          "bind_password": {
+            "type": "string",
+            "title": "Bind Password"
+          },
+          "base_dn": {
+            "type": "string",
+            "title": "Base Dn"
+          },
+          "user_base_dn": {
+            "type": "string",
+            "title": "User Base Dn"
+          },
+          "group_base_dn": {
+            "type": "string",
+            "title": "Group Base Dn"
+          },
+          "user_filter": {
+            "type": "string",
+            "title": "User Filter",
+            "default": "(objectClass=inetOrgPerson)"
+          },
+          "group_filter": {
+            "type": "string",
+            "title": "Group Filter",
+            "default": "(objectClass=groupOfNames)"
+          },
+          "username_attr": {
+            "type": "string",
+            "title": "Username Attr",
+            "default": "uid"
+          },
+          "email_attr": {
+            "type": "string",
+            "title": "Email Attr",
+            "default": "mail"
+          },
+          "name_attr": {
+            "type": "string",
+            "title": "Name Attr",
+            "default": "cn"
+          },
+          "first_name_attr": {
+            "type": "string",
+            "title": "First Name Attr",
+            "default": "givenName"
+          },
+          "last_name_attr": {
+            "type": "string",
+            "title": "Last Name Attr",
+            "default": "sn"
+          },
+          "member_of_attr": {
+            "type": "string",
+            "title": "Member Of Attr",
+            "default": "memberOf"
+          },
+          "group_role_mapping": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Group Role Mapping"
+          },
+          "group_channel_mapping": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Group Channel Mapping"
+          },
+          "deactivate_missing": {
+            "type": "boolean",
+            "title": "Deactivate Missing",
+            "default": false
+          },
+          "delete_missing": {
+            "type": "boolean",
+            "title": "Delete Missing",
+            "default": false
+          },
+          "default_password_length": {
+            "type": "integer",
+            "title": "Default Password Length",
+            "default": 16
+          },
+          "join_default_channels": {
+            "type": "boolean",
+            "title": "Join Default Channels",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "host",
+          "port",
+          "bind_dn",
+          "bind_password",
+          "base_dn",
+          "user_base_dn",
+          "group_base_dn"
+        ],
+        "title": "LDAPConfigRequest"
+      },
+      "LDAPConfigResponse": {
+        "properties": {
+          "host": {
+            "type": "string",
+            "title": "Host"
+          },
+          "port": {
+            "type": "integer",
+            "title": "Port"
+          },
+          "use_ssl": {
+            "type": "boolean",
+            "title": "Use Ssl"
+          },
+          "bind_dn": {
+            "type": "string",
+            "title": "Bind Dn"
+          },
+          "base_dn": {
+            "type": "string",
+            "title": "Base Dn"
+          },
+          "user_base_dn": {
+            "type": "string",
+            "title": "User Base Dn"
+          },
+          "group_base_dn": {
+            "type": "string",
+            "title": "Group Base Dn"
+          },
+          "user_filter": {
+            "type": "string",
+            "title": "User Filter"
+          },
+          "group_filter": {
+            "type": "string",
+            "title": "Group Filter"
+          },
+          "username_attr": {
+            "type": "string",
+            "title": "Username Attr"
+          },
+          "email_attr": {
+            "type": "string",
+            "title": "Email Attr"
+          },
+          "name_attr": {
+            "type": "string",
+            "title": "Name Attr"
+          },
+          "first_name_attr": {
+            "type": "string",
+            "title": "First Name Attr"
+          },
+          "last_name_attr": {
+            "type": "string",
+            "title": "Last Name Attr"
+          },
+          "member_of_attr": {
+            "type": "string",
+            "title": "Member Of Attr"
+          },
+          "group_role_mapping": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Group Role Mapping"
+          },
+          "group_channel_mapping": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Group Channel Mapping"
+          },
+          "deactivate_missing": {
+            "type": "boolean",
+            "title": "Deactivate Missing"
+          },
+          "delete_missing": {
+            "type": "boolean",
+            "title": "Delete Missing"
+          },
+          "default_password_length": {
+            "type": "integer",
+            "title": "Default Password Length"
+          },
+          "join_default_channels": {
+            "type": "boolean",
+            "title": "Join Default Channels"
+          }
+        },
+        "type": "object",
+        "required": [
+          "host",
+          "port",
+          "use_ssl",
+          "bind_dn",
+          "base_dn",
+          "user_base_dn",
+          "group_base_dn",
+          "user_filter",
+          "group_filter",
+          "username_attr",
+          "email_attr",
+          "name_attr",
+          "first_name_attr",
+          "last_name_attr",
+          "member_of_attr",
+          "group_role_mapping",
+          "group_channel_mapping",
+          "deactivate_missing",
+          "delete_missing",
+          "default_password_length",
+          "join_default_channels"
+        ],
+        "title": "LDAPConfigResponse"
       },
       "RoleDto": {
         "properties": {
@@ -2551,6 +3007,30 @@
         ],
         "title": "SpaceDto"
       },
+      "SyncResponse": {
+        "properties": {
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "stats": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stats"
+          }
+        },
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "title": "SyncResponse"
+      },
       "TeamCreateDto": {
         "properties": {
           "name": {
@@ -2947,6 +3427,25 @@
           "name": {
             "type": "string",
             "title": "Name"
+          },
+          "password": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Password"
+          },
+          "roles": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Roles",
+            "default": []
           }
         },
         "type": "object",
