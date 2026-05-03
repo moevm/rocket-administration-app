@@ -253,7 +253,7 @@ class LDAPSyncService:
         )
 
     async def sync_all_users(self) -> Dict[str, int]:
-        stats = {"created": 0, "updated": 0, "deactivated": 0, "deleted": 0, "errors": 0}
+        stats = {"created": 0, "updated": 0, "deactivated": 0, "deleted": 0, "errors": 0, "skipped": 0}
 
         try:
             ldap_users = await self._fetch_ldap_users()
@@ -289,9 +289,15 @@ class LDAPSyncService:
 
             # Обработка пользователей, отсутствующих в LDAP
             missing_users = rc_usernames - ldap_usernames
+            protected_roles = {"admin", "bot"}
             for username in missing_users:
                 try:
                     rc_user = rc_users[username]
+                    roles = set(rc_user.get("roles", []))
+                    if roles & protected_roles:
+                        stats["skipped"] += 1
+                        logger.warning(f"Skipping LDAP missing-user action for protected account: {username}")
+                        continue
 
                     if self.config.delete_missing:
                         # Удаление пользователя
