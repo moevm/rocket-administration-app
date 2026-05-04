@@ -1,6 +1,7 @@
 import asyncio
+import json
 import logging
-from typing import Dict, List, Optional, Set
+from typing import Dict, List, Optional
 from dataclasses import dataclass, field
 
 from ldap3 import Connection, Server, ALL, SUBTREE
@@ -70,6 +71,46 @@ class LDAPSyncService:
     async def _run_ldap_sync(self, func, *args, **kwargs):
         return await asyncio.to_thread(func, *args, **kwargs)
 
+    @staticmethod
+    def _dn_key(dn: str) -> str:
+        return dn.strip().lower()
+
+    def _add_group_memberships_from_groups(self, conn: Connection, users: List[Dict]):
+        users_by_dn = {
+            self._dn_key(user["dn"]): user
+            for user in users
+            if user.get("dn")
+        }
+        if not users_by_dn:
+            return
+
+        try:
+            conn.search(
+                search_base=self.config.group_base_dn,
+                search_filter=self.config.group_filter,
+                search_scope=SUBTREE,
+                attributes=["member"],
+                paged_size=500
+            )
+        except Exception as e:
+            logger.warning(f"Could not read LDAP group memberships: {e}")
+            return
+
+        for group_entry in conn.entries:
+            group_dn = str(group_entry.entry_dn)
+            if not group_entry["member"]:
+                continue
+
+            for member_dn in group_entry["member"].values:
+                user = users_by_dn.get(self._dn_key(str(member_dn)))
+                if not user:
+                    continue
+
+                member_of = user.setdefault("member_of", [])
+                existing_group_dns = {self._dn_key(dn) for dn in member_of}
+                if self._dn_key(group_dn) not in existing_group_dns:
+                    member_of.append(group_dn)
+
     async def _fetch_ldap_users(self) -> List[Dict]:
         conn = await self._connect()
 
@@ -114,6 +155,7 @@ class LDAPSyncService:
                     "active": True
                 })
 
+            self._add_group_memberships_from_groups(conn, users)
             return users
 
         return await self._run_ldap_sync(_search)
@@ -157,7 +199,7 @@ class LDAPSyncService:
             if entry[self.config.member_of_attr]:
                 member_of = [str(dn) for dn in entry[self.config.member_of_attr].values]
 
-            return {
+            user = {
                 "username": username_val,
                 "email": email_val,
                 "name": name_val or f"{first_name} {last_name}".strip() or username,
@@ -167,6 +209,8 @@ class LDAPSyncService:
                 "member_of": member_of,
                 "active": True
             }
+            self._add_group_memberships_from_groups(conn, [user])
+            return user
 
         return await self._run_ldap_sync(_search_one)
 
@@ -216,34 +260,41 @@ class LDAPSyncService:
         )
         return resp.get("user", {})
 
-    async def _get_room_members(self, room_id: str) -> Set[str]:
+    async def _get_room_members(self, room_id: str) -> Dict[str, str]:
         try:
             resp = await rocket_request(
                 self.rocket.call_api_get,
                 "rooms.membersOrderedByRole",
                 **rocket_query_args(roomId=room_id, count=0)
             )
-            return {member["_id"] for member in resp.get("members", [])}
+            return {
+                member["username"]: member["_id"]
+                for member in resp.get("members", [])
+                if member.get("username") and member.get("_id")
+            }
         except Exception as e:
             logger.warning(f"Не удалось получить членов комнаты {room_id}: {e}")
-            return set()
+            return {}
 
-    async def _add_users_to_room(self, room_id: str, user_ids: List[str]):
-        import json
+    async def _add_users_to_room(self, room_id: str, usernames: List[str]):
         import uuid
 
         ddp_call = {
             "msg": "method",
             "method": "addUsersToRoom",
             "id": str(uuid.uuid4()),
-            "params": [{"rid": room_id, "users": user_ids}]
+            "params": [{"rid": room_id, "users": usernames}]
         }
 
-        await rocket_request(
+        resp = await rocket_request(
             self.rocket.call_api_post,
             "method.call/addUsersToRoom",
             **rocket_query_args(message=json.dumps(ddp_call))
         )
+        message = json.loads(resp.get("message", "{}"))
+        if message.get("error"):
+            error = message["error"]
+            raise ValueError(error.get("reason") or error.get("message") or str(error))
 
     async def _remove_user_from_room(self, room_id: str, user_id: str, room_type: str):
         method = self.rocket.groups_kick if room_type == "p" else self.rocket.channels_kick
@@ -443,6 +494,7 @@ class LDAPSyncService:
                 **rocket_query_args(types=['c', 'p'], count=0)
             )
             rooms_by_name = {room["name"]: room for room in rooms_resp.get("rooms", [])}
+            rc_users = await self._get_all_rc_users()
 
             # Строим маппинг: группа → {usernames}
             group_members = {}
@@ -463,17 +515,17 @@ class LDAPSyncService:
                 room_id = room["_id"]
                 room_type = room["t"]
 
-                current_member_ids = await self._get_room_members(room_id)
+                current_members = await self._get_room_members(room_id)
 
                 desired_usernames = group_members.get(group_dn, set())
-                rc_users = await self._get_all_rc_users()
-                desired_ids = {
-                    rc_users[u]["_id"]
-                    for u in desired_usernames
-                    if u in rc_users
+                desired_existing_usernames = {
+                    username
+                    for username in desired_usernames
+                    if username in rc_users
                 }
+                current_usernames = set(current_members.keys())
 
-                to_add = desired_ids - current_member_ids
+                to_add = desired_existing_usernames - current_usernames
                 if to_add:
                     try:
                         await self._add_users_to_room(room_id, list(to_add))
@@ -483,14 +535,17 @@ class LDAPSyncService:
                         logger.error(f"Ошибка добавления в канал '{channel_name}': {e}")
                         stats["errors"] += len(to_add)
 
-                to_remove = current_member_ids - desired_ids
-                for user_id in to_remove:
+                to_remove = current_usernames - desired_existing_usernames
+                for username in to_remove:
                     try:
+                        user_id = current_members[username]
                         await self._remove_user_from_room(room_id, user_id, room_type)
                         stats["removed"] += 1
                     except Exception as e:
-                        logger.error(f"Ошибка удаления пользователя {user_id} из '{channel_name}': {e}")
+                        logger.error(f"Ошибка удаления пользователя {username} из '{channel_name}': {e}")
                         stats["errors"] += 1
+                
+                logger.warning(stats)
 
         finally:
             await self._disconnect()

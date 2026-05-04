@@ -55,11 +55,26 @@ type LdapStatusResponse = {
 type LdapSyncResponse = {
   message?: string;
   stats?: {
-    created?: number;
-    updated?: number;
-    deactivated?: number;
-    deleted?: number;
-    errors?: number;
+    users?: {
+      created?: number;
+      updated?: number;
+      deactivated?: number;
+      deleted?: number;
+      errors?: number;
+      skipped?: number;
+    };
+    roles?: {
+      updated?: number;
+      errors?: number;
+      unchanged?: number;
+      message?: string;
+    };
+    channels?: {
+      added?: number;
+      removed?: number;
+      errors?: number;
+      message?: string;
+    };
   };
 };
 
@@ -167,6 +182,9 @@ function LdapStatusPanel(props: {
   onSync: () => void;
 }) {
   const statusVariant = props.status?.success ? "default" : props.status ? "destructive" : "secondary";
+  const usersSyncStats = props.syncResult?.stats?.users;
+  const rolesSyncStats = props.syncResult?.stats?.roles;
+  const channelsSyncStats = props.syncResult?.stats?.channels;
 
   return (
     <Card className="w-full">
@@ -202,13 +220,38 @@ function LdapStatusPanel(props: {
           </div>
         )}
 
-        {props.syncResult?.stats && (
+        {usersSyncStats && (
           <div className="grid gap-2 text-sm sm:grid-cols-5">
-            <div className="rounded-md border p-3">Создано: {props.syncResult.stats.created ?? 0}</div>
-            <div className="rounded-md border p-3">Обновлено: {props.syncResult.stats.updated ?? 0}</div>
-            <div className="rounded-md border p-3">Отключено: {props.syncResult.stats.deactivated ?? 0}</div>
-            <div className="rounded-md border p-3">Удалено: {props.syncResult.stats.deleted ?? 0}</div>
-            <div className="rounded-md border p-3">Ошибок: {props.syncResult.stats.errors ?? 0}</div>
+            <div className="rounded-md border p-3">Создано: {usersSyncStats.created ?? 0}</div>
+            <div className="rounded-md border p-3">Обновлено: {usersSyncStats.updated ?? 0}</div>
+            <div className="rounded-md border p-3">Отключено: {usersSyncStats.deactivated ?? 0}</div>
+            <div className="rounded-md border p-3">Удалено: {usersSyncStats.deleted ?? 0}</div>
+            <div className="rounded-md border p-3">Ошибок: {usersSyncStats.errors ?? 0}</div>
+          </div>
+        )}
+
+        {(rolesSyncStats || channelsSyncStats) && (
+          <div className="grid gap-3 text-sm lg:grid-cols-2">
+            {rolesSyncStats && (
+              <div className="rounded-md border p-3">
+                <div className="mb-2 font-medium">Роли</div>
+                <div className="grid gap-2 sm:grid-cols-3">
+                  <div>Обновлено: {rolesSyncStats.updated ?? 0}</div>
+                  <div>Без изменений: {rolesSyncStats.unchanged ?? 0}</div>
+                  <div>Ошибок: {rolesSyncStats.errors ?? 0}</div>
+                </div>
+              </div>
+            )}
+            {channelsSyncStats && (
+              <div className="rounded-md border p-3">
+                <div className="mb-2 font-medium">Комнаты</div>
+                <div className="grid gap-2 sm:grid-cols-3">
+                  <div>Добавлено: {channelsSyncStats.added ?? 0}</div>
+                  <div>Удалено: {channelsSyncStats.removed ?? 0}</div>
+                  <div>Ошибок: {channelsSyncStats.errors ?? 0}</div>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </CardContent>

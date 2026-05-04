@@ -45,7 +45,14 @@ async def get_sync_service(
 @router.post("/sync")
 async def sync_ldap(service: LDAPSyncService = Depends(get_sync_service)) -> SyncResponse:
     try:
-        stats = await service.sync_all_users()
+        users_stats = await service.sync_all_users()
+        roles_stats = await service.sync_roles_for_all_users()
+        channels_stats = await service.sync_channel_memberships()
+        stats = {
+            "users": users_stats,
+            "roles": roles_stats,
+            "channels": channels_stats,
+        }
         return SyncResponse(message="Synchronization completed", stats=stats)
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
