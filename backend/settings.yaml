@@ -1,5 +1,5 @@
 mongo:
-  uri: mongodb://localhost:27017?replicaSet=rs0
+  uri: mongodb://localhost:27017?replicaSet=rs0&directConnection=true
   database: rocketmanager
 
 app:
