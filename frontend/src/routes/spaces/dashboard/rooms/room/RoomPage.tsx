@@ -97,7 +97,7 @@ function RoomPageContent() {
                         ['Тип', typesName[room.t] ?? room.t],
                         ['Сообщения', room.msgs],
                         ['Пользователи', room.usersCount],
-                        ['Администратор', <MonoRenderer value={room.u._id} />],
+                        ['Создатель', <MonoRenderer value={room.u._id} />],
                         ['Read only', <CheckboxRenderer value={room.ro} />],
                         [
                             'Реакции при read-only',
