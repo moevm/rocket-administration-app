@@ -247,7 +247,7 @@
 
 #### Презентационные материалы
 - [Презентация по Итерации 3 (2026)](https://docs.google.com/presentation/d/16vYPeBouL_GBxZppqjXLo8lju7lDqi5SJHRCrDlw2Yw/edit?usp=sharing)
-- [Скринкаст]()
+- [Скринкаст](https://drive.google.com/file/d/1jSv57LoQT6FYiAESZctOBUDSgjADqXZj/view?usp=sharing)
 
 
 #### Планы на следующую итерацию
