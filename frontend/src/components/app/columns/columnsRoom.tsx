@@ -112,7 +112,7 @@ export const columnsRoom = [
         accessorKey: "u._id",
         header: DataTableColumnHeader,
         meta: {
-            title: "Администратор",
+            title: "Создатель",
             type: 'string'
         },
         sortingFn: customSortingFn,
