@@ -7,11 +7,12 @@ from app.lib.cache import key_for_space
 from app.models import UserDto, TeamDto, UserInfoDto, UsersToChangePasswordDto,\
     ChangedPasswordDto, UsersImportRequestDto, ImportedUserResultDto, UserCreateDto, \
     UsersDeleteDto, UserDeleteResDto, UpdateUserRequest
-from typing import Optional, List
+from typing import List
 from app.features.spaces.utils import get_space
 from app.lib.rocket import obtain_rocket_instance, rocket_request, rocket_query_args
 from app.lib.utils import batch_execute, generate_password, extract_exception_message
 from app.lib.smtp import send_email, require_smtp_settings
+from app.services.email_service import EmailService
 from app.services.db import get_db
 from app.config import settings
 import logging
@@ -57,18 +58,29 @@ async def get_user_information(user_id: str, space=Depends(get_space)) -> UserIn
 
 
 @router.post("/change-passwords")
-async def change_user_passwords(body: UsersToChangePasswordDto, space=Depends(get_space), db=Depends(get_db)) -> List[ChangedPasswordDto]:
+async def change_user_passwords(
+    body: UsersToChangePasswordDto, 
+    space=Depends(get_space), 
+    db=Depends(get_db)
+) -> List[ChangedPasswordDto]:
     rocket = await obtain_rocket_instance(key_for_space(space))
 
+    smtp_settings = None
+    email_service = None
+    
     if body.sendEmail:
         smtp_settings = await require_smtp_settings(db, space.id)
+        email_service = EmailService(db, space.id)
 
     async def _process(user: str, password_to_set: str):
         result = ChangedPasswordDto(user=user)        
         try:
-            await rocket_request(rocket.users_update, **rocket_query_args(user_id=user, password=password_to_set))
+            await rocket_request(
+                rocket.users_update, 
+                **rocket_query_args(user_id=user, password=password_to_set)
+            )
         except Exception as e:
-            print(e)
+            logger.error(f"Failed to change password for {user}: {e}")
             result.password_error = extract_exception_message(e)
         else:
             result.password = password_to_set
@@ -77,20 +89,31 @@ async def change_user_passwords(body: UsersToChangePasswordDto, space=Depends(ge
             return result
         
         try:
-            user_info = await rocket_request(rocket.users_info, **rocket_query_args(user_id=user))
-            if len(user_info["user"]['emails']) == 0:
+            user_info = await rocket_request(
+                rocket.users_info, 
+                **rocket_query_args(user_id=user)
+            )
+            
+            if not user_info["user"].get('emails') or len(user_info["user"]['emails']) == 0:
                 result.email_send_error = "У пользователя нет адресов электронной почты"
                 return result
-            await send_email(
-                smtp_settings,
-                user_info["user"]['emails'][0]["address"],
-                "Пароль изменен",
-                f"Ваш новый пароль в пространстве {space.url}: {password_to_set}"
+            
+            user_email = user_info["user"]['emails'][0]["address"]
+            username = user_info["user"].get("username", user)
+
+            message_id = await email_service.send_password_changed_email(
+                to_email=user_email,
+                username=username,
+                password=password_to_set,
+                space_url=str(space.url)
             )
+            result.email_sent = True
+            logger.info(f"Password changed email sent to {user_email}, message_id: {message_id}")
+            
         except Exception as e:
             result.email_send_error = extract_exception_message(e)
-        else:
-            result.email_sent = True
+            logger.error(f"ERROR!! Failed to send password change email: {e}")
+            
         return result
 
     args_for_batch = []
@@ -115,8 +138,13 @@ async def create_users(
 ) -> List[ImportedUserResultDto]:
     rocket = await obtain_rocket_instance(key_for_space(space))
 
+    email_service = None
     if body.sendEmail:
-        smtp_settings = await require_smtp_settings(db, space.id)
+        try:
+            await require_smtp_settings(db, space.id)
+            email_service = EmailService(db, space.id)
+        except HTTPException as e:
+            logger.warning(f"SMTP not configured! Error: {e.detail}")
 
     async def _process_user_creation(user_data: UserCreateDto):
         if user_data.password and user_data.password.strip():
@@ -155,17 +183,26 @@ async def create_users(
         except Exception as e:
             result.error = extract_exception_message(e)
 
-        if body.sendEmail and result.created_id:
+        if body.sendEmail and result.created_id and not result.error and email_service:
             try:
-                await send_email(
-                    smtp_settings,
-                    user_data.email,
-                    f"Ваш аккаунт в {space.url} создан",
-                    f"Добро пожаловать!\n\nВаш временный пароль для входа в пространство {space.url}:\n{password}\n\nРекомендуем сменить его после первого входа."
+                logger.info(f"Attempting to send welcome email to {user_data.email}")
+                
+                message_id = await email_service.send_welcome_email(
+                    to_email=user_data.email,
+                    username=user_data.username,
+                    password=password,
+                    space_url=str(space.url)
                 )
                 result.email_sent = True
             except Exception as e:
                 result.email_error = f"Ошибка отправки email: {extract_exception_message(e)}"
+        else:
+            if not body.sendEmail:
+                logger.info(f"Email sending disabled for user {user_data.username}")
+            elif not email_service:
+                logger.warning(f"Email service not available for user {user_data.username}")
+            elif result.error:
+                logger.warning(f"User creation failed for {user_data.username}, skipping email")
 
         return result
 
