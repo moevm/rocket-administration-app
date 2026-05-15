@@ -403,7 +403,9 @@ class LDAPClient:
         search_base = self.config.users_base
         search_filter = f"(&{self.config.user_filter}({self.config.user_id_attr}={self._escape_filter(user_id)}))"
 
-        results = self.search(search_base, search_filter, size_limit=1, use_cache=use_cache)
+        attributes = ['*', 'memberOf']
+        
+        results = self.search(search_base, search_filter, attributes=attributes, size_limit=1, use_cache=use_cache)
 
         return results[0] if results else None
 
