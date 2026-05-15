@@ -16,17 +16,7 @@ export type EmailTemplateConfig = {
     sampleContext: Record<string, string>;
 };
 
-type StoredTemplates = Partial<Record<EmailTemplateKey, Partial<EmailTemplateModel>>>;
-
-const STORAGE_KEY_PREFIX = "rocket_email_templates_v1";
-
 const TOKEN_PATTERN = /{{\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*}}/g;
-
-const wait = (ms: number) =>
-    new Promise<void>((resolve) => {
-        setTimeout(resolve, ms);
-    });
-
 export const EMAIL_TEMPLATE_CONFIGS: Record<EmailTemplateKey, EmailTemplateConfig> = {
     welcome_user: {
         key: "welcome_user",
@@ -65,56 +55,7 @@ export const DEFAULT_EMAIL_TEMPLATES: EmailTemplateCollection = {
     },
 };
 
-function getStorageKey(spaceId: string): string {
-    return `${STORAGE_KEY_PREFIX}:${spaceId}`;
-}
-
-function readStoredTemplates(spaceId: string): StoredTemplates {
-    if (!spaceId || typeof window === "undefined") {
-        return {};
-    }
-
-    const raw = window.localStorage.getItem(getStorageKey(spaceId));
-    if (!raw) {
-        return {};
-    }
-
-    try {
-        const parsed: unknown = JSON.parse(raw);
-        if (!parsed || typeof parsed !== "object") {
-            return {};
-        }
-        return parsed as StoredTemplates;
-    } catch {
-        return {};
-    }
-}
-
-function writeStoredTemplates(spaceId: string, templates: StoredTemplates): void {
-    if (!spaceId || typeof window === "undefined") {
-        return;
-    }
-    window.localStorage.setItem(getStorageKey(spaceId), JSON.stringify(templates));
-}
-
-function normalizeTemplate(
-    value: Partial<EmailTemplateModel> | undefined,
-    fallback: EmailTemplateModel,
-): EmailTemplateModel {
-    return {
-        subject: value?.subject ?? fallback.subject,
-        body: value?.body ?? fallback.body,
-    };
-}
-
-function renderTemplateString(template: string, context: Record<string, string>): string {
-    return template.replace(TOKEN_PATTERN, (_, variableName: string) => {
-        if (Object.prototype.hasOwnProperty.call(context, variableName)) {
-            return context[variableName];
-        }
-        return `{{${variableName}}}`;
-    });
-}
+const TOKEN_PATTERN = /{{\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*}}/g;
 
 export function extractTemplateVariables(content: string): string[] {
     const regex = new RegExp(TOKEN_PATTERN.source, "g");
@@ -154,13 +95,22 @@ export function findUnknownVariables(params: {
     return usedVariables.filter((variableName) => !availableVariables.has(variableName));
 }
 
-export async function fetchEmailTemplates(spaceId: string): Promise<EmailTemplateCollection> {
-    await wait(200);
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
-    const stored = readStoredTemplates(spaceId);
+export async function fetchEmailTemplates(spaceId: string): Promise<EmailTemplateCollection> {
+    const response = await fetch(`${API_BASE_URL}/spaces/${spaceId}/settings/email-templates`, {
+        credentials: 'include',
+    });
+    
+    if (!response.ok) {
+        console.error(`Failed to fetch templates: ${response.status}`);
+        return DEFAULT_EMAIL_TEMPLATES;
+    }
+    
+    const data = await response.json();
     return {
-        welcome_user: normalizeTemplate(stored.welcome_user, DEFAULT_EMAIL_TEMPLATES.welcome_user),
-        password_changed: normalizeTemplate(stored.password_changed, DEFAULT_EMAIL_TEMPLATES.password_changed),
+        welcome_user: data.welcome_user || DEFAULT_EMAIL_TEMPLATES.welcome_user,
+        password_changed: data.password_changed || DEFAULT_EMAIL_TEMPLATES.password_changed,
     };
 }
 
@@ -169,16 +119,25 @@ export async function saveEmailTemplate(params: {
     key: EmailTemplateKey;
     template: EmailTemplateModel;
 }): Promise<EmailTemplateModel> {
-    await wait(250);
-
-    const stored = readStoredTemplates(params.spaceId);
-    stored[params.key] = {
-        subject: params.template.subject,
-        body: params.template.body,
-    };
-    writeStoredTemplates(params.spaceId, stored);
-
-    return params.template;
+    const response = await fetch(`${API_BASE_URL}/spaces/${params.spaceId}/settings/email-templates/${params.key}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+            subject: params.template.subject,
+            body: params.template.body,
+        }),
+    });
+    
+    if (!response.ok) {
+        const text = await response.text();
+        console.error(`Save failed: ${response.status}`, text);
+        throw new Error(`Failed to save template: ${response.status}`);
+    }
+    
+    return await response.json();
 }
 
 export async function previewEmailTemplate(params: {
@@ -186,18 +145,37 @@ export async function previewEmailTemplate(params: {
     template: EmailTemplateModel;
     context?: Record<string, string>;
 }): Promise<EmailTemplateModel> {
-    await wait(200);
-
-    const config = EMAIL_TEMPLATE_CONFIGS[params.key];
-    const context = {
-        ...config.sampleContext,
-        ...(params.context ?? {}),
-    };
-
-    return {
-        subject: renderTemplateString(params.template.subject, context),
-        body: renderTemplateString(params.template.body, context),
-    };
+    const spaceId = window.location.pathname.split('/')[2];
+    
+    const response = await fetch(`${API_BASE_URL}/spaces/${spaceId}/settings/email-templates/preview`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+            template: {
+                subject: params.template.subject,
+                body: params.template.body,
+            },
+            context: params.context || {},
+        }),
+    });
+    
+    if (!response.ok) {
+        const config = EMAIL_TEMPLATE_CONFIGS[params.key];
+        const context = {
+            ...config.sampleContext,
+            ...(params.context ?? {}),
+        };
+        
+        return {
+            subject: params.template.subject.replace(TOKEN_PATTERN, (_, varName) => context[varName] || `{{${varName}}}`),
+            body: params.template.body.replace(TOKEN_PATTERN, (_, varName) => context[varName] || `{{${varName}}}`),
+        };
+    }
+    
+    return await response.json();
 }
 
 export async function testSendEmailTemplate(params: {
@@ -205,11 +183,27 @@ export async function testSendEmailTemplate(params: {
     template: EmailTemplateModel;
     context?: Record<string, string>;
 }): Promise<{ recipient: string; messageId: string }> {
-    await previewEmailTemplate(params);
-    await wait(200);
-
-    return {
-        recipient: "test@example.com",
-        messageId: `stub-${Date.now()}`,
-    };
+    const spaceId = window.location.pathname.split('/')[2];
+    
+    const response = await fetch(`/spaces/${spaceId}/settings/email-templates/test-send`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            template: {
+                subject: params.template.subject,
+                body: params.template.body,
+            },
+            context: params.context || {},
+            to: "test@example.com",
+        }),
+    });
+    
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.detail || `Failed to send test email: ${response.statusText}`);
+    }
+    
+    return await response.json();
 }

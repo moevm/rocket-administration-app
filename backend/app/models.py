@@ -379,3 +379,33 @@ class UserDeleteResDto(BaseModel):
     force_delete: bool
     success: bool = False
     error: Optional[str] = None
+
+class EmailTemplateUpsertDto(BaseModel):
+    subject: str = Field(min_length=1)
+    body: str = Field(min_length=1)
+
+class EmailTemplateDto(BaseModel):
+    key: str
+    subject: str
+    body: str
+
+class EmailTemplatesMapDto(BaseModel):
+    welcome_user: EmailTemplateDto
+    password_changed: EmailTemplateDto
+
+class EmailTemplatePreviewRequestDto(BaseModel):
+    template: EmailTemplateUpsertDto
+    context: Optional[Dict[str, str]] = None
+
+class EmailTemplatePreviewResponseDto(BaseModel):
+    subject: str
+    body: str
+
+class EmailTemplateTestSendRequestDto(BaseModel):
+    template: EmailTemplateUpsertDto
+    context: Optional[Dict[str, str]] = None
+    to: EmailStr
+
+class EmailTemplateTestSendResponseDto(BaseModel):
+    recipient: EmailStr
+    message_id: str
