@@ -37,7 +37,7 @@ import {
     saveEmailTemplate,
     testSendEmailTemplate,
     fetchEmailTemplates,
-} from "@/api/email-templates-stub.ts";
+} from "@/api/email-templates";
 
 const templateSchema = z.object({
     subject: z.string().trim().min(1, "Обязательное поле"),

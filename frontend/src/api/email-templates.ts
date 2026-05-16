@@ -55,8 +55,6 @@ export const DEFAULT_EMAIL_TEMPLATES: EmailTemplateCollection = {
     },
 };
 
-const TOKEN_PATTERN = /{{\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*}}/g;
-
 export function extractTemplateVariables(content: string): string[] {
     const regex = new RegExp(TOKEN_PATTERN.source, "g");
     const variables = new Set<string>();
