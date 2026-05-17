@@ -1,9 +1,12 @@
 import DataTableColumnHeader from "@/components/app/table/DataTableColumnHeader.tsx";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
-import {ApiTeamModel} from "@/store/global-store.ts";
+import {ApiTeamModel, $selectedSpaceId, $users} from "@/store/global-store.ts";
 import dayjs from 'dayjs';
 import {DateRenderer, MonoRenderer, OptRenderer} from "@/components/app/ValueRenderers.tsx";
 import {customSortingFn, TypedColumnDef} from "@/lib/table.ts";
+import { useAtomValue } from "jotai";
+import {loaded} from "@/api";
+import { NavLink } from "react-router";
 
 const typesType = {
     "1": "Закрытый канал",
@@ -90,7 +93,27 @@ export const columnsTeam = [
             type: 'string'
         },
         sortingFn: customSortingFn,
-        cell: ({cell}) => <MonoRenderer value={cell.getValue()} />
+        cell: ({ row }) => {
+            const spaceId = useAtomValue($selectedSpaceId);
+            const usersLoadable = useAtomValue($users);
+
+            if (!spaceId || usersLoadable.state !== "hasData") return <span>-</span>;
+            
+            const creator = usersLoadable.data.find((u) => u._id ===row.original.createdBy?._id);
+            if (!creator?._id) return <span>-</span>;
+
+            const creatorFio = creator.name ?? creator.username ?? creator._id;
+
+            return (
+                <NavLink
+                    to={`/spaces/${spaceId}/dashboard/users/${creator._id}`}
+                    className="text-blue-600 hover:underline"
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    {creatorFio}
+                </NavLink>
+            );
+        },
     },
     {
         accessorKey: "updatedAt",

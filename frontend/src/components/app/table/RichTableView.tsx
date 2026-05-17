@@ -314,12 +314,16 @@ function RichTableView<TData, TValue>({
                                     className={"cursor-pointer"}
                                     key={row.id}
                                     data-state={row.getIsSelected() && "selected"}
-                                    // TODO: проваливание здесь
                                     onClick={(e) => {
-                                        const isCheckboxClick = (e.target as HTMLElement).closest('.row-select-checkbox');
-                                        if (!isCheckboxClick && settings.rowClickHandler) {
-                                            settings.rowClickHandler(row.original);
-                                        }
+                                        const target = e.target as HTMLElement;
+
+                                        const isInteractive = target.closest(
+                                            '.row-select-checkbox, a, button, input, textarea, select, label, [role="button"], [data-row-click-ignore="true"]'
+                                        );
+
+                                        if (isInteractive) return;
+
+                                        settings.rowClickHandler?.(row.original);
                                     }}
                                     onContextMenu={(e) => {
                                         e.preventDefault();

@@ -9,7 +9,8 @@ import {
     $prefetchedDeleteTeamFromRoomSmallRooms,
     $prefetchedDeleteUsersOutOfTeamSmallUsers,
     $selectedSpaceId, $selectedTeam, $selectedTeamId, $selectedTeamsData,
-    $teamInfo
+    $teamInfo,
+    $users
 } from "@/store/global-store.ts";
 import {NavLink, useParams} from "react-router";
 import {Label} from "@/components/ui/label.tsx";
@@ -42,6 +43,10 @@ const typesType = {
 
 function TeamPageContent() {
     const team = loaded(useAtomValue($selectedTeam)).data
+    const allUsers = loaded(useAtomValue($users)).data;
+
+    const creator = allUsers.find((u) => u._id === team.createdBy?._id);
+
     const selectedSpaceId = useAtomValue($selectedSpaceId)!
     const {users, rooms} = loaded(useAtomValue($teamInfo)).data
 
@@ -61,6 +66,8 @@ function TeamPageContent() {
         }
     ]
     setSelectedTeamsData(data)
+
+    console.log(team)
 
     return (
         <div className="flex flex-col py-6 mx-6">
@@ -85,7 +92,7 @@ function TeamPageContent() {
                         ['Имя', team.name],
                         ['Тип', typesType[team.type]],
                         ['Создано в', String(dayjs(team.createdAt))],
-                        ['Создатель', <MonoRenderer value={team.createdBy._id} />],
+                        ['Создатель', team.createdBy?._id ? ( <NavLink to={`/spaces/${selectedSpaceId}/dashboard/users/${team.createdBy._id}`} className="text-blue-600 hover:underline" > {creator?.name ?? creator?.username ?? team.createdBy?.username ?? team.createdBy?._id} </NavLink> ) : ( <span>-</span> )],
                         ['Обновлено в', <OptRenderer value={team.updatedAt} />],
                         ['Id комнаты', <MonoRenderer value={team.roomId} />],
                     ]}
@@ -141,6 +148,7 @@ function TeamPage() {
     const setSelectedTeamId = useSetAtom($selectedTeamId)
     const selectedTeam = useAtomValue($selectedTeam)
     const selectedTeamInfo = useAtomValue($teamInfo)
+    const users = useAtomValue($users);
 
     useEffect(() => {
         setSelectedTeamId(teamId!)
@@ -148,7 +156,7 @@ function TeamPage() {
 
     return (
         <BatchLoader
-            states={[selectedTeam, selectedTeamInfo]}
+            states={[selectedTeam, selectedTeamInfo, users]}
             loadingMessage='Загрузка команды'
             display={() => <TeamPageContent/>}
         />
