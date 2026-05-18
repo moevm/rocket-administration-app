@@ -67,8 +67,6 @@ function TeamPageContent() {
     ]
     setSelectedTeamsData(data)
 
-    console.log(team)
-
     return (
         <div className="flex flex-col py-6 mx-6">
             <Breadcrumb>
