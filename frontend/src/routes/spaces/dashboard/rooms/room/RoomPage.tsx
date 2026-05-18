@@ -69,7 +69,7 @@ function RoomPageContent() {
         }
     ]
     setSelectedRoomsData(data)
-
+    
     return (
         <div className="flex flex-col py-6 mx-6">
 
@@ -97,7 +97,7 @@ function RoomPageContent() {
                         ['Тип', typesName[room.t] ?? room.t],
                         ['Сообщения', room.msgs],
                         ['Пользователи', room.usersCount],
-                        ['Создатель', <MonoRenderer value={room.u._id} />],
+                        ['Создатель', room.u?._id ? ( <NavLink to={`/spaces/${selectedSpaceId}/dashboard/users/${room.u._id}`} className="text-blue-600 hover:underline" > {room.u.name ?? room.u.username ?? room.u._id} </NavLink> ) : ( <span>-</span> )],
                         ['Read only', <CheckboxRenderer value={room.ro} />],
                         [
                             'Реакции при read-only',

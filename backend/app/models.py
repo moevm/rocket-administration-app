@@ -19,6 +19,7 @@ class TeamsAndRoomsResDto(BaseModel):
 class ShortUserDto(BaseModel):
     id: str = Field(alias='_id')
     username: str
+    name: Optional[str] = None
 
 
 class RoomDto(BaseModel):
