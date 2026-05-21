@@ -121,6 +121,7 @@ const RoleMultiSelect = ({
                   <Checkbox
                     checked={selectedRoles.includes(role.value)}
                     className="mr-2"
+                    disabled
                   />
                   {role.label}
                 </CommandItem>
