@@ -21,7 +21,6 @@ import {BatchLoader} from "@/components/app/DataLoader.tsx";
 import EntityCard from "@/components/app/EntityCard.tsx";
 import {CheckboxRenderer, MonoRenderer, OptRenderer} from "@/components/app/ValueRenderers.tsx";
 import RoomUserTableView from "@/components/app/table/RoomUserTableView.tsx";
-import ShortTeamTableView from "@/components/app/table/ShortTeamTableView.tsx";
 import {showAddRoomsToUsersDialogAtom} from "@/components/app/dialogs/room-page-dialogs/AddRoomsToUsersDialog.tsx";
 import {
     showDeleteUsersOutOfRoomDialogAtom
@@ -30,7 +29,7 @@ import {showAddRoomsToTeamsDialogAtom} from "@/components/app/dialogs/room-page-
 import {
     showDeleteTeamsOutOfRoomsDialogAtom
 } from "@/components/app/dialogs/room-page-dialogs/DeleteTeamsOutOfRoomsDialog.tsx";
-import {showHideRoomDialogAtom} from "@/components/app/dialogs/room-page-dialogs/HideRoomDialog.tsx";
+//import {showHideRoomDialogAtom} from "@/components/app/dialogs/room-page-dialogs/HideRoomDialog.tsx";
 import {showDeleteRoomDialogAtom} from "@/components/app/dialogs/room-page-dialogs/DeleteRoomDialog.tsx";
 import {RoomReactWhenReadOnlySetting} from "@/components/app/RoomReactWhenReadOnlySetting.tsx";
 import {showEditRoomDialogAtom} from "@/components/app/dialogs/room-page-dialogs/EditRoomDialog.tsx";
@@ -50,13 +49,12 @@ function RoomPageContent() {
     const selectedSpaceId = useAtomValue($selectedSpaceId)!
     const {team, members, reactWhenReadOnly} = loaded(useAtomValue($roomInfo)).data
 
-    const teams = team ? team : []
 
     const setAddRoomToUsersDialogOpen = useSetAtom(showAddRoomsToUsersDialogAtom)
     const setDeleteUsersOutOfRoomDialogOpen = useSetAtom(showDeleteUsersOutOfRoomDialogAtom)
     const setAddTeamsToRoomsDialogOpen = useSetAtom(showAddRoomsToTeamsDialogAtom)
     const setDeleteTeamsOutOfRoomDialogOpen = useSetAtom(showDeleteTeamsOutOfRoomsDialogAtom)
-    const setHideRoomDialogOpen = useSetAtom(showHideRoomDialogAtom)
+    //const setHideRoomDialogOpen = useSetAtom(showHideRoomDialogAtom)
     const setDeleteRoomDialogOpen = useSetAtom(showDeleteRoomDialogAtom)
     const setEditRoomDialogOpen = useSetAtom(showEditRoomDialogAtom);
 
@@ -110,6 +108,16 @@ function RoomPageContent() {
                         ['Default', <CheckboxRenderer value={room.default} />],
                         ['Тема',  <OptRenderer value={room.topic} />],
                         ['Объявление', <OptRenderer value={room.announcement} />],
+                        [
+                        "Команда",
+                            team?._id ? (
+                                <NavLink to={`/spaces/${selectedSpaceId}/dashboard/teams/${team._id}`} className="text-blue-600 hover:underline">
+                                {team.name ?? team._id}
+                                </NavLink>
+                            ) : (
+                                <span className={"text-foreground/70"}>–</span>
+                            ),
+                        ],
                     ]}
                 />
                 <div className={"flex justify-between gap-6"}>
@@ -149,10 +157,6 @@ function RoomPageContent() {
                 <RoomUserTableView data={members} roomId={room._id} roomName={room.name}/>
             </div>
 
-            <div className={"pt-8"}>
-                <Label className={"text-3xl"}>Команды</Label>
-                <ShortTeamTableView data={[teams]}/>
-            </div>
         </div>
     )
 }
