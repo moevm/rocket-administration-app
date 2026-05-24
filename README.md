@@ -190,3 +190,12 @@ docker compose restart
 2. Перейти в "Рабочее пространство" → "Права доступа" (`/admin/permissions`)
 3. Выдать роли Admin (или, при наличии, специально выделенной для аккаунта который будет использоваться с RocketManager)
    все права
+
+### Maintenance и обновление версий
+
+#### RocketChat (и MongoDB)
+
+При обновлении мажорной версии RocketChat нужно обновлять и MongoDB (требование RocketChat). Таблица совместимости
+версий RocketChat и MongoDB доступна по [ссылке](https://docs.rocket.chat/docs/support-prerequisites). При обновлении
+мажорной версии MongoDB необходимо провести миграцию, обновив параметр `fcv`. Алгоритм и более подробную информацию
+можно найти в [issue](https://github.com/moevm/rocket-administration-app/issues/177).
