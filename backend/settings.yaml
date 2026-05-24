@@ -1,7 +1,7 @@
 default: &default
   mongo:
     uri: mongodb://localhost:27017?replicaSet=rs0&directConnection=true
-    database: rocketappdb
+    database: rocketmanager
 
   app:
     batch_delay: 0.2
@@ -26,7 +26,7 @@ docker:
   <<: *default
   mongo:
     uri: mongodb://mongodb:27017?replicaSet=rs0&directConnection=true
-    database: rocketappdb
+    database: rocketmanager
   
   ldap:
     <<: *default.ldap
