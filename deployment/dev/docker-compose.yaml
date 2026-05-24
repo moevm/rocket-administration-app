@@ -102,3 +102,41 @@ services:
       - ../../openldap/bootstrap:/bootstrap:ro
     entrypoint: [ "/bin/bash" ]
     command: [ "/bootstrap/init.sh" ]
+
+  backend:
+    build:
+      context: ../../backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      mongodb-bootstrap:
+        condition: service_completed_successfully
+      openldap:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../../backend:/app
+      - /app/.venv
+    environment:
+      MONGO_URI: "mongodb://mongodb:27017/?replicaSet=rs0"
+      LDAP__HOST: "openldap"
+      LDAP__PORT: "389"
+    command: fastapi dev --host 0.0.0.0 --port 8000
+  
+  frontend:
+    build:
+      context: ../../frontend
+      dockerfile: Dockerfile
+      target: development
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ../../frontend:/app
+      - /app/node_modules
+    

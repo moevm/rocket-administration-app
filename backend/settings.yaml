@@ -1,13 +1,13 @@
 mongo:
-  uri: mongodb://localhost:27017?replicaSet=rs0&directConnection=true
+  uri: mongodb://mongodb:27017?replicaSet=rs0&directConnection=true
   database: rocketmanager
 
 app:
   batch_delay: 0.2
 
 ldap:
-  host: localhost
-  port: 8389
+  host: openldap
+  port: 389
   use_ssl: false
   bind_dn: "cn=admin,dc=moevm,dc=info"
   bind_password: "admin"
@@ -20,3 +20,6 @@ ldap:
   user_name_attr: "cn"
   user_email_attr: "mail"
   connection_timeout: 10
+
+rocketchat:
+  url: http://rocketchat:3000
