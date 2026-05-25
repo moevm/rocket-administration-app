@@ -6,11 +6,11 @@ volumes:
 
 services:
   rocketchat:
-    image: rocket.chat:8
+    image: rocket.chat:8.4
     restart: unless-stopped
     environment:
       MONGO_URL: "mongodb://mongodb:27017/rocketchat?replicaSet=rs0"
-      ROOT_URL: http://localhost:3000
+      ROOT_URL: http://127.0.0.1:3000
       PORT: 3000
       DEPLOY_METHOD: docker
       ADMIN_USERNAME: rocketadmin
@@ -24,7 +24,7 @@ services:
     expose:
       - 3000
     ports:
-      - "0.0.0.0:3000:3000"
+      - "127.0.0.1:3000:3000"
     healthcheck:
       test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3000/api/info', (r) => process.exit(r.statusCode === 200 ? 0 : 1))"]
       interval: 30s
@@ -33,23 +33,23 @@ services:
       start_period: 10s
 
   mongodb:
-    image: mongo:8
+    image: mongo:8.3
     restart: unless-stopped
     volumes:
       - mongodb_data:/data/db
-    command: [ "--replSet", "rs0", "--bind_ip_all" ]
     ports:
       - "0.0.0.0:27017:27017"
     healthcheck:
-      test: [ "CMD", "mongosh", "--quiet", "--eval", "db.runCommand({ ping: 1 })" ]
-      interval: 5s
-      timeout: 5s
-      retries: 3
-      start_period: 10s
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+    command: [ "--replSet", "rs0", "--bind_ip_all" ]
 
-  # One-shot контейнер для инициализации MongoDB в режиме replica set
+# One-shot контейнер для инициализации MongoDB в режиме replica set
   mongodb-bootstrap:
-    image: mongo:8
+    image: mongo:8.3
     restart: no
     depends_on:
       mongodb:
@@ -62,7 +62,7 @@ services:
   # https://github.com/bitnami/containers/issues/83267
   # Альтернатива - https://github.com/nfrastack/container-openldap
   openldap:
-    image: nfrastack/openldap:2.6
+    image: nfrastack/openldap:2.6-8.0.2
     restart: unless-stopped
     ports:
       - "0.0.0.0:8389:389"
@@ -86,9 +86,8 @@ services:
       retries: 3
       start_period: 30s
 
-  # One-shot контейнер для инициализации openldap данными из init.ldif
   openldap-bootstrap:
-    image: nfrastack/openldap:2.6
+    image: nfrastack/openldap:2.6-8.0.2
     restart: no
     environment:
       - TZ=Europe/Moscow
@@ -102,3 +101,46 @@ services:
       - ../../openldap/bootstrap:/bootstrap:ro
     entrypoint: [ "/bin/bash" ]
     command: [ "/bootstrap/init.sh" ]
+
+  backend:
+    build: ../../backend
+    restart: unless-stopped
+    environment:
+      ENV_FOR_DYNACONF: docker
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      mongodb-bootstrap:
+        condition: service_completed_successfully
+    ports:
+      - "127.0.0.1:8000:8000"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "http://backend:8000/_health", "-O", "/dev/null"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+    volumes:
+      - ../../backend:/app
+      - /app/.venv
+    profiles:
+      - back
+      - full
+
+  frontend:
+    build:
+      context: ../../frontend
+      args:
+        BACKEND_URL: "http://127.0.0.1:8000"
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://frontend:80"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    profiles:
+      - front
+      - full
