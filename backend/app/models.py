@@ -410,3 +410,8 @@ class EmailTemplateTestSendRequestDto(BaseModel):
 class EmailTemplateTestSendResponseDto(BaseModel):
     recipient: EmailStr
     message_id: str
+
+
+class UpdateTeamRequest(BaseModel):
+    name: Optional[str] = None
+    type: Optional[int] = None  # 0 - public, 1 - private

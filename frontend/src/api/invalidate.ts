@@ -197,3 +197,12 @@ export const useInvalidateUser = (userId: string) => {
         }
     }, [queryClient, spaceId, userId]);
 };
+
+export const useInvalidateTeam = (teamId: string) => {
+    const queryClient = useQueryClient();
+    
+    return async () => {
+        await queryClient.invalidateQueries({ queryKey: ['/spaces/{space_id}/teams/{team_id}', teamId] });
+        await queryClient.invalidateQueries({ queryKey: ['/spaces/{space_id}/teams/'] });
+    };
+};
