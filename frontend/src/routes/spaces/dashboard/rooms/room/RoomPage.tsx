@@ -20,7 +20,6 @@ import { Button } from "@/components/ui/button.tsx";
 import { useEffect, useState } from "react";
 import { BatchLoader } from "@/components/app/DataLoader.tsx";
 import RoomUserTableView from "@/components/app/table/RoomUserTableView.tsx";
-import ShortTeamTableView from "@/components/app/table/ShortTeamTableView.tsx";
 import { showAddRoomsToUsersDialogAtom } from "@/components/app/dialogs/room-page-dialogs/AddRoomsToUsersDialog.tsx";
 import {
     showDeleteUsersOutOfRoomDialogAtom
@@ -61,7 +60,18 @@ function RoomPageContent() {
         default: room.default || false,
     });
 
-    const teams = team ? [team] : [];
+    useEffect(() => {
+        setEditedRoom({
+            name: room.name || '',
+            description: room.description || '',
+            topic: room.topic || '',
+            announcement: room.announcement || '',
+            ro: room.ro || false,
+            default: room.default || false,
+        });
+        setIsEditing(false);
+    }, [room._id, room.name, room.description, room.topic, room.announcement, room.ro, room.default]);
+
     const invalidateRoom = useInvalidateRoom(room?._id || '');
     const invalidateRooms = useInvalidateRooms();
 
@@ -76,7 +86,9 @@ function RoomPageContent() {
 
     const { mutate: updateRoom, isPending: isUpdating } = $api.useMutation(
         'patch', 
-        '/spaces/{space_id}/rooms/groups/{room_id}', 
+        room.t === 'c' 
+        ? '/spaces/{space_id}/rooms/channels/{room_id}'
+        : '/spaces/{space_id}/rooms/groups/{room_id}', 
         createMutationOptions({
             onSuccess: async () => {
                 await invalidateRoom();
@@ -196,14 +208,30 @@ function RoomPageContent() {
                                 <div className="font-mono text-sm break-all">{room._id}</div>
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-sm text-muted-foreground">Тип</Label>
+                                <Label className="text-sm text-muted-foreground">Тип: </Label>
                                 <Badge variant="outline">
                                     {typesName[room.t] || room.t || '-'}
                                 </Badge>
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-sm text-muted-foreground">Создатель</Label>
-                                <div className="font-mono text-sm">{room.u?._id || '-'}</div>
+                                <Label className="text-sm text-muted-foreground">Создатель: </Label>
+                                {room.u?._id ? (
+                                    <NavLink to={`/spaces/${selectedSpaceId}/dashboard/users/${room.u._id}`} className="text-blue-600 hover:underline">
+                                        {room.u.name ?? room.u.username ?? room.u._id}
+                                    </NavLink>
+                                ) : (
+                                    <span className={"text-foreground/70"}>–</span>
+                                )}
+                            </div>
+                            <div className="space-y-2">
+                                <Label className="text-sm text-muted-foreground">Команда: </Label>
+                                {team?._id ? (
+                                    <NavLink to={`/spaces/${selectedSpaceId}/dashboard/teams/${team._id}`} className="text-blue-600 hover:underline">
+                                        {team.name ?? team._id}
+                                    </NavLink>
+                                ) : (
+                                    <span className={"text-foreground/70"}>–</span>
+                                )}
                             </div>
                             <div className="space-y-2">
                                 <Label className="text-sm text-muted-foreground">Сообщения</Label>
@@ -272,11 +300,17 @@ function RoomPageContent() {
                             </div>
                             <div className="space-y-2">
                                 <Label className="text-sm text-muted-foreground">Реакции при Read Only</Label>
-                                <RoomReactWhenReadOnlySetting
-                                    spaceId={selectedSpaceId}
-                                    roomId={room._id}
-                                    value={reactWhenReadOnly}
-                                />
+                                {isEditing ? (
+                                    <RoomReactWhenReadOnlySetting
+                                        spaceId={selectedSpaceId}
+                                        roomId={room._id}
+                                        value={reactWhenReadOnly}
+                                    />
+                                ) : (
+                                    <div className="text-sm">
+                                        {reactWhenReadOnly ? "Включены" : "Отключены"}
+                                    </div>
+                                )}
                             </div>
                         </div>
 
@@ -335,11 +369,6 @@ function RoomPageContent() {
             <div className="pt-8">
                 <Label className="text-3xl">Пользователи</Label>
                 <RoomUserTableView data={members} roomId={room._id} roomName={room.name} />
-            </div>
-
-            <div className="pt-8">
-                <Label className="text-3xl">Команды</Label>
-                <ShortTeamTableView data={teams} />
             </div>
         </div>
     );
