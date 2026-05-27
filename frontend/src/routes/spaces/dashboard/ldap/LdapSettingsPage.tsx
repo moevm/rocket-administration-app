@@ -473,6 +473,19 @@ function LdapSettingsPage() {
                 />
                 <FormField
                   control={form.control}
+                  name="bind_password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Пароль</FormLabel>
+                      <FormControl>
+                        <Input {...field} type="password" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
                   name="base_dn"
                   render={({ field }) => (
                     <FormItem>
@@ -641,7 +654,7 @@ function LdapSettingsPage() {
                   name="default_password_length"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Длина пароля</FormLabel>
+                      <FormLabel>Длина пароля для новых пользователей</FormLabel>
                       <FormControl>
                         <Input {...field} type="number" />
                       </FormControl>
@@ -711,21 +724,8 @@ function LdapSettingsPage() {
                 />
               </div>
 
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-                <FormField
-                  control={form.control}
-                  name="bind_password"
-                  render={({ field }) => (
-                    <FormItem className="flex-1">
-                      <FormLabel>Пароль</FormLabel>
-                      <FormControl>
-                        <Input {...field} type="password" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button type="submit" disabled={saveConfig.isPending} className="sm:mb-[1px]">
+              <div className="flex justify-end">
+                <Button type="submit" disabled={saveConfig.isPending}>
                   {saveConfig.isPending ? <Loader2 className="animate-spin" /> : <Save />}
                   Сохранить
                 </Button>

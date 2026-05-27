@@ -174,4 +174,13 @@ export const columnsRoom = [
         sortingFn: customSortingFn,
         cell: ({cell}) => <OptRenderer value={cell.getValue()} />
     },
+    {
+        accessorKey: "archived",
+        header: DataTableColumnHeader,
+        meta: {
+            title: "Архив",
+            type: 'boolean'
+        },
+        cell: ({cell}) => <CheckboxRenderer value={cell.getValue()} />
+    },
 ] as TypedColumnDef<ApiRoomModel>[]

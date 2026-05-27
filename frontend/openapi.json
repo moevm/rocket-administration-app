@@ -106,12 +106,13 @@
       },
       "patch": {
         "summary": "Update Team",
-        "description": "Обновление команд не поддерживается Rocket.Chat API",
+        "description": "Обновляет информацию о команде",
         "operationId": "update_team_spaces__space_id__teams__team_id__patch",
         "parameters": [
           { "name": "team_id", "in": "path", "required": true, "schema": { "type": "string", "title": "Team Id" } },
           { "name": "space_id", "in": "path", "required": true, "schema": { "type": "string", "title": "Space Id" } }
         ],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpdateTeamRequest" } } } },
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -1215,7 +1216,8 @@
           "default": { "anyOf": [{ "type": "boolean" }, { "type": "null" }], "title": "Default" },
           "topic": { "anyOf": [{ "type": "string" }, { "type": "null" }], "title": "Topic" },
           "announcement": { "anyOf": [{ "type": "string" }, { "type": "null" }], "title": "Announcement" },
-          "reactWhenReadOnly": { "anyOf": [{ "type": "boolean" }, { "type": "null" }], "title": "Reactwhenreadonly" }
+          "reactWhenReadOnly": { "anyOf": [{ "type": "boolean" }, { "type": "null" }], "title": "Reactwhenreadonly" },
+          "archived": { "anyOf": [{ "type": "boolean" }, { "type": "null" }], "title": "Archived" }
         },
         "type": "object",
         "required": ["_id"],
@@ -1436,6 +1438,14 @@
         },
         "type": "object",
         "title": "UpdateRoomRequest"
+      },
+      "UpdateTeamRequest": {
+        "properties": {
+          "name": { "anyOf": [{ "type": "string" }, { "type": "null" }], "title": "Name" },
+          "type": { "anyOf": [{ "type": "integer" }, { "type": "null" }], "title": "Type" }
+        },
+        "type": "object",
+        "title": "UpdateTeamRequest"
       },
       "UpdateUserRequest": {
         "properties": {

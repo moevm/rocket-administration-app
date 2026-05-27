@@ -234,6 +234,13 @@ function RoomPageContent() {
                                 )}
                             </div>
                             <div className="space-y-2">
+                                <Label className="text-sm text-muted-foreground">Архивация</Label>
+                                <Badge variant={room.archived ? "destructive" : "outline"}>
+                                    {room.archived ? "Архивирован" : "Не архивирован"}
+                                </Badge>
+                            </div>
+
+                            <div className="space-y-2">
                                 <Label className="text-sm text-muted-foreground">Сообщения</Label>
                                 <div className="font-medium">{room.msgs || 0}</div>
                             </div>

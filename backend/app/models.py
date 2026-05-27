@@ -36,6 +36,7 @@ class RoomDto(BaseModel):
     topic: Optional[str] = None
     announcement: Optional[str] = None
     reactWhenReadOnly: Optional[bool] = None
+    archived: Optional[bool] = None
 
 
 class TeamDto(BaseModel):

@@ -34,10 +34,12 @@ function RoomsTableView({ data, onArchiveSuccess }: RoomsTableViewProps) {
   const setAddNewRoomDialogOpen = useSetAtom(showAddNewRoomDialogAtom);
   const invalidateRooms = useInvalidateRooms();
 
-  const [selectedRows, setSelectedRows] = useState<Row<ApiRoomModel>[]>([]);
   const [tableKey, setTableKey] = useState(Date.now());
 
-  const selectedRoomIds = selectedRows.map((row) => row.original._id);
+  const sortedData = useMemo(
+    () => [...data].sort((a, b) => (a.archived ? 1 : 0) - (b.archived ? 1 : 0)),
+    [data]
+  );
 
   const { mutate: archiveRooms, isPending: isArchiving } = $api.useMutation(
     "post",
@@ -51,13 +53,13 @@ function RoomsTableView({ data, onArchiveSuccess }: RoomsTableViewProps) {
     createMutationOptions({})
   );
 
-  const handleArchive = useCallback(() => {
-    if (selectedRoomIds.length === 0) return;
+  const handleArchive = useCallback((roomIds: string[]) => {
+    if (roomIds.length === 0) return;
 
     archiveRooms(
       {
         params: { path: { space_id: selectedSpaceId! } },
-        body: { rooms: selectedRoomIds },
+        body: { rooms: roomIds },
       },
       {
         onSuccess: (data) => {
@@ -70,27 +72,26 @@ function RoomsTableView({ data, onArchiveSuccess }: RoomsTableViewProps) {
           if (error) {
             toast.error(error);
           } else {
-            toast.success(`Комнаты (${selectedRoomIds.length}) отправлены в архив`);
+            toast.success(`Комнаты (${roomIds.length}) отправлены в архив`);
             invalidateRooms();
             setTableKey(Date.now());
-            setSelectedRows([]);
             onArchiveSuccess?.();
           }
         },
-        onError: (error) => {
-          toast.error(error.message || "Не удалось архивировать комнаты");
+        onError: () => {
+          toast.error("Не удалось архивировать комнаты");
         },
       }
     );
-  }, [selectedRoomIds, selectedSpaceId, archiveRooms, invalidateRooms, onArchiveSuccess]);
+  }, [selectedSpaceId, archiveRooms, invalidateRooms, onArchiveSuccess]);
 
-  const handleUnarchive = useCallback(() => {
-    if (selectedRoomIds.length === 0) return;
+  const handleUnarchive = useCallback((roomIds: string[]) => {
+    if (roomIds.length === 0) return;
 
     unarchiveRooms(
       {
         params: { path: { space_id: selectedSpaceId! } },
-        body: { rooms: selectedRoomIds },
+        body: { rooms: roomIds },
       },
       {
         onSuccess: (data) => {
@@ -103,19 +104,18 @@ function RoomsTableView({ data, onArchiveSuccess }: RoomsTableViewProps) {
           if (error) {
             toast.error(error);
           } else {
-            toast.success(`Комнаты (${selectedRoomIds.length}) извлечены из архива`);
+            toast.success(`Комнаты (${roomIds.length}) извлечены из архива`);
             invalidateRooms();
             setTableKey(Date.now());
-            setSelectedRows([]);
             onArchiveSuccess?.();
           }
         },
-        onError: (error) => {
-          toast.error(error.message || "Не удалось извлечь комнаты из архива");
+        onError: () => {
+          toast.error("Не удалось извлечь комнаты из архива");
         },
       }
     );
-  }, [selectedRoomIds, selectedSpaceId, unarchiveRooms, invalidateRooms, onArchiveSuccess]);
+  }, [selectedSpaceId, unarchiveRooms, invalidateRooms, onArchiveSuccess]);
 
   const extendedContextMenuConfig = useMemo(() => {
     const baseConfig = roomContextMenuConfig;
@@ -123,6 +123,7 @@ function RoomsTableView({ data, onArchiveSuccess }: RoomsTableViewProps) {
     const extendedItems = (rows: Row<ApiRoomModel>[]) => {
       const originalItems = baseConfig.items(rows);
       const itemsArray = React.Children.toArray(originalItems);
+      const roomIds = rows.map((r) => r.original._id as string);
 
       return (
         <>
@@ -131,14 +132,14 @@ function RoomsTableView({ data, onArchiveSuccess }: RoomsTableViewProps) {
             <ContextMenuSubTrigger>Архивация</ContextMenuSubTrigger>
             <ContextMenuSubContent>
               <ContextMenuItem
-                onClick={handleArchive}
-                disabled={selectedRoomIds.length === 0 || isArchiving}
+                onClick={() => handleArchive(roomIds)}
+                disabled={roomIds.length === 0 || isArchiving}
               >
                 Архивировать
               </ContextMenuItem>
               <ContextMenuItem
-                onClick={handleUnarchive}
-                disabled={selectedRoomIds.length === 0 || isUnarchiving}
+                onClick={() => handleUnarchive(roomIds)}
+                disabled={roomIds.length === 0 || isUnarchiving}
               >
                 Извлечь из архива
               </ContextMenuItem>
@@ -152,13 +153,13 @@ function RoomsTableView({ data, onArchiveSuccess }: RoomsTableViewProps) {
       getLabel: baseConfig.getLabel,
       items: extendedItems,
     };
-  }, [roomContextMenuConfig, selectedRoomIds.length, isArchiving, isUnarchiving, handleArchive, handleUnarchive]);
+  }, [roomContextMenuConfig, isArchiving, isUnarchiving, handleArchive, handleUnarchive]);
 
   return (
     <RichTableView
       key={tableKey}
       tableId="rooms"
-      entries={data}
+      entries={sortedData}
       tableConfig={{ columns: columnsRoom }}
       contextMenuConfig={extendedContextMenuConfig}
       settings={{
@@ -168,7 +169,6 @@ function RoomsTableView({ data, onArchiveSuccess }: RoomsTableViewProps) {
         rowClickHandler: (room) =>
           navigate(`/spaces/${selectedSpaceId}/dashboard/rooms/${room._id}`),
       }}
-      onSelectionUpdated={(rows) => setSelectedRows(rows)}
       buttonsSlot={() => (
         <div className="flex justify-between w-full">
           <Button
