@@ -126,7 +126,7 @@ async def unarchive_rooms(body: RoomsArchiveDto, space=Depends(get_space)) -> Li
             return res
         except Exception as e:
             error_msg = extract_exception_message(e)
-            if "invalid-room" not in error_msg.lower() and "not a channel" not in error_msg.lower():
+            if "invalid-room" not in error_msg.lower() and "not a channel" not in error_msg.lower() and "error-room-not-found" not in error_msg.lower():
                 res.error = error_msg
                 return res
 
@@ -487,7 +487,7 @@ async def update_room_group(
     except Exception as e:
         logger.exception(f"Failed to update group: {e}")
         raise HTTPException(
-            status_code=400, 
+            status_code=400,
             detail=f"Failed to update group: {str(e)}"
         )
 
@@ -520,7 +520,7 @@ async def update_room_channels(
             )
 
         current_room = room_info['room']
-
+        
         await _update_room_fields(rocket, room_id, room_data, current_room, CHANNEL_UPDATE_CONFIG)
 
         updated_info = await rocket_request(
