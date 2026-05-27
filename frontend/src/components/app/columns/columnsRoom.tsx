@@ -1,8 +1,10 @@
 import DataTableColumnHeader from "@/components/app/table/DataTableColumnHeader.tsx";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
-import {ApiRoomModel} from "@/store/global-store.ts";
+import {ApiRoomModel, $selectedSpaceId} from "@/store/global-store.ts";
 import {CheckboxRenderer, MonoRenderer, OptRenderer} from "@/components/app/ValueRenderers.tsx";
 import {customSortingFn, TypedColumnDef} from "@/lib/table.ts";
+import { useAtomValue } from "jotai";
+import { NavLink } from "react-router";
 
 const typesName = {
     d: "Личные сообщения",
@@ -112,11 +114,27 @@ export const columnsRoom = [
         accessorKey: "u._id",
         header: DataTableColumnHeader,
         meta: {
-            title: "Администратор",
+            title: "Создатель",
             type: 'string'
         },
         sortingFn: customSortingFn,
-        cell: ({cell}) => <MonoRenderer value={cell.getValue()} />
+        cell: ({row}) => {
+            const spaceId = useAtomValue($selectedSpaceId);
+            const creatorId = row.original.u?._id;
+            const creatorFio = row.original.u?.name ?? row.original.u?.username ?? creatorId;
+
+            if (!spaceId || !creatorId) return <span>-</span>;
+
+            return (
+            <NavLink
+                to={`/spaces/${spaceId}/dashboard/users/${creatorId}`}
+                className="text-blue-600 hover:underline"
+                onClick={(e) => e.stopPropagation()}
+            >
+                {creatorFio}
+            </NavLink>
+            );
+        },
     },
     {
         accessorKey: "ro",
@@ -155,5 +173,14 @@ export const columnsRoom = [
         },
         sortingFn: customSortingFn,
         cell: ({cell}) => <OptRenderer value={cell.getValue()} />
+    },
+    {
+        accessorKey: "archived",
+        header: DataTableColumnHeader,
+        meta: {
+            title: "Архив",
+            type: 'boolean'
+        },
+        cell: ({cell}) => <CheckboxRenderer value={cell.getValue()} />
     },
 ] as TypedColumnDef<ApiRoomModel>[]

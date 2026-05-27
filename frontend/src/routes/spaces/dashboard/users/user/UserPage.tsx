@@ -28,6 +28,9 @@ import {showAddUserInTeamDialogAtom} from "@/components/app/dialogs/user-page-di
 import {showDeleteUserFromRoomDialogAtom} from "@/components/app/dialogs/user-page-dialogs/DeleteUserFromRoomDialog.tsx";
 import {showDeleteUserFromTeamDialogAtom} from "@/components/app/dialogs/user-page-dialogs/DeleteUserFromTeamDialog.tsx";
 import {showDeleteUserDialogAtom} from "@/components/app/dialogs/user-page-dialogs/DeleteUserDialog.tsx";
+import {showEditUserDialogAtom} from "@/components/app/dialogs/user-page-dialogs/EditUserDialog.tsx";
+import EditUserDialog from "@/components/app/dialogs/user-page-dialogs/EditUserDialog.tsx";
+import {Pencil} from "lucide-react";
 
 function UserPageContent() {
     const user = loaded(useAtomValue($selectedUser)).data
@@ -40,6 +43,7 @@ function UserPageContent() {
     const setDeleteUserFromRoomOpen = useSetAtom(showDeleteUserFromRoomDialogAtom)
     const setDeleteUserFromTeamOpen = useSetAtom(showDeleteUserFromTeamDialogAtom)
     const setDeleteUserOpen = useSetAtom(showDeleteUserDialogAtom)
+    const setEditUserDialogOpen = useSetAtom(showEditUserDialogAtom);
 
     const setSelectedUsersData = useSetAtom($selectedUsersData)
     const data = [
@@ -99,6 +103,11 @@ function UserPageContent() {
                         <Button variant="outline" onClick={() => {setDeleteUserOpen(true)}}>
                             Удалить
                         </Button>
+                        <Button variant="outline" onClick={() => {setEditUserDialogOpen(true)}}>
+                            <Pencil className="mr-2 h-4 w-4" />
+                            Редактировать
+                        </Button>
+                        <EditUserDialog />
                     </div>
                 </div>
             </div>

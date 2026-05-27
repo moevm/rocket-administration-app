@@ -1,6 +1,8 @@
-import {atom, useAtom, useAtomValue} from "jotai/index";
+import {atom, useAtom, useAtomValue, useSetAtom} from "jotai/index";
 import {
-    $roomsQueryOptions,
+    ApiRoomUserModel,
+    ApiUserModel,
+    $prefetchedDeleteUsersOutOfRoomSmallUsers,
     $selectedRoomsData,
     $selectedSpaceId,
     $users
@@ -16,29 +18,42 @@ import {
 } from "@/components/ui/dialog.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {useEffect, useState} from "react";
-import {$api, createMutationOptions, loaded, queryClient} from "@/api";
+import {$api, createMutationOptions, loaded} from "@/api";
 import ExportCard from "@/components/app/dialogs/ExportCard.tsx";
 import UserSmallTableView from "@/components/app/table/UserSmallTableView.tsx";
 import {useInvalidateEntities} from "@/api/invalidate.ts";
 
 export const showDeleteUsersOutOfRoomDialogAtom = atom(false)
 
+function spaceUserToSmallRow(u: ApiUserModel): ApiRoomUserModel {
+    return {
+        _id: u._id,
+        name: u.name,
+        username: u.username,
+        status: u.status,
+        roles: u.roles,
+    }
+}
+
 function DeleteUsersOutOfRoomContent(props: {
-    smallUsers: { _id: string, username: string, name: string }[]
+    smallUsers: ApiRoomUserModel[]
 }) {
     const [open, setOpen] = useAtom(showDeleteUsersOutOfRoomDialogAtom)
     const [dialogStep, setDialogStep] = useState(1);
     const selectedSpaceId = useAtomValue($selectedSpaceId)!
     const selectedRoomsData = useAtomValue($selectedRoomsData)
     const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
-    const [results, setResults] = useState<object[]>([]);
+    const [results, setResults] = useState<Record<string, unknown>[]>([]);
+
+    const setPrefetchedSmallUsers = useSetAtom($prefetchedDeleteUsersOutOfRoomSmallUsers)
 
     useEffect(() => {
         if (!open) {
             setDialogStep(1)
             setResults([])
+            setPrefetchedSmallUsers(null)
         }
-    }, [open]);
+    }, [open, setPrefetchedSmallUsers]);
 
     const invalidate = useInvalidateEntities()
 
@@ -48,7 +63,7 @@ function DeleteUsersOutOfRoomContent(props: {
     } = $api.useMutation('delete', '/spaces/{space_id}/user_room/group', createMutationOptions({
         onSuccess: async (data) => {
             setDialogStep(0)
-            setResults(data)
+            setResults(data as Record<string, unknown>[])
             invalidate()
         }
     }))
@@ -111,13 +126,17 @@ function DeleteUsersOutOfRoomContent(props: {
 
 function DeleteUsersOutOfRoomDialog() {
     const users = useAtomValue($users)
+    const prefetched = useAtomValue($prefetchedDeleteUsersOutOfRoomSmallUsers)
+    const states = prefetched === null ? [users] : []
 
     return (
         <BatchLoader
-            states={[users]}
+            states={states}
             loadingMessage='Загрузка пользователей'
             display={() => <DeleteUsersOutOfRoomContent
-                smallUsers={loaded(users).data.map(({_id, name, username}) => ({_id, name, username}))}/>}
+                smallUsers={prefetched === null
+                    ? loaded(users).data.map(spaceUserToSmallRow)
+                    : prefetched}/>}
         />
     )
 }

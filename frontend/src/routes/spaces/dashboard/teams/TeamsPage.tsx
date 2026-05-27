@@ -1,4 +1,4 @@
-import {$teams, showAddNewTeamDialogAtom} from "@/store/global-store.ts";
+import {$teams, $users, showAddNewTeamDialogAtom} from "@/store/global-store.ts";
 import {useAtomValue} from "jotai/index";
 import {BatchLoader} from "@/components/app/DataLoader.tsx";
 import {loaded} from "@/api";
@@ -8,11 +8,12 @@ import {useSetAtom} from "jotai/react";
 
 function TeamsPage() {
     const teams = useAtomValue($teams)
+    const users = useAtomValue($users);
 
     return (
         <>
             <BatchLoader
-                states={[teams]}
+                states={[teams, users]}
                 loadingMessage={"Загрузка команд"}
                 display={() =>
                     <div className={"flex flex-col m-6  py-4 ml-6"}>

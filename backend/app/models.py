@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, HttpUrl, EmailStr, AnyUrl
-from typing import Optional, List
+from typing import Optional, List, Literal, Dict
 from app.services.db import DbModel
 from datetime import datetime
 
@@ -19,6 +19,7 @@ class TeamsAndRoomsResDto(BaseModel):
 class ShortUserDto(BaseModel):
     id: str = Field(alias='_id')
     username: str
+    name: Optional[str] = None
 
 
 class RoomDto(BaseModel):
@@ -34,6 +35,8 @@ class RoomDto(BaseModel):
     default: Optional[bool] = None
     topic: Optional[str] = None
     announcement: Optional[str] = None
+    reactWhenReadOnly: Optional[bool] = None
+    archived: Optional[bool] = None
 
 
 class TeamDto(BaseModel):
@@ -50,6 +53,8 @@ class UserCreateDto(BaseModel):
     username: str
     email: EmailStr
     name: str
+    password: Optional[str] = None
+    roles: List[str] = []
 
 
 class UsersImportRequestDto(BaseModel):
@@ -74,6 +79,22 @@ class RoomCreateDto(BaseModel):
     readOnly: bool = False
     disable_system_messages: bool = True
     teamId: Optional[str] = None
+
+
+class UpdateRoomRequest(BaseModel):
+    name: Optional[str] = None
+    readOnly: Optional[bool] = None
+    topic: Optional[str] = None
+    announcement: Optional[str] = None
+    description: Optional[str] = None
+
+
+class UpdateUserRequest(BaseModel):
+    name: Optional[str] = None
+    username: Optional[str] = None
+    email: Optional[str] = None
+    active: Optional[bool] = None
+    roles: Optional[List[str]] = None
 
 
 class RoomsImportRequestDto(BaseModel):
@@ -116,7 +137,7 @@ class UserDto(BaseModel):
     type: str
     roles: List[str]
     avatarETag: Optional[str] = None
-    nameInsensitive: str
+    nameInsensitive: Optional[str] = None
     emails: Optional[List[UserEmailDto]] = None
     lastLogin: Optional[datetime] = None
 
@@ -150,11 +171,31 @@ class RoomUserDto(BaseModel):
     username: str
     name: str
     status: str
+    roles: Optional[List[str]] = None
 
 
 class RoomInfoDto(BaseModel):
     team: Optional[ShortTeamDto] = None
     members: Optional[List[RoomUserDto]] = None
+    reactWhenReadOnly: bool = False
+
+
+class RoomSettingsPatchDto(BaseModel):
+    reactWhenReadOnly: bool
+
+
+class RoomMemberRolesDto(BaseModel):
+    roles: List[str]
+
+
+class RoomMemberRolesResDto(BaseModel):
+    success: bool = True
+    error: Optional[str] = None
+
+
+class RoomRoleTypeDto(BaseModel):
+    id: str
+    label: str
 
 
 class CreateSpaceRequest(BaseModel):
@@ -194,15 +235,76 @@ class UserInfoDto(BaseModel):
 class SmtpSettingsDto(BaseModel):
     host: AnyUrl
     sender: EmailStr
+    use_tls: bool = False
 
 
 class SmtpSettingsModel(DbModel):
     host: AnyUrl
     sender: EmailStr
+    use_tls: bool = False
 
 
 class SmtpSettingsResponseDto(BaseModel):
     value: Optional[SmtpSettingsDto]
+
+
+EmailTemplateKey = Literal["welcome_user", "password_changed"]
+
+
+class EmailTemplateDto(BaseModel):
+    key: EmailTemplateKey
+    subject: str
+    body: str
+
+
+class EmailTemplatesMapDto(BaseModel):
+    welcome_user: EmailTemplateDto
+    password_changed: EmailTemplateDto
+
+
+class EmailTemplateUpsertDto(BaseModel):
+    subject: str = Field(min_length=1)
+    body: str = Field(min_length=1)
+
+
+class EmailTemplatePreviewRequestDto(BaseModel):
+    template: EmailTemplateUpsertDto
+    context: Optional[Dict[str, str]] = None
+
+
+class EmailTemplatePreviewResponseDto(BaseModel):
+    subject: str
+    body: str
+
+
+class EmailTemplateTestSendRequestDto(BaseModel):
+    template: EmailTemplateUpsertDto
+    context: Optional[Dict[str, str]] = None
+    to: EmailStr
+
+
+class EmailTemplateTestSendResponseDto(BaseModel):
+    recipient: EmailStr
+    message_id: str
+
+
+class EmailTemplateMetaDto(BaseModel):
+    key: EmailTemplateKey
+    description: str
+    available_variables: List[str]
+    required_variables: List[str]
+
+
+class EmailTemplatesMetaResponseDto(BaseModel):
+    items: List[EmailTemplateMetaDto]
+
+
+class EmailTemplateModel(DbModel):
+    space_id: str
+    key: EmailTemplateKey
+    subject: str
+    body: str
+    updated_at: datetime
 
 
 class UsersToChangePasswordDto(BaseModel):
@@ -257,7 +359,15 @@ class TeamsDeleteDto(BaseModel):
 class RoomsDeleteDto(BaseModel):
     rooms: List[str]
 
+class RoomsArchiveDto(BaseModel):
+    rooms: List[str]
+
 class RoomDeleteResDto(BaseModel):
+    room: str
+    success: bool = False
+    error: Optional[str] = None
+
+class RoomArchiveResDto(BaseModel):
     room: str
     success: bool = False
     error: Optional[str] = None
@@ -271,3 +381,38 @@ class UserDeleteResDto(BaseModel):
     force_delete: bool
     success: bool = False
     error: Optional[str] = None
+
+class EmailTemplateUpsertDto(BaseModel):
+    subject: str = Field(min_length=1)
+    body: str = Field(min_length=1)
+
+class EmailTemplateDto(BaseModel):
+    key: str
+    subject: str
+    body: str
+
+class EmailTemplatesMapDto(BaseModel):
+    welcome_user: EmailTemplateDto
+    password_changed: EmailTemplateDto
+
+class EmailTemplatePreviewRequestDto(BaseModel):
+    template: EmailTemplateUpsertDto
+    context: Optional[Dict[str, str]] = None
+
+class EmailTemplatePreviewResponseDto(BaseModel):
+    subject: str
+    body: str
+
+class EmailTemplateTestSendRequestDto(BaseModel):
+    template: EmailTemplateUpsertDto
+    context: Optional[Dict[str, str]] = None
+    to: EmailStr
+
+class EmailTemplateTestSendResponseDto(BaseModel):
+    recipient: EmailStr
+    message_id: str
+
+
+class UpdateTeamRequest(BaseModel):
+    name: Optional[str] = None
+    type: Optional[int] = None  # 0 - public, 1 - private

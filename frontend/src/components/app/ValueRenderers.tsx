@@ -10,7 +10,7 @@ export function CheckboxRenderer({value}: {
 }) {
     return <>{
         (typeof value === 'boolean')
-            ? <Checkbox checked={value}/>
+            ? <Checkbox checked={value} disabled/>
             : <MissingValue/>
     }</>
 }

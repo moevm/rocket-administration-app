@@ -1,5 +1,10 @@
-import {atom, useAtom, useAtomValue} from "jotai/index";
-import {$rooms, $selectedSpaceId, $selectedTeamsData, $teams, $teamsQueryOptions} from "@/store/global-store.ts";
+import {atom, useAtom, useAtomValue, useSetAtom} from "jotai/index";
+import {
+    $prefetchedDeleteTeamFromRoomSmallRooms,
+    $rooms,
+    $selectedSpaceId,
+    $selectedTeamsData,
+} from "@/store/global-store.ts";
 import {BatchLoader} from "@/components/app/DataLoader.tsx";
 import {
     Dialog,
@@ -10,10 +15,8 @@ import {
     DialogTitle
 } from "@/components/ui/dialog.tsx";
 import {Button} from "@/components/ui/button.tsx";
-import {$api, createMutationOptions, loaded, queryClient} from "@/api";
+import {$api, createMutationOptions, loaded} from "@/api";
 import {useEffect, useState} from "react";
-import {showAddRoomsIntoTeamDialogAtom} from "@/components/app/dialogs/team-page-dialogs/AddTeamIntoRoomDialog.tsx";
-import TeamSmallTableView from "@/components/app/table/TeamSmallTableView.tsx";
 import ExportCard from "@/components/app/dialogs/ExportCard.tsx";
 import RoomSmallTableView from "@/components/app/table/RoomSmallTableView.tsx";
 import {useInvalidateEntities} from "@/api/invalidate.ts";
@@ -22,7 +25,6 @@ export const showDeleteRoomFromTeamDialogAtom = atom(false)
 
 
 function DeleteTeamFromRoomContent(props: {
-    teams: any,
     smallRooms: { _id: string, name: string | null | undefined, t: string }[]
 }) {
     const selectedTeamsData = useAtomValue($selectedTeamsData)
@@ -30,14 +32,17 @@ function DeleteTeamFromRoomContent(props: {
     const [dialogStep, setDialogStep] = useState(1);
     const selectedSpaceId = useAtomValue($selectedSpaceId)!
     const [selectedRoomsIds, setSelectedRoomsIds] = useState<string[]>([]);
-    const [results, setResults] = useState<object[]>([]);
+    const [results, setResults] = useState<Record<string, unknown>[]>([]);
+
+    const setPrefetchedRooms = useSetAtom($prefetchedDeleteTeamFromRoomSmallRooms)
 
     useEffect(() => {
         if (!open) {
             setDialogStep(1)
             setResults([])
+            setPrefetchedRooms(null)
         }
-    }, [open]);
+    }, [open, setPrefetchedRooms]);
 
     const invalidate = useInvalidateEntities()
 
@@ -47,7 +52,7 @@ function DeleteTeamFromRoomContent(props: {
     } = $api.useMutation('delete', '/spaces/{space_id}/team_room/', createMutationOptions({
         onSuccess: async (data) => {
             setDialogStep(0)
-            setResults(data)
+            setResults(data as Record<string, unknown>[])
             invalidate()
         }
     }))
@@ -110,13 +115,21 @@ function DeleteTeamFromRoomContent(props: {
 
 function DeleteTeamFromRoomDialog() {
     const rooms = useAtomValue($rooms)
-    const teams = useAtomValue($teams)
+    const prefetched = useAtomValue($prefetchedDeleteTeamFromRoomSmallRooms)
+    const states = prefetched === null ? [rooms] : []
 
     return (
         <BatchLoader
-            states={[rooms, teams]}
+            states={states}
             loadingMessage='Загрузка комнат'
-            display={() => <DeleteTeamFromRoomContent teams={teams} smallRooms={loaded(rooms).data.map(({_id, name, t}) => ({_id, name, t}))}/>}
+            display={() => <DeleteTeamFromRoomContent
+                smallRooms={prefetched === null
+                    ? loaded(rooms).data.map(({_id, name, t}) => ({
+                        _id,
+                        name,
+                        t: t ?? 'c',
+                    }))
+                    : prefetched}/>}
         />
     )
 }

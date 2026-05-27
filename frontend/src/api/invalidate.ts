@@ -13,6 +13,7 @@ import {
 } from "@/store/global-store.ts";
 import {useAtomValue} from "jotai";
 import {useCallback} from "react";
+import { useQueryClient } from "@tanstack/react-query"
 
 export const useInvalidateTeams = () => {
     const selectedSpaceId = useAtomValue($selectedSpaceId)
@@ -170,3 +171,38 @@ export const useInvalidateEntities = () => {
         }
     }, [selectedRoomId, selectedSpaceId, selectedTeamId, selectedUserId])
 }
+
+export const useInvalidateRoom = (roomId: string) => {
+    const queryClient = useQueryClient();
+    const spaceId = useAtomValue($selectedSpaceId);
+    
+    return useCallback(() => {
+        if (spaceId && roomId) {
+            queryClient.invalidateQueries({
+                queryKey: $roomInfoQueryOptions(spaceId, roomId, true).queryKey
+            });
+        }
+    }, [queryClient, spaceId, roomId]);
+};
+
+export const useInvalidateUser = (userId: string) => {
+    const queryClient = useQueryClient();
+    const spaceId = useAtomValue($selectedSpaceId);
+    
+    return useCallback(() => {
+        if (spaceId && userId) {
+            queryClient.invalidateQueries({
+                queryKey: $userInfoQueryOptions(spaceId, userId, true).queryKey
+            });
+        }
+    }, [queryClient, spaceId, userId]);
+};
+
+export const useInvalidateTeam = (teamId: string) => {
+    const queryClient = useQueryClient();
+    
+    return async () => {
+        await queryClient.invalidateQueries({ queryKey: ['/spaces/{space_id}/teams/{team_id}', teamId] });
+        await queryClient.invalidateQueries({ queryKey: ['/spaces/{space_id}/teams/'] });
+    };
+};

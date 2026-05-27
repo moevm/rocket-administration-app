@@ -122,7 +122,7 @@ export const FileDialog = ({
             onOpenChange={onOpenChange}
             title={title}
             description={dialogStep == 1 && Description}
-            contentClassName="max-h-screen overflow-y-auto"
+            contentClassName="max-h-screen overflow-y-auto max-w-3xl w-full"
             footerContent={
                 dialogStep == 1 &&
                 <Button

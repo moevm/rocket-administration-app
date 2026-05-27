@@ -21,6 +21,7 @@ import TeamsPage from "@/routes/spaces/dashboard/teams/TeamsPage.tsx";
 import UserPage from "@/routes/spaces/dashboard/users/user/UserPage.tsx";
 import RoomPage from "@/routes/spaces/dashboard/rooms/room/RoomPage.tsx";
 import TeamPage from "@/routes/spaces/dashboard/teams/team/TeamPage.tsx";
+import LdapSettingsPage from "@/routes/spaces/dashboard/ldap/LdapSettingsPage.tsx";
 
 i18next.init({
     lng: "ru",
@@ -48,6 +49,7 @@ createRoot(document.getElementById('root')!).render(
                                 <Route path="rooms/:roomId" element={<RoomPage/>}/>
                                 <Route path="teams" element={<TeamsPage/>}/>
                                 <Route path="teams/:teamId" element={<TeamPage/>}/>
+                                <Route path="ldap" element={<LdapSettingsPage/>}/>
                                 <Route path="notifications" element={<SettingsPage/>}/>
                             </Route>
                         </Route>

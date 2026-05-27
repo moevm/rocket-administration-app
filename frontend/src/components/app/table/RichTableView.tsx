@@ -6,9 +6,7 @@ import {
     useReactTable,
     VisibilityState
 } from "@tanstack/react-table";
-import {Point} from "@/components/custom-radix/context-menu.tsx";
-import {useCallback, useEffect, useMemo} from "react";
-import {ContextMenuLabel} from "@/components/ui/context-menu.tsx";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import {Input} from "@/components/ui/input.tsx";
 import {MultiSelect} from "@/components/ui/multi-select.tsx";
 import {Button} from "@/components/ui/button.tsx";
@@ -17,7 +15,6 @@ import {DataTableViewOptions} from "@/components/app/table/DataTableViewOptions.
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {DataTablePagination} from "@/components/app/table/DataTablePagination.tsx";
 import {ColumnDef} from "@tanstack/table-core";
-import ExternallyTriggeredContextMenu from "@/components/app/ExternallyTriggeredContextMenu.tsx";
 import {ExportDialog} from "@/components/app/dialogs/ExportDialog.tsx";
 import {FileDialog} from "@/components/app/dialogs/FileDialog.tsx";
 import {toast} from "sonner";
@@ -25,8 +22,8 @@ import {UserImportDialog} from "@/components/app/dialogs/UserImportDialog.tsx";
 import TableFilters from "@/components/app/table/TableFilters.tsx";
 import {FilterConfig, performFilter} from "@/lib/filters.ts";
 import {FilterMeta} from "@tanstack/table-core/src/types.ts";
-import {useAtom} from "jotai/index";
-import {$hideColumnsAtomFamily, $searchColumnsAtomFamily, showContextMenuAtom} from "@/store/global-store.ts";
+import {useAtom, useSetAtom} from "jotai";
+import {$hideColumnsAtomFamily, $searchColumnsAtomFamily, contextMenuDataAtom, showContextMenuAtom} from "@/store/global-store.ts";
 import {useAtomValue} from "jotai";
 
 export interface ContextMenuConfig<TData> {
@@ -46,7 +43,6 @@ interface RichTableViewProps<TData, TValue> {
         enableSearch?: boolean;
         enableExport?: boolean;
         enableImport?: boolean;
-        // enableSelectFromFile?: boolean;
         enableColumnVisibilityToggle?: boolean;
         rowClickHandler?: (data: TData) => void;
     };
@@ -72,37 +68,38 @@ function RichTableView<TData, TValue>({
     const [filterString, setFilterString] = React.useState<string>();
     const [searchColumns, setSearchColumns] = useAtom($searchColumnsAtomFamily(tableId))
 
-    const contextMenuPosition = React.useRef<Point>({x: 0, y: 0});
-    const [contextMenuOpen, setContextMenuOpen] = useAtom(showContextMenuAtom)
-    const contextMenuRows = React.useRef<Row<TData>[]>([]);
+    const setContextMenuData = useSetAtom(contextMenuDataAtom);
+    const setContextMenuOpen = useSetAtom(showContextMenuAtom);
 
     const [showDialogExport, setShowDialogExport] = React.useState<boolean>(false);
     const [showDialogImport, setShowDialogImport] = React.useState<boolean>(false);
     const [showDialogSelectFromFile, setShowDialogSelectFromFile] = React.useState<boolean>(false);
 
-    const customGlobalFilterFn: FilterFn<TData> = React.useCallback(
-        (
-            row: Row<TData>,
-            columnId: string
-        ): boolean => {
-            const searchTerm = String(filterString).toLowerCase().trim();
+    const [showOnlySelected, setShowOnlySelected] = React.useState<boolean>(false);
 
-            if (!searchTerm) {
-                return true;
-            }
+    const [globalFilter, setGlobalFilter] = React.useState({
+        filterString: "",
+        showOnlySelected: false,
+        searchColumns: [] as string[],
+    });
 
-            if (searchColumns.length === 0) {
-                return false;
-            }
+    useEffect(() => {
+        setGlobalFilter({ filterString: filterString ?? "", showOnlySelected, searchColumns });
+    }, [filterString, showOnlySelected, searchColumns]);
 
-            if (!searchColumns.includes(columnId)) {
-                return false;
-            }
+    const customGlobalFilterFn: FilterFn<TData> = useCallback(
+        (row: Row<TData>, columnId: string, filterValue): boolean => {
+            const { filterString: search, showOnlySelected: onlySelected, searchColumns: cols } = filterValue;
 
-            const cellValue = row.getValue(columnId);
-            return String(cellValue).toLowerCase().includes(searchTerm);
+            if (onlySelected && !row.getIsSelected()) return false;
+
+            const searchTerm = search.toLowerCase().trim();
+            if (!searchTerm) return true;
+            if (cols.length === 0 || !cols.includes(columnId)) return false;
+
+            return String(row.getValue(columnId)).toLowerCase().includes(searchTerm);
         },
-        [searchColumns, filterString]
+        []
     );
 
     const table = useReactTable<TData>({
@@ -112,7 +109,8 @@ function RichTableView<TData, TValue>({
             sorting,
             rowSelection,
             columnVisibility,
-            columnFilters
+            columnFilters,
+            globalFilter
         },
         onSortingChange: setSorting,
         onRowSelectionChange: data => {
@@ -123,6 +121,7 @@ function RichTableView<TData, TValue>({
         },
         onColumnVisibilityChange: setColumnVisibility,
         onColumnFiltersChange: setColumnFilters,
+        onGlobalFilterChange: setGlobalFilter,
         getCoreRowModel: getCoreRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
@@ -148,6 +147,7 @@ function RichTableView<TData, TValue>({
         }
     });
 
+
     const [hiddenColumns, setHiddenColumns] = useAtom($hideColumnsAtomFamily(tableId))
 
     const allTableColumns = useMemo(() => {
@@ -171,23 +171,11 @@ function RichTableView<TData, TValue>({
 
     }, [allTableColumns, setHiddenColumns])
 
-    // const hideColumn = useCallback((id: string) => {
-    //     console.log('hiding column', id)
-    //     console.log('prev hidden: ', hiddenColumns)
-    //     const newHidden = [...hiddenColumns, id]
-    //     console.log('new hidden', newHidden)
-    //     setHiddenColumns(newHidden)
-    // }, [setHiddenColumns, hiddenColumns])
-
     useEffect(() => {
         for (const col of allTableColumns) {
             col.toggleVisibility(visibleColumns.includes(col.id))
         }
     }, [allTableColumns, visibleColumns]);
-
-    useEffect(() => {
-        table.setGlobalFilter(filterString)
-    }, [filterString, table, searchColumns]);
 
     const [tableFilters, setTableFilters] = React.useState<FilterConfig[]>([])
     const updateTableFilters = useCallback((filters: FilterConfig[]) => {
@@ -212,21 +200,12 @@ function RichTableView<TData, TValue>({
         updateTableFilters([])
     }, []);
 
+    const selectedRows = table.getSelectedRowModel().rows;
+    const selectedCount = selectedRows.length;
+    const selectedButtonRef = useRef<HTMLButtonElement>(null);
+
     return (
         <div className={"flex w-full flex-col"}>
-            <ExternallyTriggeredContextMenu
-                open={contextMenuOpen}
-                onOpenChange={setContextMenuOpen}
-                point={contextMenuPosition.current}
-            >
-                <ContextMenuLabel>
-                    {contextMenuConfig.getLabel
-                        ? contextMenuConfig.getLabel(contextMenuRows.current)
-                        : "Действия"}
-                </ContextMenuLabel>
-                {contextMenuConfig.items(contextMenuRows.current)}
-            </ExternallyTriggeredContextMenu>
-
             <div className="flex flex-col gap-2 w-full py-2">
                 {!(settings) || settings.enableSearch && (
                     <div className="flex gap-2">
@@ -267,22 +246,45 @@ function RichTableView<TData, TValue>({
                     </div>
                 )}
 
-                <TableFilters table={table} filters={tableFilters} onFiltersUpdated={updateTableFilters}/>
-
+                <TableFilters 
+                    table={table} 
+                    filters={tableFilters} 
+                    onFiltersUpdated={updateTableFilters}
+                    showOnlySelected={showOnlySelected}
+                    onShowOnlySelectedChange={setShowOnlySelected}
+                />
                 <div className="flex justify-between">
                     <div className="flex gap-2">
-                        {/*{settings?.enableExport &&*/
-                            <Button variant="outline" size="sm" onClick={() => setShowDialogExport(true)}>
-                                <FileUp/> Экспорт
-                            </Button>}
+                        <Button variant="outline" size="sm" onClick={() => setShowDialogExport(true)}>
+                            <FileUp/> Экспорт
+                        </Button>
                         {settings?.enableImport &&
                             <Button variant="outline" size="sm" onClick={() => setShowDialogImport(true)}>
                                 <FileDown/> Импорт
                             </Button>}
-                        {/*settings?.enableSelectFromFile &&*/
-                            <Button variant="outline" size="sm" onClick={() => setShowDialogSelectFromFile(true)}>
-                                <CheckIcon/> Выделить из файла
-                            </Button>}
+                        <Button variant="outline" size="sm" onClick={() => setShowDialogSelectFromFile(true)}>
+                            <CheckIcon/> Выделить из файла
+                        </Button>
+
+                        <Button
+                            ref={selectedButtonRef}
+                            variant="outline"
+                            size="sm"
+                            onClick={(e) => {
+                                if (selectedCount === 0) return;
+                                setContextMenuData({
+                                    point: { x: e.clientX, y: e.clientY },
+                                    rows: selectedRows,
+                                    config: contextMenuConfig,
+                                });
+                                setContextMenuOpen(true);
+                            }}
+                            disabled={selectedCount === 0}
+                        >
+                            <CheckIcon className="mr-2 h-4 w-4" />
+                            Выделено: {selectedCount}
+                        </Button>
+
                         {buttonsSlot && buttonsSlot()}
                     </div>
                     {settings?.enableColumnVisibilityToggle && <DataTableViewOptions allTableColumns={allTableColumns} visibleColumns={visibleColumns} setVisibleColumns={setVisibleColumns}/>}
@@ -312,19 +314,29 @@ function RichTableView<TData, TValue>({
                                     className={"cursor-pointer"}
                                     key={row.id}
                                     data-state={row.getIsSelected() && "selected"}
-                                    // TODO: проваливание здесь
                                     onClick={(e) => {
-                                        const isCheckboxClick = (e.target as HTMLElement).closest('.row-select-checkbox');
-                                        if (!isCheckboxClick && settings.rowClickHandler) {
-                                            settings.rowClickHandler(row.original);
-                                        }
+                                        const target = e.target as HTMLElement;
+
+                                        const isInteractive = target.closest(
+                                            '.row-select-checkbox, a, button, input, textarea, select, label, [role="button"], [data-row-click-ignore="true"]'
+                                        );
+
+                                        if (isInteractive) return;
+
+                                        settings.rowClickHandler?.(row.original);
                                     }}
                                     onContextMenu={(e) => {
                                         e.preventDefault();
-                                        contextMenuPosition.current = {x: e.clientX, y: e.clientY};
                                         const selectedRows = table.getSelectedRowModel().rows as Row<TData>[];
-                                        contextMenuRows.current = row.getIsSelected() ? selectedRows : [row as Row<TData>];
-
+                                        const rows = row.getIsSelected() ? selectedRows : [row as Row<TData>];
+                                        setContextMenuData({
+                                            point: { x: e.clientX, y: e.clientY },
+                                            rows,
+                                            config: {
+                                                getLabel: contextMenuConfig.getLabel,
+                                                items: contextMenuConfig.items,
+                                            },
+                                        });
                                         setContextMenuOpen(true);
                                     }}
                                 >

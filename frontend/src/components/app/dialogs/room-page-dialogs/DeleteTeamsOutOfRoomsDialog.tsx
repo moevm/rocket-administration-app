@@ -1,6 +1,5 @@
 import {atom, useAtom, useAtomValue} from "jotai/index";
 import {
-    $roomsQueryOptions,
     $selectedRoomsData,
     $selectedSpaceId,
     $teams
@@ -16,7 +15,7 @@ import {
 } from "@/components/ui/dialog.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {useEffect, useState} from "react";
-import {$api, createMutationOptions, loaded, queryClient} from "@/api";
+import {$api, createMutationOptions, loaded} from "@/api";
 import TeamSmallTableView from "@/components/app/table/TeamSmallTableView.tsx";
 import ExportCard from "@/components/app/dialogs/ExportCard.tsx";
 import {useInvalidateEntities} from "@/api/invalidate.ts";
@@ -24,7 +23,7 @@ import {useInvalidateEntities} from "@/api/invalidate.ts";
 export const showDeleteTeamsOutOfRoomsDialogAtom = atom(false)
 
 function DeleteTeamsOutOfRoomsContent(props: {
-    teams: any,
+    teamsForRoom: { _id: string; name: string; roomId: string; type: number }[]
     smallTeams: { _id: string, name: string, roomId: string, type: number }[]
 }) {
     const [open, setOpen] = useAtom(showDeleteTeamsOutOfRoomsDialogAtom)
@@ -32,9 +31,9 @@ function DeleteTeamsOutOfRoomsContent(props: {
     const [dialogStep, setDialogStep] = useState(1);
     const selectedSpaceId = useAtomValue($selectedSpaceId)!
     const [selectedTeamIds, setSelectedTeamIds] = useState<string[]>([]);
-    const [results, setResults] = useState<object[]>([]);
+    const [results, setResults] = useState<Record<string, unknown>[]>([]);
 
-    const allTeams = props.teams.data;
+    const allTeams = props.teamsForRoom;
 
     const [selectedTeamsIds, setSelectedTeamsIds] = useState<string[]>([]);
 
@@ -46,7 +45,10 @@ function DeleteTeamsOutOfRoomsContent(props: {
     }, [open]);
 
     useEffect(() => {
-        if (!selectedTeamIds.length) return;
+        if (!selectedTeamIds.length) {
+            setSelectedTeamsIds([])
+            return
+        }
 
         const selectedFullTeams = allTeams.filter(team =>
             selectedTeamIds.includes(team.roomId)
@@ -54,7 +56,7 @@ function DeleteTeamsOutOfRoomsContent(props: {
 
         const teamIds = selectedFullTeams.map(team => team._id);
         setSelectedTeamsIds(teamIds);
-    }, [selectedTeamIds]);
+    }, [selectedTeamIds, allTeams]);
 
     const invalidate = useInvalidateEntities()
 
@@ -64,7 +66,7 @@ function DeleteTeamsOutOfRoomsContent(props: {
     } = $api.useMutation('delete', '/spaces/{space_id}/team_room/', createMutationOptions({
         onSuccess: async (data) => {
             setDialogStep(0)
-            setResults(data)
+            setResults(data as Record<string, unknown>[])
             invalidate()
         }
     }))
@@ -128,12 +130,26 @@ function DeleteTeamsOutOfRoomsContent(props: {
 
 function DeleteTeamsOutOfRoomsDialog() {
     const teams = useAtomValue($teams)
+    const selectedRoomsData = useAtomValue($selectedRoomsData)
 
     return (
         <BatchLoader
             states={[teams]}
             loadingMessage='Загрузка команд'
-            display={() => <DeleteTeamsOutOfRoomsContent teams={teams} smallTeams={loaded(teams).data.map(({_id, name, type, roomId}) => ({_id, name, type, roomId}))}/>}
+            display={() => {
+                const roomIds = new Set(selectedRoomsData.map((r) => r._id))
+                const teamsForRoom = loaded(teams).data
+                    .filter((t): t is typeof t & { roomId: string } => t.roomId != null && roomIds.has(t.roomId))
+                    .map((t) => ({
+                        _id: t._id,
+                        name: t.name ?? '',
+                        roomId: t.roomId,
+                        type: t.type ?? 0,
+                    }))
+                return (
+                    <DeleteTeamsOutOfRoomsContent teamsForRoom={teamsForRoom} smallTeams={teamsForRoom}/>
+                )
+            }}
         />
     )
 }

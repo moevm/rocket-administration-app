@@ -12,19 +12,23 @@ import {
     FormMessage
 } from "@/components/ui/form.tsx";
 import {Input} from "@/components/ui/input.tsx";
+import {Checkbox} from "@/components/ui/checkbox.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {$api, createMutationOptions, loaded, queryClient} from "@/api";
 import {
     $smtpSettings,
     $selectedSpaceId,
     ApiSmtpSettingsModel,
-    $spacesQueryOptions, $spaces, $selectedSpace, ApiSpaceModel, $roomsQueryOptions, $smtpSettingsQueryOptions
+    $selectedSpace,
+    ApiSpaceModel,
+    $smtpSettingsQueryOptions
 } from "@/store/global-store.ts";
 import {useAtomValue} from "jotai/index";
 import {BatchLoader} from "@/components/app/DataLoader.tsx";
 import {Loader2} from "lucide-react";
 import {registerSchema} from "@/lib/form.ts";
 import {useInvalidateSpace} from "@/api/invalidate.ts";
+import EmailTemplatesSettings from "@/routes/spaces/dashboard/settings/EmailTemplatesSettings.tsx";
 
 
 const smtpSettingsSchema = z.object({
@@ -46,8 +50,21 @@ const smtpSettingsSchema = z.object({
             .nonnegative("Ожидается положительное число")
     ),
     path: z.string().optional(),
-    sender: z.string().email()
+    sender: z.string().email(),
+    use_tls: z.boolean().default(false)
 })
+
+const safeDecodeUrlComponent = (value: string) => {
+    if (!value) {
+        return "";
+    }
+
+    try {
+        return decodeURIComponent(value);
+    } catch {
+        return value;
+    }
+}
 
 function EditSpaceContent(props: {
     space: ApiSpaceModel
@@ -194,13 +211,14 @@ function SMTPSettingsContent(props: {
     }))
 
     function onSubmit(values: z.infer<typeof smtpSettingsSchema>) {
-        const {login, password, host, port, path, sender} = values;
-        const fullUrl = `smtp://${login}:${password}@${host}:${port}${path ? `/${path}` : ''}`;
+        const {login, password, host, port, path, sender, use_tls} = values;
+        const fullUrl = `smtp://${encodeURIComponent(login)}:${encodeURIComponent(password)}@${host}:${port}${path ? `/${path}` : ''}`;
 
         mutate({
             body: {
                 host: fullUrl,
-                sender: sender
+                sender: sender,
+                use_tls: use_tls
             },
             params: {
                 path: {
@@ -212,16 +230,17 @@ function SMTPSettingsContent(props: {
 
     const initialFormValues = {
         login: props.smtpSettings?.value?.host ?
-            new URL(props.smtpSettings.value?.host).username : '',
+            safeDecodeUrlComponent(new URL(props.smtpSettings.value?.host).username) : '',
         password: props.smtpSettings?.value?.host ?
-            new URL(props.smtpSettings.value?.host).password : '',
+            safeDecodeUrlComponent(new URL(props.smtpSettings.value?.host).password) : '',
         host: props.smtpSettings?.value?.host ?
             new URL(props.smtpSettings.value?.host).hostname : '',
         port: props.smtpSettings?.value?.host ?
             new URL(props.smtpSettings.value?.host).port : '',
         path: props.smtpSettings?.value?.host ?
             new URL(props.smtpSettings.value?.host).pathname.slice(1) : '',
-        sender: props.smtpSettings?.value?.sender || ''
+        sender: props.smtpSettings?.value?.sender || '',
+        use_tls: props.smtpSettings?.value?.use_tls ?? false
     };
 
     const form = useForm<z.infer<typeof smtpSettingsSchema>>({
@@ -314,7 +333,7 @@ function SMTPSettingsContent(props: {
                             <span>SMTP-URL</span>
                             <div className="p-2 rounded border bg-muted/50 overflow-hidden">
                                 <code className="text-sm break-all whitespace-pre-wrap">
-                                    {`smtp://${form.watch("login") || "login"}:${form.watch("password") || "password"}@${form.watch("host") || "host"}:${form.watch("port") || "port"}${form.watch("path") ? `/${form.watch("path")}` : ""}`}
+                                    {`smtp://${encodeURIComponent(form.watch("login") || "login")}:${encodeURIComponent(form.watch("password") || "password")}@${form.watch("host") || "host"}:${form.watch("port") || "port"}${form.watch("path") ? `/${form.watch("path")}` : ""}`}
                                 </code>
                             </div>
                         </div>
@@ -329,6 +348,25 @@ function SMTPSettingsContent(props: {
                                         <Input {...field} />
                                     </FormControl>
                                     <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="use_tls"
+                            render={({field}) => (
+                                <FormItem className="flex flex-row items-start space-x-3 space-y-0 py-2">
+                                    <FormControl>
+                                        <Checkbox
+                                            checked={field.value}
+                                            onCheckedChange={field.onChange}
+                                        />
+                                    </FormControl>
+                                    <div className="space-y-1 leading-none">
+                                        <FormLabel>
+                                            Использовать SSL/TLS
+                                        </FormLabel>
+                                    </div>
                                 </FormItem>
                             )}
                         />
@@ -354,16 +392,22 @@ function SettingsPageContent(props: {
     space: ApiSpaceModel
 }) {
     return (
-        <div className="flex flex-col m-6 h-screen max-w-screen-lg w-screen py-4 ml-6">
+        <div className="flex flex-col max-w-[1160px] w-full p-4">
             <span className="text-4xl">Настройки</span>
 
-            <div className="mt-6 flex space-x-6 w-full">
+            <div className="mt-6 flex flex-wrap gap-6 w-full">
                 <div className="w-[550px]">
                     <SMTPSettingsContent smtpSettings={props.smtpSetting}/>
                 </div>
                 <div className="w-[550px]">
                     <EditSpaceContent space={props.space}/>
                 </div>
+            </div>
+            <div className="mt-6 w-full">
+                <EmailTemplatesSettings
+                    spaceId={props.space._id ?? ""}
+                    spaceUrl={String(props.space.url)}
+                />
             </div>
         </div>
     )

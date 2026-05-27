@@ -1,5 +1,5 @@
 import {Button} from "@/components/ui/button.tsx";
-import {Filter, X} from "lucide-react";
+import {Filter, X, EyeIcon} from "lucide-react";
 import * as React from "react";
 import {useCallback, useEffect, useMemo, useState} from "react";
 import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle} from "@/components/ui/dialog";
@@ -227,11 +227,15 @@ function TableFilters<TData>(
     {
         table,
         filters,
-        onFiltersUpdated
+        onFiltersUpdated,
+        showOnlySelected, 
+        onShowOnlySelectedChange
     }: {
         table: Table<TData>,
         filters: FilterConfig[],
-        onFiltersUpdated: (data: FilterConfig[]) => void
+        onFiltersUpdated: (data: FilterConfig[]) => void,
+        showOnlySelected: boolean,
+        onShowOnlySelectedChange: (value: boolean) => void
     }
 ) {
     // const [filters, setFilters] = useState<FilterConfig[]>([]);
@@ -275,6 +279,14 @@ function TableFilters<TData>(
             <Button variant="outline" onClick={() => addFilter()}>
                 <Filter/>
                 Добавить фильтр
+            </Button>   
+            <Button
+                variant={showOnlySelected ? "default" : "outline"}
+                size="sm"
+                onClick={() => onShowOnlySelectedChange(!showOnlySelected)}
+            >
+                <EyeIcon className="mr-2 h-4 w-4" />
+                {showOnlySelected ? "Показать все" : "Только выделенные"}
             </Button>
             {filters.map(((filter, i) => (
                 <FilterDisplay

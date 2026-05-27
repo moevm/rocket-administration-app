@@ -1,3 +1,4 @@
+import type {ReactNode} from "react";
 import {atom, WritableAtom} from "jotai";
 import {$api, loadableQuery} from "@/api";
 import {atomWithQuery} from 'jotai-tanstack-query'
@@ -281,10 +282,33 @@ export const $selectedTeamsData = atom<{
     roomId: string
 }[]>([])
 
+
+export const $prefetchedDeleteUsersOutOfRoomSmallUsers = atom<ApiRoomUserModel[] | null>(null)
+export const $prefetchedDeleteUsersOutOfTeamSmallUsers = atom<ApiRoomUserModel[] | null>(null)
+export const $prefetchedDeleteTeamFromRoomSmallRooms = atom<{
+    _id: string
+    name: string | null | undefined
+    t: string
+}[] | null>(null)
+
 export const showAddNewTeamDialogAtom = atom(false)
 export const showAddNewUserDialogAtom = atom(false)
 export const showAddNewRoomDialogAtom = atom(false)
 export const showContextMenuAtom = atom(false)
+
+export type ContextMenuData = {
+    rows: unknown[];
+    point: { x: number; y: number };
+    config: {
+        getLabel?: (rows: unknown[]) => string;
+        items: (rows: unknown[]) => ReactNode;
+    } | null;
+}
+export const contextMenuDataAtom = atom<ContextMenuData>({
+    rows: [],
+    point: { x: 0, y: 0 },
+    config: null,
+})
 
 export const $searchColumnsAtomFamily = atomFamily<string, WritableAtom<string[], [string[]], void>>(
     (id: string) => atomWithStorage(`${id}_search`, [] as string[], undefined, {getOnInit: true})
